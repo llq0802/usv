@@ -84,7 +84,7 @@
 </template>
 
 <script>
-import { fetchData } from '../api/index';
+import { fetchData } from '../api/login';
 export default {
     name: 'basetable',
     data() {
