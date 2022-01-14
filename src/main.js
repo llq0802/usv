@@ -13,7 +13,8 @@ import 'babel-polyfill';
 Vue.config.productionTip = false;
 Vue.use(VueI18n);
 Vue.use(ElementUI, {
-    size: 'small'
+    size: 'small' //小号
+    // size: 'mini' //超小号
 });
 const i18n = new VueI18n({
     locale: 'zh',

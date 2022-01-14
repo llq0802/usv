@@ -5,7 +5,7 @@
             <i v-if="!collapse" class="el-icon-s-fold"></i>
             <i v-else class="el-icon-s-unfold"></i>
         </div>
-        <div class="logo">船舶智能调度管理平台</div>
+        <div class="logo">{{ headerTitle }}</div>
         <div class="header-right">
             <div class="header-user-con">
                 <!-- 全屏显示 -->
@@ -46,9 +46,13 @@
 </template>
 <script>
 import bus from '@/utils/bus';
+import { headerTitle } from '@/config';
+
 export default {
     data() {
         return {
+            //标题名称
+            headerTitle: Object.freeze(headerTitle),
             collapse: false,
             fullscreen: false,
             name: 'linxin',
