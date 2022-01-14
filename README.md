@@ -1,179 +1,93 @@
-# vue-manage-system
-
-<a href="https://github.com/vuejs/vue">
-    <img src="https://img.shields.io/badge/vue-2.6.10-brightgreen.svg" alt="vue">
-  </a>
-  <a href="https://github.com/ElemeFE/element">
-    <img src="https://img.shields.io/badge/element--ui-2.8.2-brightgreen.svg" alt="element-ui">
-  </a>
-  <a href="https://github.com/lin-xin/vue-manage-system/blob/master/LICENSE">
-    <img src="https://img.shields.io/github/license/mashape/apistatus.svg" alt="license">
-  </a>
-  <a href="https://github.com/lin-xin/vue-manage-system/releases">
-    <img src="https://img.shields.io/github/release/lin-xin/vue-manage-system.svg" alt="GitHub release">
-  </a>
-  <a href="https://lin-xin.gitee.io/example/work/#/donate">
-    <img src="https://img.shields.io/badge/%24-donate-ff69b4.svg" alt="donate">
-  </a>
-
-基于 Vue + Element UI 的后台管理系统解决方案。[线上地址](https://lin-xin.gitee.io/example/work/)
-
-> React + Ant Design 的版本正在开发中，仓库地址：[react-manage-system](https://github.com/lin-xin/react-manage-system)
-
-[English document](https://github.com/lin-xin/manage-system/blob/master/README_EN.md)
-
-## 项目截图
-
-### 登录
-
-![Image text](https://github.com/lin-xin/manage-system/raw/master/screenshots/wms3.png)
-
-### 默认皮肤
-
-![Image text](https://github.com/lin-xin/manage-system/raw/master/screenshots/wms1.png)
-
-### 浅绿色皮肤
-
-![Image text](https://github.com/lin-xin/manage-system/raw/master/screenshots/wms2.png)
-
-## 赞赏
-
-请作者喝杯咖啡吧！(微信号：linxin_20)
-
-![微信扫一扫](https://lin-xin.gitee.io/images/weixin.jpg)
-
-## 特别鸣谢
-
-- [实验楼](https://www.shiyanlou.com?source=vue-manage-system)
-
-## 前言
-
-该方案作为一套多功能的后台框架模板，适用于绝大部分的后台管理系统（Web Management System）开发。基于 vue.js，使用 vue-cli3 脚手架，引用 Element UI 组件库，方便开发快速简洁好看的组件。分离颜色样式，支持手动切换主题色，而且很方便使用自定义主题色。
-
-## 功能
-
--   [x] Element UI
--   [x] 登录/注销
--   [x] Dashboard
--   [x] 表格
--   [x] Tab 选项卡
--   [x] 表单
--   [x] 图表 :bar_chart:
--   [x] 富文本编辑器
--   [x] markdown 编辑器
--   [x] 图片拖拽/裁剪上传
--   [x] 支持切换主题色 :sparkles:
--   [x] 列表拖拽排序
--   [x] 权限测试
--   [x] 404 / 403
--   [x] 三级菜单
--   [x] 自定义图标
--   [x] 可拖拽弹窗
--   [x] 国际化
-
-## 安装步骤
+## 一、 安装步骤
 
 ```
-git clone https://github.com/lin-xin/vue-manage-system.git      // 把模板下载到本地
-cd vue-manage-system    // 进入模板目录
-npm install         // 安装项目依赖，等待安装完成之后，安装失败可用 cnpm 或 yarn
+npm install  // 安装项目依赖，等待安装完成之后，安装失败可用 cnpm 或 yarn
 
 // 开启服务器，浏览器访问 http://localhost:8080
-npm run serve
+npm  start
 
 // 执行构建命令，生成的dist文件夹放在服务器下即可访问
 npm run build
+
 ```
 
-## 组件使用说明与演示
+### 目录结构
 
-### vue-schart
+```
+-src
+│
+│  App.vue 根组件
+│  main.js 根入口js
+│
+│
+├─api 网络请求api
+│  │  request.js 封装的axios请求
+│  │
+│  └─login
+│          index.js
+│
+├─assets
+│  ├─css 样式文件
+│  │  │  base.css 公共样式文件
+│  │  │  color-dark.css 暗黑主题样式
+│  │  │  icon.css 图标样式
+│  │  │
+│  │  └─theme-green 浅绿色主题样式
+│  │      │  color-green.css
+│  │      │  index.css
+│  │      │
+│  │      └─fonts 字体图标
+│  │              element-icons.ttf
+│  │              element-icons.woff
+│  │
+│  └─img 图片文件
+│          img.jpg
+│          login-bg.jpg
+│          logo.png
+│
+├─components
+│  ├─amap 地图组件
+│  │      Amap.vue
+│  │
+│  └─common 页面公共组件
+│          Header.vue
+│          Home.vue
+│          Sidebar.vue
+│          Tags.vue
+│
+├─config 配置文件
+│      index.js
+│
+├─lang 国际化语言
+│      i18n.js
+│
+├─pages 路由页面
+│  ├─403
+│  │      403.vue
+│  │
+│  ├─404
+│  │      404.vue
+│  │
+│  ├─home
+│  │      Dashboard.vue
+│  │
+│  ├─login
+│  │      Login.vue
+│  │
+│  └─Permission
+│          Permission.vue│
+│
+├─router 路由配置
+│      index.js
+│
+└─utils 工具函数
+        bus.js
+        directives.js
+        index.js
 
-vue.js 封装 sChart.js 的图表组件。访问地址：[vue-schart](https://github.com/linxin/vue-schart)
-
-<p><a href="https://www.npmjs.com/package/vue-schart"><img src="https://img.shields.io/npm/dm/vue-schart.svg" alt="Downloads"></a></p>
-
-```html
-<template>
-    <div>
-        <schart class="wrapper" canvasId="myCanvas" :options="options"></schart>
-    </div>
-</template>
-
-<script>
-    import Schart from 'vue-schart'; // 导入Schart组件
-    export default {
-        data() {
-            return {
-                options: {
-                    type: 'bar',
-                    title: {
-                        text: '最近一周各品类销售图'
-                    },
-                    labels: ['周一', '周二', '周三', '周四', '周五'],
-                    datasets: [
-                        {
-                            label: '家电',
-                            data: [234, 278, 270, 190, 230]
-                        },
-                        {
-                            label: '百货',
-                            data: [164, 178, 190, 135, 160]
-                        },
-                        {
-                            label: '食品',
-                            data: [144, 198, 150, 235, 120]
-                        }
-                    ]
-                }
-            };
-        },
-        components: {
-            Schart
-        }
-    };
-</script>
-<style>
-    .wrapper {
-        width: 7rem;
-        height: 5rem;
-    }
-</style>
 ```
 
-## 其他注意事项
-
-### 一、如果我不想用到上面的某些组件呢，那我怎么在模板中删除掉不影响到其他功能呢？
-
-举个栗子，我不想用 Vue-Quill-Editor 这个组件，那我需要分四步走。
-
-第一步：删除该组件的路由，在目录 src/router/index.js 中，找到引入改组件的路由，删除下面这段代码。
-
-```JavaScript
-{
-    // 富文本编辑器组件
-    path: '/editor',
-    component: resolve => require(['../components/page/VueEditor.vue'], resolve)
-},
-```
-
-第二步：删除引入该组件的文件。在目录 src/components/page/ 删除 VueEditor.vue 文件。
-
-第三步：删除该页面的入口。在目录 src/components/common/Sidebar.vue 中，找到该入口，删除下面这段代码。
-
-```js
-{
-	index: 'editor',
-	title: '富文本编辑器'
-},
-```
-
-第四步：卸载该组件。执行以下命令：
-npm un vue-quill-editor -S
-
-完成。
-
-### 二、如何切换主题色呢？
+## 二、如何切换主题色呢？
 
 第一步：打开 src/main.js 文件，找到引入 element 样式的地方，换成浅绿色主题。
 
@@ -188,10 +102,64 @@ import 'element-ui/lib/theme-default/index.css'; // 默认主题
 @import "./assets/css/main.css";
 @import "./assets/css/color-dark.css";     /*深色主题*/
 /*@import "./assets/css/theme-green/color-green.css";   !*浅绿色主题*!*/
+第三步：打开 src/components/common/Sidebar.vue 文件，找到 el-menu 标签，把 background-color/text-color/active-text-color 属性去掉即可。
 ```
 
-第三步：打开 src/components/common/Sidebar.vue 文件，找到 el-menu 标签，把 background-color/text-color/active-text-color 属性去掉即可。
+## 三、说明
 
-## License
+1.  > 航段的类型未指定 'Unspecified' type = 0
+    > 坐标导航航段 'DirectToLocation' type = 1
+    > 航标导航航段 'DirectToNavaid' type = 2
+    > 航道导航航段 'ViaWaterway' type = 3
+    > 标准离港程序航段 'Sid' type = 4
+    > 标准进港程序航段 'Star' type = 5
+    > 进港泊位过渡段 'InboundBerthTransition' type = 6
+    > 离港泊位过渡段 'OutboundBerthTransition' type = 7
+    > 进港航道过渡段 'InboundEnrouteTransition' type = 8
+    > 离港航道过渡段 'OutboundEnrouteTransition' type = 9
 
-[MIT](https://github.com/lin-xin/vue-manage-system/blob/master/LICENSE)
+-   2.  > 当前航线:'#227be0', 进港航段:'#976F02', 离港航段:'#00C227';
+        > 航道高亮:'#26A4BA', 航段高亮:'#011932';
+
+## 四、相关规范
+
+### 公共
+
+1. HTML、CSS、JS 等缩进均采用 soft tab（2 个空格）
+
+### CSS、Less、Scss
+
+1. 类名使用小写字母，以中划线分隔 例如'top-box' ;id 采用驼峰式命名
+
+### JS
+
+1. 语句结束后必须加 `;` 分号结尾
+
+2. 变量和方法名采用小驼峰形式，常量名采用全大写加下划线形式，类名采用大驼峰形式
+
+    ```javascript
+    // 变量
+    let testNum = 1;
+
+    // 方法
+    function testFunc() {}
+
+    // 常量
+    const MAX_NUM = 20;
+
+    // 类名
+    function BigPerson() {}
+    class Dep {}
+    ```
+
+3. 所有文件名用小写，过长时写加 "-" 分割的形式，如 "cultural-boutique "、 "tourism-boutique，不允许大写文件名"
+
+4. 公共组件，放在 src/components 文件夹中
+
+5. 私有组件，存放在对应页面下的 "components" 文件夹中，并且组件文件夹以 "S-" 开头命名，如私有 login "S-Login-说明功能 "
+
+6. vue 文件名必须大写字母开头，文件代码控制在 500 行内，必要时应抽取部分代码在对应页面下的 JS 文件中
+
+7. 事件处理方法命名由 "handle" + "相关元素" + "事件名" 组成。 如处理导航栏子元素点击事件的方法 `handleNavItemClick`
+
+8. 网请求函数命名由 api + '其他' ，命名要根据请求内容合理命名。

@@ -13,13 +13,12 @@ body,
 }
 
 body {
-    font-family: 'PingFang SC', "Helvetica Neue", Helvetica, "microsoft yahei", arial, STHeiTi, sans-serif;
+    font-family: 'PingFang SC', 'Helvetica Neue', Helvetica, 'microsoft yahei', arial, STHeiTi, sans-serif;
 }
 
 a {
-    text-decoration: none
+    text-decoration: none;
 }
-
 
 .content-box {
     position: absolute;
@@ -28,8 +27,8 @@ a {
     top: 70px;
     bottom: 0;
     padding-bottom: 30px;
-    -webkit-transition: left .3s ease-in-out;
-    transition: left .3s ease-in-out;
+    -webkit-transition: left 0.3s ease-in-out;
+    transition: left 0.3s ease-in-out;
     background: #f0f0f0;
 }
 
@@ -70,7 +69,7 @@ a {
     margin-bottom: 20px;
 }
 
-.el-button+.el-tooltip {
+.el-button + .el-tooltip {
     margin-left: 10px;
 }
 
@@ -84,7 +83,7 @@ a {
 
 .move-enter-active,
 .move-leave-active {
-    transition: opacity .5s;
+    transition: opacity 0.5s;
 }
 
 .move-enter,
@@ -154,24 +153,4 @@ a {
 
 .el-upload--text em {
     font-style: normal;
-}
-
-/*VueEditor*/
-
-.ql-container {
-    min-height: 400px;
-}
-
-.ql-snow .ql-tooltip {
-    transform: translateX(117.5px) translateY(10px) !important;
-}
-
-.editor-btn {
-    margin-top: 20px;
-}
-
-/*markdown*/
-
-.v-note-wrapper .v-note-panel {
-    min-height: 500px;
 }
