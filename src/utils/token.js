@@ -1,3 +1,5 @@
+import jwt_decode from 'jwt-decode';
+
 /**
  * 监听token过期时间,更新token
  * @return: Boolean
@@ -13,8 +15,8 @@ export const updateToken = async (timer, config) => {
         // 解析token并且遍历取出数据
         let objToken = jwt_decode(res.data.token);
         let arrayToken = [];
-        for (let i in objToken) {
-            arrayToken.push(objToken[i]);
+        for (let item of objToken) {
+            arrayToken.push(item);
         }
         // 更新token
         window.localStorage.setItem('token', res.data.token);

@@ -74,7 +74,7 @@ export const constant = {
     colorArray: (val) => colorArray.get(val)
 };
 //系统名称
-export const headerTitle = '船舶智能调度管理平台';
+export const HEADER_TITLE = '船舶智能调度管理平台';
 
 //侧边栏数组
 export const SIDERBAR_TREE = [
@@ -85,39 +85,8 @@ export const SIDERBAR_TREE = [
     },
     {
         icon: 'el-icon-lx-cascades',
-        index: 'table',
+        index: 'user',
         title: '基础表格'
-    },
-    {
-        icon: 'el-icon-lx-calendar',
-        index: '3',
-        title: '表单相关',
-        subs: [
-            {
-                index: 'form',
-                title: '基本表单'
-            },
-
-            {
-                index: 'upload',
-                title: '文件上传'
-            }
-        ]
-    },
-    {
-        icon: 'el-icon-rank',
-        index: '6',
-        title: '拖拽组件',
-        subs: [
-            {
-                index: 'drag',
-                title: '拖拽列表'
-            },
-            {
-                index: 'dialog',
-                title: '拖拽弹框'
-            }
-        ]
     },
     {
         icon: 'el-icon-lx-global',

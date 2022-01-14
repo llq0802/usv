@@ -1,9 +1,9 @@
 import request from '../request';
 
-export const fetchData = (query) => {
+export const apiSigninLogin = (params) => {
     return request({
-        url: './table.json',
-        method: 'get',
-        params: query
+        url: '/auth/signin',
+        method: 'post',
+        data: params
     });
 };

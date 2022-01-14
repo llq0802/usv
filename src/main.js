@@ -3,7 +3,7 @@ import App from './App.vue';
 import router from './router';
 import ElementUI from 'element-ui';
 import VueI18n from 'vue-i18n';
-import { messages } from './lang/i18n';
+import { messagesI18n } from './lang/i18n';
 import 'element-ui/lib/theme-chalk/index.css'; // 默认主题
 // import './assets/css/theme-green/index.css'; // 浅绿色主题
 import './assets/css/icon.css';
@@ -14,11 +14,13 @@ Vue.config.productionTip = false;
 Vue.use(VueI18n);
 Vue.use(ElementUI, {
     size: 'small' //小号
-    // size: 'mini' //超小号
 });
+//全局修改默认配置，点击空白处不能关闭弹窗dialog
+ElementUI.Dialog.props.closeOnClickModal.default = false;
+
 const i18n = new VueI18n({
     locale: 'zh',
-    messages
+    messagesI18n
 });
 
 new Vue({

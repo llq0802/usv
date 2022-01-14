@@ -118,8 +118,8 @@ import 'element-ui/lib/theme-default/index.css'; // 默认主题
     > 进港航道过渡段 'InboundEnrouteTransition' type = 8
     > 离港航道过渡段 'OutboundEnrouteTransition' type = 9
 
--   2.  > 当前航线:'#227be0', 进港航段:'#976F02', 离港航段:'#00C227';
-        > 航道高亮:'#26A4BA', 航段高亮:'#011932';
+2.  > 当前航线:'#227be0', 进港航段:'#976F02', 离港航段:'#00C227';
+    > 航道高亮:'#26A4BA', 航段高亮:'#011932';
 
 ## 四、相关规范
 

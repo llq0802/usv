@@ -1,5 +1,5 @@
-export const messages = {
-    'zh': {
+export const messagesI18n = {
+    zh: {
         i18n: {
             breadcrumb: '国际化产品',
             tips: '通过切换语言按钮，来改变当前内容的语言。',
@@ -13,18 +13,18 @@ export const messages = {
             value: '文档'
         }
     },
-    'en': {
+    en: {
         i18n: {
             breadcrumb: 'International Products',
             tips: 'Click on the button to change the current language. ',
             btn: 'Switch Chinese',
             title1: 'Common usage',
-            p1: "If you reveal your secrets to the wind you should not blame the wind for  revealing them to the trees.",
-            p2: "Nothing can help us endure dark times better than our faith. ",
+            p1: 'If you reveal your secrets to the wind you should not blame the wind for  revealing them to the trees.',
+            p2: 'Nothing can help us endure dark times better than our faith. ',
             p3: "If you can do what you do best and be happy, you're further along in life  than most people.",
             title2: 'Component interpolation',
             info: 'The default language of Element is Chinese. If you wish to use another language, please refer to the {action}.',
             value: 'documentation'
         }
     }
-}
+};

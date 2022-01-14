@@ -18,27 +18,9 @@ const routes = [
                 meta: { title: '系统首页' }
             },
             {
-                path: '/table',
-                component: () => import(/* webpackChunkName: "table" */ '../pages/BaseTable.vue'),
+                path: '/user',
+                component: () => import(/* webpackChunkName: "user" */ '../pages/user/User.vue'),
                 meta: { title: '基础表格' }
-            },
-            {
-                path: '/form',
-                component: () => import(/* webpackChunkName: "form" */ '../pages/BaseForm.vue'),
-                meta: { title: '基本表单' }
-            },
-
-            {
-                // 拖拽列表组件
-                path: '/drag',
-                component: () => import(/* webpackChunkName: "drag" */ '../pages/DragList.vue'),
-                meta: { title: '拖拽列表' }
-            },
-            {
-                // 拖拽Dialog组件
-                path: '/dialog',
-                component: () => import(/* webpackChunkName: "dragdialog" */ '../pages/DragDialog.vue'),
-                meta: { title: '拖拽弹框' }
             },
             {
                 // 国际化组件
@@ -49,7 +31,7 @@ const routes = [
             {
                 // 权限页面
                 path: '/permission',
-                component: () => import(/* webpackChunkName: "permission" */ '../pages/Permission/Permission.vue'),
+                component: () => import(/* webpackChunkName: "permission" */ '../pages/permissions/Permission.vue'),
                 meta: { title: '权限测试', permission: true }
             },
             {
