@@ -17,29 +17,8 @@ const routes = [
                 component: () => import(/* webpackChunkName: "dashboard" */ '../pages/home/Dashboard.vue'),
                 meta: { title: '系统首页' }
             },
-            {
-                path: '/table',
-                component: () => import(/* webpackChunkName: "table" */ '../pages/BaseTable.vue'),
-                meta: { title: '基础表格' }
-            },
-            {
-                path: '/form',
-                component: () => import(/* webpackChunkName: "form" */ '../pages/BaseForm.vue'),
-                meta: { title: '基本表单' }
-            },
-
-            {
-                // 拖拽列表组件
-                path: '/drag',
-                component: () => import(/* webpackChunkName: "drag" */ '../pages/DragList.vue'),
-                meta: { title: '拖拽列表' }
-            },
-            {
-                // 拖拽Dialog组件
-                path: '/dialog',
-                component: () => import(/* webpackChunkName: "dragdialog" */ '../pages/DragDialog.vue'),
-                meta: { title: '拖拽弹框' }
-            },
+            
+           
             {
                 // 国际化组件
                 path: '/i18n',
@@ -47,21 +26,15 @@ const routes = [
                 meta: { title: '国际化' }
             },
             {
-                // 权限页面
-                path: '/permission',
-                component: () => import(/* webpackChunkName: "permission" */ '../pages/Permission/Permission.vue'),
-                meta: { title: '权限测试', permission: true }
-            },
-            {
                 path: '/404',
                 component: () => import(/* webpackChunkName: "404" */ '../pages/404/404.vue'),
                 meta: { title: '404' }
             },
             {
-                path: '/403',
-                component: () => import(/* webpackChunkName: "403" */ '../pages/403/403.vue'),
-                meta: { title: '403' }
-            }
+              path: '/test',
+              component: () => import(/* webpackChunkName: "test" */ '../pages/MapTest.vue'),
+              meta: { title: '测试专用' }
+          }
         ]
     },
     {

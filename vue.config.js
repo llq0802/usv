@@ -3,11 +3,10 @@ module.exports = {
     publicPath: './',
     outputDir: 'dist',
     assetsDir: 'static',
-    devtool: process.env.NODE_ENV === 'production' ? 'eval-cheap-source-map' : 'source-map', //'source-map',
     lintOnSave: process.env.NODE_ENV !== 'production',
     productionSourceMap: process.env.NODE_ENV !== 'production',
     configureWebpack: {
-        devtool: 'source-map',
+        devtool: process.env.NODE_ENV === 'production' ? 'eval-cheap-source-map' : 'source-map', //'source-map',
         resolve: {
             // 重定义路径
             alias: {
