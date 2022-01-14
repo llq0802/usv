@@ -23,12 +23,6 @@ const routes = [
                 meta: { title: '基础表格' }
             },
             {
-                // 国际化组件
-                path: '/i18n',
-                component: () => import(/* webpackChunkName: "i18n" */ '../pages/I18n.vue'),
-                meta: { title: '国际化' }
-            },
-            {
                 // 权限页面
                 path: '/permission',
                 component: () => import(/* webpackChunkName: "permission" */ '../pages/permissions/Permission.vue'),
@@ -40,9 +34,9 @@ const routes = [
                 meta: { title: '404' }
             },
             {
-                path: '/403',
-                component: () => import(/* webpackChunkName: "403" */ '../pages/403/403.vue'),
-                meta: { title: '403' }
+                path: '/test',
+                component: () => import(/* webpackChunkName: "test" */ '../pages/MapTest.vue'),
+                meta: { title: '测试专用' }
             }
         ]
     },
