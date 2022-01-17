@@ -25,10 +25,10 @@ module.exports = {
         proxy: {
             '/api': {
                 target: process.env.VUE_APP_API_BASE_PATH, //环境变量控制访问地址
-                // target:'https://usv.tongji.cq.cn/',   //'http://192.168.110.224:8766',  //访问的后端服务器地址    ----接口的前半段
+                // target:'https://usv.tongji.cq.cn/',   //'http://192.168.110.234:8766',  //访问的后端服务器地址    ----接口的前半段
                 changeOrigin: true, //是否跨域
                 pathRewrite: {
-                    // '^/api':'/api'   //路径重写 --作用不大,可以省略
+                    // '^/api':''
                 }
             }
         }

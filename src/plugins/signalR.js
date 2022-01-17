@@ -1,10 +1,10 @@
-//引入安装的signalr包<br>
+//引入安装的signalr包
 import * as signalR from '@aspnet/signalr';
-import { signalrUrl } from '@/utils';
+import { SIGNALR_Url } from '@/utils';
 import Vue from 'vue';
 // 定期检查token是否过期
 import { checkTokenTime } from '@/utils/common';
-
+const token = window.localStorage.getItem('token');
 export default class SocketService {
     // signalR实例
     ws = null;
@@ -26,7 +26,7 @@ export default class SocketService {
     //连接
     async content() {
         this.ws = new signalR.HubConnectionBuilder()
-            .withUrl(signalrUrl, { accessTokenFactory: () => window.localStorage.getItem('token') })
+            .withUrl(SIGNALR_Url, { accessTokenFactory: () => window.localStorage.getItem('token') })
             .build();
         try {
             if (
@@ -111,9 +111,7 @@ let dataCallbacks = new Map();
 
 // 连接是否成功
 let isconnected = false;
-const signal = new signalR.HubConnectionBuilder()
-    .withUrl(signalrUrl, { accessTokenFactory: () => window.localStorage.getItem('token') })
-    .build();
+const signal = new signalR.HubConnectionBuilder().withUrl(SIGNALR_Url, { accessTokenFactory: () => token }).build();
 
 // 直接开始连接
 export function subscribe(e, id, callback) {

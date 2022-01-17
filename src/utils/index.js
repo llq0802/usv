@@ -67,7 +67,7 @@ export function returnMessage(message) {
             errorMessage = '请求错误';
             break;
         case 403:
-            errorMessage = '请求错误';
+            errorMessage = '权限不可用';
             break;
         case 404:
             errorMessage = '请求错误,未找到资源';
@@ -79,19 +79,19 @@ export function returnMessage(message) {
             errorMessage = '请求超时';
             break;
         case 500:
-            errorMessage = '服务器出错';
+            errorMessage = '服务器忙，请稍后再试';
             break;
         case 501:
             errorMessage = '网络未实现';
             break;
         case 502:
-            errorMessage = '网络错误';
+            errorMessage = '网络发生了错误';
             break;
         case 503:
-            errorMessage = '服务不可用';
+            errorMessage = '服务暂时不可用';
             break;
         case 504:
-            errorMessage = '网络超时';
+            errorMessage = '网络连接超时了';
             break;
         case 505:
             errorMessage = 'http版本不支持该请求';

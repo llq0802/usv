@@ -4,7 +4,7 @@ import router from './router';
 
 import './plugins/elementui';
 import './assets/css/icon.less';
-import './utils/directives';
+import './plugins/directives';
 import 'babel-polyfill';
 
 Vue.config.productionTip = false;

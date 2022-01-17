@@ -2,7 +2,7 @@
     <div class="sidebar">
         <el-menu
             class="sidebar-el-menu"
-            :default-active="onRoutes"
+            :default-active="$route.path"
             :collapse="collapse"
             background-color="#324157"
             text-color="#bfcbd9"
@@ -49,12 +49,7 @@ export default {
             items: SIDERBAR_TREE
         };
     },
-    computed: {
-        onRoutes() {
-            return this.$route.path.replace('/', '');
-        }
-    },
-    created() {
+    mounted() {
         // 通过 Event Bus 进行组件间通信，来折叠侧边栏
         bus.$on('collapse', (msg) => {
             this.collapse = msg;

@@ -16,7 +16,8 @@ h2,
 h3,
 h4,
 h4,
-h5 {
+h5,
+p {
     margin: 0;
     padding: 0;
 }
@@ -44,6 +45,7 @@ img {
     border: 0 none;
     vertical-align: middle;
 }
+
 /*右边大盒子*/
 .wrapper .content-box {
     position: absolute;
@@ -65,15 +67,14 @@ img {
     overflow-y: auto;
     box-sizing: border-box;
 }
-
+/*折叠栏距离 */
 .wrapper .content-collapse {
     left: 65px;
 }
-
 .content-box > .content .container {
     padding: 30px;
     background: #fff;
-    border: 1px solid #ddd;
+    border: 0;
     border-radius: 5px;
 }
 
@@ -109,7 +110,7 @@ img {
 
 .move-enter-active,
 .move-leave-active {
-    transition: opacity 0.5s;
+    transition: opacity 0.3s;
 }
 
 .move-enter,

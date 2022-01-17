@@ -7,6 +7,7 @@
             <div class="content">
                 <transition name="move" mode="out-in">
                     <keep-alive :include="tagsList">
+                        <!-- key能使组件不复用 -->
                         <router-view :key="$route.fullPath"></router-view>
                     </keep-alive>
                 </transition>
@@ -33,7 +34,7 @@ export default {
         vSidebar,
         vTags
     },
-    created() {
+    mounted() {
         bus.$on('collapse-content', (msg) => {
             this.collapse = msg;
         });

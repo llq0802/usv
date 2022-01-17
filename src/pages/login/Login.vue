@@ -23,13 +23,15 @@
 </template>
 
 <script>
+import jwt_decode from 'jwt-decode';
+import { HEADER_TITLE, MESSAGE } from '@/config';
 import { apiSigninLogin } from 'api/login';
-import { HEADER_TITLE } from '@/config';
+import { setStorage } from '@/utils/localStorage';
 
 export default {
     data() {
         return {
-            HEADER_TITLE: Object.freeze(HEADER_TITLE),
+            HEADER_TITLE: Object.freeze(HEADER_TITLE), //系统名称
             param: {
                 userName: process.env.VUE_APP_DEFAULT_ACCOUNT,
                 password: process.env.VUE_APP_DEFAULT_PASSWORD
@@ -43,15 +45,36 @@ export default {
     },
     methods: {
         submitForm() {
-            this.$refs.login.validate((valid) => {
+            this.$refs.login.validate(async (valid) => {
                 if (valid) {
+                    const params = this.param;
                     this.loginLoading = true;
-                    this.$message.success('登录成功');
-                    localStorage.setItem('ms_userName', this.param.userName);
-                    this.$router.push('/');
-                    this.loginLoading = false;
+                    const { data } = await apiSigninLogin(params);
+                    if (data.token) {
+                        const objToken = jwt_decode(data.token);
+                        const arrayToken = [];
+                        for (let key in objToken) {
+                            if (objToken.hasOwnProperty(key)) {
+                                arrayToken.push(objToken[key]);
+                            }
+                        }
+                        //设置本地存储
+                        setStorage('token', data.token);
+                        //过期时间
+                        setStorage('tokenTime', objToken.nbf || arrayToken[7]);
+                        //用户名
+                        setStorage('userName', this.param.userName);
+                        // 角色
+                        setStorage('role', arrayToken[4]);
+                        // 当前用户关联的公司id
+                        setStorage('organizationId', arrayToken[5]);
+                        this.loginLoading = false;
+                        this.$message.success(MESSAGE.loginSuccess);
+                        // console.log(JSON.parse(localStorage.getItem('usv')));
+                        this.$router.push('/');
+                    }
                 } else {
-                    this.$message.error('请输入账号和密码');
+                    this.$message.error(MESSAGE.loginError);
                     return false;
                 }
             });

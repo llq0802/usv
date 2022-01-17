@@ -47,6 +47,7 @@
 <script>
 import bus from '@/utils/bus';
 import { HEADER_TITLE } from '@/config';
+import { delStorage, getStorage } from '@/utils/localStorage';
 
 export default {
     data() {
@@ -60,16 +61,16 @@ export default {
     },
     computed: {
         username() {
-            let username = localStorage.getItem('ms_username');
-            return username ? username : this.name;
+            let username = getStorage('userName');
+            return username ? username : 'admin';
         }
     },
     methods: {
         // 用户名下拉菜单选择事件
         handleCommand(command) {
             if (command == 'loginout') {
-                localStorage.removeItem('ms_username');
-                this.$router.push('/login');
+                delStorage();
+                this.$router.replace('/login');
             }
         },
         // 侧边栏折叠

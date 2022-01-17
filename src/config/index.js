@@ -64,19 +64,40 @@ let colorArray = new Map([
     ['Z', '#FFEB3Bbb']
 ]);
 
-//颜色、船只状态常量
-export const constant = {
+//航线颜色、船状态常量
+export const BASE_CONSTANTS = {
     usvState: (val) => UsvStates.get(val),
     planState: (val) => PlanStates.get(val),
     channelRouter: (val) => ChannelRouters.get(val),
     returnMode: (val) => ReturnModes.get(val),
-    strokeColorList: (val) => strokeColorList.get(val % strokeColorList.size),
+    strokeColorList: (val) => strokeColorList.get(val),
     colorArray: (val) => colorArray.get(val)
 };
 //系统名称
 export const HEADER_TITLE = '船舶智能调度管理平台';
+//signalr地址
+export const SIGNALR_Url = process.env.VUE_APP_API_BASE_PATH + '/events';
+//跨域配置
+export const API = '/api';
+// localStorage存储的项目名key
+export const USV = 'usv';
+//page和size
+export const PAGE_SIZE = {
+    page: 1,
+    size: 10
+};
+//权限对应表
+export const ROLE = {
+    1: '管理员'
+};
 
-export const signalrUrl = process.env.VUE_APP_API_BASE_PATH + '/events';
+//提示信息
+export const MESSAGE = {
+    success: '设置成功',
+    error: '设置失败',
+    loginSuccess: '登录成功',
+    loginError: '请输入正确的账号和密码'
+};
 
 //侧边栏数组
 export const SIDERBAR_TREE = [
