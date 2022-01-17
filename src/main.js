@@ -8,6 +8,7 @@ import './utils/directives';
 import 'babel-polyfill';
 
 Vue.config.productionTip = false;
+Vue.config.devtools = true;
 
 new Vue({
     router,

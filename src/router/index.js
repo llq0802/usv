@@ -35,7 +35,7 @@ const routes = [
             },
             {
                 path: '/test',
-                component: () => import(/* webpackChunkName: "test" */ '../pages/MapTest.vue'),
+                component: () => import(/* webpackChunkName: "test" */ '../test.vue'),
                 meta: { title: '测试专用' }
             }
         ]

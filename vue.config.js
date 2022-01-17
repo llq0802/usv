@@ -13,7 +13,8 @@ module.exports = {
                 components: '@/components',
                 assets: '@/assets',
                 pages: '@/pages',
-                api: '@/api'
+                api: '@/api',
+                utils: '@/utils'
             }
         }
     },
