@@ -8,6 +8,7 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
+    "@aspnet/signalr": "^1.1.4",
     "axios": "^0.24.0",
     "babel-polyfill": "^6.26.0",
     "element-ui": "^2.11.0",

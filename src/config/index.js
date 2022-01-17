@@ -76,36 +76,75 @@ export const constant = {
 //系统名称
 export const HEADER_TITLE = '船舶智能调度管理平台';
 
+export const signalrUrl = process.env.VUE_APP_API_BASE_PATH + '/events';
+
 //侧边栏数组
 export const SIDERBAR_TREE = [
+    // {
+    //     icon: 'el-icon-lx-home',
+    //     index: '/',
+    //     title: '系统首页'
+    // },
     {
-        icon: 'el-icon-lx-home',
+        icon: 'el-icon-map-location',
         index: '/',
-        title: '系统首页'
+        title: '运行状态'
     },
     {
-        icon: 'el-icon-lx-cascades',
-        index: 'user',
-        title: '基础表格'
+        icon: 'el-icon-s-claim',
+        index: 'plan',
+        title: '计划管理'
+    },
+    {
+        icon: 'el-icon-lx-add',
+        index: 'planroute',
+        title: '航线管理'
     },
     {
         icon: 'el-icon-lx-global',
-        index: 'i18n',
-        title: '国际化功能'
+        index: 'waterway',
+        title: '航标航道管理'
     },
     {
-        icon: 'el-icon-lx-warn',
-        index: '7',
-        title: '错误处理',
-        subs: [
-            {
-                index: 'permission',
-                title: '权限测试'
-            },
-            {
-                index: '404',
-                title: '404页面'
-            }
-        ]
+        icon: 'el-icon-lx-info',
+        index: 'portberth',
+        title: '港口泊位管理'
+    },
+    {
+        icon: 'el-icon-lx-cascades',
+        index: 'chart',
+        title: '航图展示管理'
+    },
+    {
+        icon: 'el-icon-lx-edit',
+        index: 'shipinfo',
+        title: '船舶信息管理'
+    },
+    {
+        icon: 'el-icon-user-solid',
+        index: 'user',
+        title: '用户信息管理'
+    },
+    {
+        icon: 'el-icon-user-solid',
+        index: 'organization',
+        title: '组织机构管理'
     }
+
+    //后续处理
+    // {
+    //     icon: 'el-icon-lx-warn',
+    //     index: '7',
+    //     title: '错误处理',
+    //     subs: [
+    //         {
+    //             index: 'permission',
+    //             title: '权限测试'
+    //         },
+    //         {
+    //             index: '404',
+    //             title: '404页面'
+    //         }
+    //     ]
+    // }
 ];

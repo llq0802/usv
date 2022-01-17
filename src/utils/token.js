@@ -27,3 +27,16 @@ export const updateToken = async (timer, config) => {
         authenticate(res.data.token);
     }
 };
+
+/**
+ * 检查token是否过期
+ * @param {*} expTime  token过期时间 比如3600s
+ * @param {*} cTime   一般为0 距离到期的还剩的时间s
+ * @returns
+ */
+export const checkTokenTime = (expTime, cTime = 0) => {
+    // 现在的时间
+    const nowTime = Date.now() / 1000;
+    // 如果<=cTime证明过期了
+    return expTime - nowTime <= cTime ? true : false;
+};

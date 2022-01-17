@@ -10,33 +10,29 @@ const routes = [
     {
         path: '/',
         component: () => import(/* webpackChunkName: "home" */ '../components/common/Home.vue'),
-        meta: { title: '自述文件' },
+        meta: { title: '公共页' },
         children: [
             {
                 path: '/',
                 component: () => import(/* webpackChunkName: "dashboard" */ '../pages/home/Dashboard.vue'),
-                meta: { title: '系统首页' }
+                meta: { title: '运行状态' }
             },
             {
                 path: '/user',
                 component: () => import(/* webpackChunkName: "user" */ '../pages/user/User.vue'),
-                meta: { title: '基础表格' }
+                meta: { title: '用户管理' }
             },
-            {
-                // 权限页面
-                path: '/permission',
-                component: () => import(/* webpackChunkName: "permission" */ '../pages/permissions/Permission.vue'),
-                meta: { title: '权限测试', permission: true }
-            },
+
+            // {
+            //     // 权限页面
+            //     path: '/permission',
+            //     component: () => import(/* webpackChunkName: "permission" */ '../pages/permissions/Permission.vue'),
+            //     meta: { title: '权限测试', permission: true }
+            // },
             {
                 path: '/404',
                 component: () => import(/* webpackChunkName: "404" */ '../pages/404/404.vue'),
                 meta: { title: '404' }
-            },
-            {
-                path: '/test',
-                component: () => import(/* webpackChunkName: "test" */ '../pages/MapTest.vue'),
-                meta: { title: '测试专用' }
             }
         ]
     },

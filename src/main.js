@@ -3,7 +3,7 @@ import App from './App.vue';
 import router from './router';
 
 import './plugins/elementui';
-import './assets/css/icon.css';
+import './assets/css/icon.less';
 import './utils/directives';
 import 'babel-polyfill';
 

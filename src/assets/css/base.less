@@ -1,8 +1,29 @@
-* {
+@siderbarWith: 210px;
+
+html,
+body,
+form,
+div,
+span,
+ul,
+li,
+ol,
+dl,
+dt,
+dd,
+h1,
+h2,
+h3,
+h4,
+h4,
+h5 {
     margin: 0;
     padding: 0;
 }
-
+ol,
+ul {
+    list-style-type: none;
+}
 html,
 body,
 #app,
@@ -19,10 +40,14 @@ body {
 a {
     text-decoration: none;
 }
-
-.content-box {
+img {
+    border: 0 none;
+    vertical-align: middle;
+}
+/*右边大盒子*/
+.wrapper .content-box {
     position: absolute;
-    left: 250px;
+    left: 200px;
     right: 0;
     top: 70px;
     bottom: 0;
@@ -32,19 +57,20 @@ a {
     background: #f0f0f0;
 }
 
-.content {
+/*右边大盒子中的home组件*/
+.wrapper .content-box > .content {
     width: auto;
     height: 100%;
     padding: 10px;
-    overflow-y: scroll;
+    overflow-y: auto;
     box-sizing: border-box;
 }
 
-.content-collapse {
+.wrapper .content-collapse {
     left: 65px;
 }
 
-.container {
+.content-box > .content .container {
     padding: 30px;
     background: #fff;
     border: 1px solid #ddd;

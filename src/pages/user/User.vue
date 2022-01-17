@@ -1,5 +1,7 @@
 <template>
-    <div>用户</div>
+    <div class="user-content">
+        <div>1231</div>
+    </div>
 </template>
 
 <script>
@@ -15,4 +17,7 @@ export default {
 </script>
 
 <style scoped lang='less'>
+.user-content {
+    background: red;
+}
 </style>

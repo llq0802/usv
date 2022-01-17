@@ -46,10 +46,10 @@ export default {
             this.$refs.login.validate((valid) => {
                 if (valid) {
                     this.loginLoading = true;
-
                     this.$message.success('登录成功');
-                    // localStorage.setItem('ms_userName', this.param.userName);
-                    // this.$router.push('/');
+                    localStorage.setItem('ms_userName', this.param.userName);
+                    this.$router.push('/');
+                    this.loginLoading = false;
                 } else {
                     this.$message.error('请输入账号和密码');
                     return false;

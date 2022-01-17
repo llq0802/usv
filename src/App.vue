@@ -5,10 +5,10 @@
 </template>
 <style>
 /**重置css */
-@import './assets/css/map-style.css';
-@import './assets/css/base.css';
+@import './assets/css/map-style.less';
+@import './assets/css/base.less';
 /*深色主题*/
-@import './assets/css/color-dark.css';
+@import './assets/css/color-dark.less';
 /*浅绿色主题*/
-/* @import './assets/css/theme-green/color-green.css'; */
+/* @import './assets/css/theme-green/color-green.less'; */
 </style>
