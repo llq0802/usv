@@ -1,8 +1,0 @@
-/* 地图左下角log隐藏 */
-.amap-logo{
-  display: none;
-  opacity:0 !important;
-}
-.amap-copyright {
-  opacity:0;
-}
