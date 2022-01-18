@@ -19,7 +19,7 @@ VueAMap.initAMapApiLoader({
     'AMap.MapType',
     'AMap.PolyEditor',
     'AMap.CircleEditor',
-    'AMap.Geocoder',
+    'AMap.Geocoder'
   ],
   // 高德 sdk 版本，默认为 1.4.4
   v: '1.4.4'
