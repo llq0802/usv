@@ -55,7 +55,7 @@ export default {
           const params = this.param;
           this.loginLoading = true;
           const { data } = await apiSigninLogin(params);
-          if (data.token) {
+          if (data && data.token) {
             const objToken = jwt_decode(data.token);
             const arrayToken = [];
             for (let key in objToken) {

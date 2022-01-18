@@ -134,13 +134,13 @@ export default {
 
 .tags-li {
   float: left;
-  margin: 3px 5px 2px 3px;
+  margin: 4px 5px 2px 5px;
   border-radius: 3px;
   font-size: 12px;
   overflow: hidden;
   cursor: pointer;
-  height: 23px;
-  line-height: 23px;
+  height: 20px;
+  line-height: 20px;
   border: 1px solid #e9eaec;
   background: #fff;
   padding: 0 5px 0 12px;
