@@ -33,6 +33,11 @@ const routes = [
         path: '/404',
         component: () => import(/* webpackChunkName: "404" */ '../pages/404/404.vue'),
         meta: { title: '404' }
+      },
+      {
+        path: '/t',
+        component: () => import(/* webpackChunkName: "test" */ 'pages/plan/Plan'),
+        meta: { title: '测试' }
       }
     ]
   },

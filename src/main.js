@@ -6,6 +6,7 @@ import './plugins/elementui';
 import './assets/css/icon.less';
 import './plugins/directives';
 import 'babel-polyfill';
+import '@/plugins/amap';
 
 Vue.config.productionTip = false;
 Vue.config.devtools = true;
