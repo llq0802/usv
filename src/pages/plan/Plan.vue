@@ -49,6 +49,8 @@ import Map from 'components/amap/Amap';
 // 导入表格
 import MyTable from 'components/common/table/Mytable';
 
+import axios from 'axios';
+
 export default {
   components: {
     Map, MyTable
@@ -67,6 +69,16 @@ export default {
     clickPoint() {
       console.log('点击了坐标点!');
     }
+  },
+  created() {
+    axios.get('/api/plan/query', {
+      params: {
+        Page: 1,
+        Size: 10
+      }
+    }).then(res => {
+      console.log(res)
+    })
   }
 }
 </script>

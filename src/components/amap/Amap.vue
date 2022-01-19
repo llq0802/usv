@@ -12,6 +12,8 @@
     >
       <!--运行状态-->
       <slot name="running"></slot>
+      <!--详细运行状态-->
+      <slot name="detail_running"></slot>
       <!--计划管理-->
       <slot name="plan"></slot>
       <!--航线管理-->
