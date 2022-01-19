@@ -10,7 +10,7 @@ const routes = [
   {
     path: '/',
     component: () => import(/* webpackChunkName: "home" */ '../components/common/layout/Index.vue'),
-    meta: { title: '公共页' },
+    meta: { title: '首页' },
     children: [
       {
         path: '/',

@@ -88,9 +88,22 @@ export const PAGE_SIZE = {
   page_sizes: [10, 20, 30, 50]
 };
 //权限对应表
-export const ROLE = {
-  1: '管理员'
-};
+export const ROLE = [
+  {
+    value: 1,
+    label: '系统管理员',
+    type: 'success'
+  },
+  {
+    value: 2,
+    label: '单位管理员',
+    type: 'info'
+  },
+  {
+    value: 4,
+    label: '普通用户'
+  }
+];
 
 //提示信息
 export const MESSAGE = {

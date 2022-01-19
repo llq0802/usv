@@ -11,6 +11,7 @@
         <el-form-item prop="password">
           <el-input
             type="password"
+            show-password
             placeholder="请输入密码"
             v-model="param.password"
             @keyup.enter.native="submitForm()"
@@ -55,7 +56,7 @@ export default {
           const params = this.param;
           this.loginLoading = true;
           const { data } = await apiSigninLogin(params);
-          if (data.token) {
+          if (data && data.token) {
             const objToken = jwt_decode(data.token);
             const arrayToken = [];
             for (let key in objToken) {

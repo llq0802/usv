@@ -4,6 +4,7 @@
     <v-sidebar></v-sidebar>
     <div class="content-box" :class="{ 'content-collapse': collapse }">
       <v-tags></v-tags>
+      <!-- <bread-crumb :dataList="$route.matched"></bread-crumb> -->
       <div class="content">
         <transition name="move" mode="out-in">
           <keep-alive :include="tagsList">
@@ -21,6 +22,7 @@
 import vHead from './Header.vue';
 import vSidebar from './Sidebar.vue';
 import vTags from './Tags.vue';
+import BreadCrumb from './Breadcrumb.vue';
 import bus from '@/utils/bus';
 export default {
   data() {
@@ -32,13 +34,14 @@ export default {
   components: {
     vHead,
     vSidebar,
-    vTags
+    vTags,
+    BreadCrumb
   },
+
   mounted() {
     bus.$on('collapse-content', (msg) => {
       this.collapse = msg;
     });
-
     // 只有在标签页列表里的页面才使用keep-alive，即关闭标签之后就不保存到内存中了。
     bus.$on('tags', (msg) => {
       let arr = [];
