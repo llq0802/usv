@@ -18,7 +18,7 @@
     </div>
 
     <!--地图-->
-    <PlanMap>
+    <Map>
       <template #plan>
         <!--坐标点-->
         <template>
@@ -39,19 +39,19 @@
           <el-amap-polyline :path="[[106.556342, 29.592314], [106.551342, 29.592314]]"> </el-amap-polyline>
         </template>
       </template>
-    </PlanMap>
+    </Map>
   </div>
 </template>
 
 <script>
 // 导入地图组件
-import PlanMap from 'components/amap/Amap';
+import Map from 'components/amap/Amap';
 // 导入表格
 import MyTable from 'components/common/table/Mytable';
 
 export default {
   components: {
-    PlanMap, MyTable
+    Map, MyTable
   },
   data () {
     return {

@@ -35,9 +35,8 @@
 
 <script>
 // 引入地图
-import VueAMap from 'vue-amap';
+import VueAMap, { lazyAMapApiLoaderInstance } from 'vue-amap';
 // 引入实例懒加载api
-import { lazyAMapApiLoaderInstance } from 'vue-amap';
 
 export default {
   data() {
@@ -87,7 +86,6 @@ export default {
   methods: {
     // 设置卫星图层
     setSateLayer() {
-      console.log('设置卫星地图')
       if (this.mapInstance) {
         this.isSate = !this.isSate;
         if (this.isSate) {
