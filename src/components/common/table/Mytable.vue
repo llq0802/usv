@@ -209,9 +209,6 @@ export default {
     //下拉框出现/隐藏时触发
     visibleChange(row) {
       this.$emit('dropdownShow', row);
-    },
-    c() {
-      console.log(123);
     }
   }
 };

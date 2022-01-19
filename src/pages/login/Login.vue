@@ -11,6 +11,7 @@
         <el-form-item prop="password">
           <el-input
             type="password"
+            show-password
             placeholder="请输入密码"
             v-model="param.password"
             @keyup.enter.native="submitForm()"

@@ -1,12 +1,15 @@
 <template>
   <div class="user-content">
     <el-card class="box-card">
+      <!-- 搜索组件 -->
       <table-search
         :buttonName="'添加用户'"
         @buttonSearch="handleButtonSearch"
         @handleDrag="handleButtonDrag"
+        @clear="handleButtonSearch"
       >
       </table-search>
+      <!-- 封装的表格 -->
       <base-table
         :total="total"
         :tableLoading="loading"
@@ -18,14 +21,20 @@
         @dropdownShow="dropdownShow"
       />
     </el-card>
-
-    <edit-add :isShow="isShowEditAdd" @cancal="dragCancal" :title="title"></edit-add>
+    <!-- 弹框组件 -->
+    <edit-add
+      :isShow.sync="isShowEditAdd"
+      :title="title"
+      :organInfoList="organInfoList"
+      :currentRow="currentRow"
+    />
   </div>
 </template>
 
 <script>
 import { PAGE_SIZE } from '@/config';
 import * as userApi from '@/api/user';
+import * as organApi from '@/api/organization';
 import BaseTable from '@/components/common/table/Mytable.vue';
 import TableSearch from '@/components/common/table-search/TableSearch.vue';
 import EditAdd from './components/S-AddOrEdit.vue';
@@ -50,6 +59,7 @@ export default {
       total: 0,
       loading: false,
       tableData: [],
+      organInfoList: [],
       tableColumn: Object.freeze([
         {
           type: 'index',
@@ -96,6 +106,7 @@ export default {
   },
   mounted() {
     this.getUserList();
+    this.getOrganList();
   },
   methods: {
     tableButtonClick(options) {
@@ -109,10 +120,26 @@ export default {
         this.total = data.total;
       }
     },
+
+    async getOrganList() {
+      let { data } = await organApi.apiGetOrganAll();
+      if (data) {
+        this.organInfoList = data;
+      }
+    },
     // 删除用户
-    delUser(row, index) {
-      console.log('delUser');
-      console.log(row, index);
+    async delUser(row, index) {
+      const confirmRlust = await this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).catch((err) => err);
+      if (confirmRlust === 'confirm') {
+        const { data } = await userApi.apiDelUser;
+        if (+data.errorCode === 0) {
+          this.tableData.splice(index, 1);
+        }
+      }
     },
     //搜索用户
     handleButtonSearch(val) {
@@ -128,20 +155,16 @@ export default {
     },
     dropdownChange(val) {
       if (val === 'userInfo') {
-        console.log('userInfo');
         this.title = 'edit';
-        this.isShowEditAdd = true;
       } else if (val === 'passWord') {
-        console.log('passWord');
+        this.title = 'editPassword';
       }
+      this.isShowEditAdd = true;
     },
     dropdownShow(row) {
       if (this.currentRow.id === row.id) return;
       this.currentRow = row;
       console.log(this.currentRow);
-    },
-    dragCancal() {
-      this.isShowEditAdd = false;
     }
   }
 };
