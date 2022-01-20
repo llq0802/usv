@@ -104,3 +104,20 @@ export function returnMessage(message) {
   }
   return errorMessage;
 }
+
+/**
+ * 封装操作确认框
+ * @param {*} context  Vue实例
+ * @param {*} val
+ * @returns
+ */
+export const confirmMsg = async (context, val = '该项') => {
+  const confirmRlust = await context
+    .$confirm(`此操作将永久删除${val}, 是否继续？`, '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    })
+    .catch((err) => err);
+  return confirmRlust;
+};

@@ -46,13 +46,28 @@
 
 <script>
 import bus from '@/utils/bus';
-import { SIDERBAR_TREE } from '@/config';
+import { routes } from '@/router';
 export default {
   data() {
     return {
       collapse: false,
-      items: SIDERBAR_TREE
+      routes: Object.freeze(routes)
     };
+  },
+  computed: {
+    items() {
+      return routes[0].children
+        .filter((item) => {
+          if (item.path !== '/404') return item;
+        })
+        .map((item) => {
+          return {
+            index: item.path,
+            title: item.meta.title,
+            icon: item.meta.icon
+          };
+        });
+    }
   },
   mounted() {
     // 通过 Event Bus 进行组件间通信，来折叠侧边栏

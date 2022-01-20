@@ -6,7 +6,9 @@
       </el-input>
     </el-col>
     <el-col :span="4">
-      <el-button  v-if="buttonName" type="primary" @click="handleDrag(keyWords)">{{ buttonName }}</el-button>
+      <el-button v-if="buttonName" type="primary" @click="handleDrag(keyWords)">{{
+        buttonName
+      }}</el-button>
     </el-col>
   </el-row>
 </template>
@@ -14,7 +16,7 @@
 <script>
 export default {
   data() {
-    return {keyWords:''}
+    return { keyWords: '' };
   },
   props: {
     placeholder:{
@@ -25,20 +27,18 @@ export default {
       type: String,
       default: ''
     }
-      
   },
-  
+
   methods: {
-    handleSearch(val){
+    handleSearch(val) {
       this.$emit('buttonSearch', val);
     },
-    handleDrag(val){
-      this.$emit('handleDrag' ,val);
+    handleDrag(val) {
+      this.$emit('handleDrag', val);
     },
-    handleClear(){
+    handleClear() {
       this.$emit('clear');
-        console.log(this.keyWords);
-
+      console.log(this.keyWords);
     }
   }
 };

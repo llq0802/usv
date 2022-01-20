@@ -8,8 +8,6 @@ import { apiRefreshToken } from '@/api/login';
  */
 // 如果用户在操作的时候,token过期时间减去当前的时间小于设置的时间,那么更新token到Authorization,并且重新将token的过期时间设置到localStorage
 export const updateToken = async (timer, config) => {
-  console.log('updateToken');
-
   const nTime = Date.now() / 1000;
   let tokenTime = getStorage('tokenTime');
   let res = +tokenTime - nTime;

@@ -52,11 +52,13 @@ service.interceptors.response.use(
   },
   (err) => {
     NProgress.done();
-
+    //身份过期
     if (err.response.status === 401) {
+      console.log(err.response.data);
       Message({
         message: err.response.data.message || '身份信息过期,请重新登录',
-        type: 'error'
+        type: 'error',
+        duration: 3000
       });
       router.replace('/login');
     } else {

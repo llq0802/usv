@@ -10,7 +10,7 @@
       :data="tableData"
       :border="border"
       :show-header="showHeader"
-      :size="size"
+      :size="tableSize"
       @sort-change="handleSortChange"
       @cell-click="handleCellClick"
       @row-click="handleRowClick"
@@ -18,6 +18,8 @@
     >
       <!-- 多选项 -->
       <el-table-column v-if="selectionOption.selection" v-bind="selectionOption"> </el-table-column>
+      <!-- 序号项 -->
+      <el-table-column type="index" label="序号" align="center" v-if="tableIndex" />
       <!-- 普通项 -->
       <el-table-column
         show-overflow-tooltip
@@ -32,7 +34,6 @@
           <span v-if="item.render">
             {{ item.render(scope.row[item.prop], scope.row) }}
           </span>
-          <span v-else-if="item.type === 'index'">{{ index + 1 }}</span>
           <span v-else-if="item.tag">
             <template v-for="tag in ROLE">
               <el-tag v-if="scope.row[item.prop] === tag.value" :type="tag.type" :key="tag.value">{{
@@ -49,7 +50,7 @@
         v-if="tableOption.label"
         :label="tableOption.label"
         :align="tableOption.align || 'center'"
-        class-name="small-padding fixed-width"
+        :width="tableOption.width && tableOption.width"
       >
         <template slot-scope="scope">
           <template v-for="(item, index) in tableOption.options">
@@ -117,14 +118,17 @@ export default {
       type: Boolean,
       default: true
     },
-    size: {
-      type: String,
-      default: 'small'
-    },
-    // 是否显示表头
     showHeader: {
       type: Boolean,
       default: true
+    },
+    tableIndex: {
+      type: Boolean,
+      default: true
+    },
+    tableSize: {
+      type: String,
+      default: 'small'
     },
     // 预加载loading
     tableLoading: {
@@ -179,6 +183,7 @@ export default {
       default: true
     }
   },
+
   methods: {
     // 切换当前一页展示多少条事件
     handleSizeChange(val) {
