@@ -14,6 +14,7 @@
       <!-- 表格 -->
       <MyTable
         :showHeader="false"
+        :tableIndex="false"
         :total="total"
         :tableLoading="tableLoading"
         :tableData="tableData"
