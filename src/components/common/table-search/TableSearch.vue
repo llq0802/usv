@@ -1,7 +1,7 @@
 <template>
   <el-row>
     <el-col :span="6" style="min-width: 160px; margin-right: 10px">
-      <el-input placeholder="请输入内容" v-model="keyWords" @clear='handleClear' clearable>
+      <el-input :placeholder="placeholder" v-model="keyWords" @clear='handleClear' clearable>
         <el-button slot="append" icon="el-icon-search" @click="handleSearch(keyWords)"></el-button>
       </el-input>
     </el-col>
@@ -17,6 +17,10 @@ export default {
     return {keyWords:''}
   },
   props: {
+    placeholder:{
+      type: String,
+      default: '请输入内容'
+    },
     buttonName:{
       type: String,
       default: ''
@@ -38,6 +42,13 @@ export default {
     }
   }
 };
-</script
+</script>
 
-<style></style>
+<style lang="less" scoped>
+@elColor: #409eff;
+/deep/ .el-input-group__append,
+.el-input-group__prepend {
+  background-color: @elColor;
+  color: #fafafa;
+}
+</style>

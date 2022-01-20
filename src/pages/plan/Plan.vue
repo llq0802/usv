@@ -2,19 +2,25 @@
   <div class="container">
     <!--表格区域-->
     <div class="table-part">
-      <el-header>table</el-header>
-      <el-row>
-        <el-col :span="1">&nbsp;</el-col>
-        <el-col :span="10">
-          <el-input placeholder="请输入计划航线关键字">
-            <template slot="append"><i class="el-icon-search"></i></template>
-          </el-input>
-        </el-col>
-        <el-col :span="12" class="col-btn">
-          <el-button type="warning">添加航线</el-button>
-        </el-col>
-      </el-row>
-      <MyTable :tableData="tableData"></MyTable>
+      <!-- <el-header>table</el-header> -->
+      <!-- 搜索组件 -->
+      <table-search
+        :buttonName="'添加航线'"
+        :placeholder="'请输入计划航线名称'"
+        @buttonSearch="handleButtonSearch"
+        @handleDrag="handleButtonDrag"
+      >
+      </table-search>
+      <!-- 表格 -->
+      <MyTable
+        :showHeader="false"
+        :total="total"
+        :tableLoading="tableLoading"
+        :tableData="tableData"
+        :tableColumn="tableColumn"
+        :tableOption="tableOption"
+        :paginationOptions="paginationOptions"
+      ></MyTable>
     </div>
 
     <!--地图-->
@@ -30,13 +36,19 @@
 
           <el-amap-marker :position="[106.551342, 29.592314]" :offset="offset">
             <div class="precise-marker" @click="clickPoint">
-              <p>23</p>
+              <p>299</p>
             </div>
           </el-amap-marker>
         </template>
         <!--计划航线-->
         <template>
-          <el-amap-polyline :path="[[106.556342, 29.592314], [106.551342, 29.592314]]"> </el-amap-polyline>
+          <el-amap-polyline
+            :path="[
+              [106.556342, 29.592314],
+              [106.551342, 29.592314]
+            ]"
+          >
+          </el-amap-polyline>
         </template>
       </template>
     </Map>
@@ -48,36 +60,95 @@
 import Map from 'components/amap/Amap';
 // 导入表格
 import MyTable from 'components/common/table/Mytable';
-
-import axios from 'axios';
+import TableSearch from 'components/common/table-search/TableSearch';
+import { PAGE_SIZE } from '@/config'
+import { apiGetPlan } from 'api/plan';
 
 export default {
   components: {
-    Map, MyTable
+    Map, MyTable, TableSearch
   },
   data () {
     return {
+      // 表格搜索框样式
+      tableSearchStyle: {
+        width: '200px',
+        marginRight: '50px'
+      },
       // 表格数据
       tableData: [],
-
+      total: 0,
+      tableLoading: false,
+      // 表头配置
+      tableColumn: Object.freeze([
+        { prop: 'id', label: 'id', width: 60 },
+        { prop: 'name',label: 'name', width: 180},
+      ]),
+      // 操作配置
+      tableOption: Object.freeze({
+        label: '操作',
+        options: [
+          {
+            label: '修改信息',
+            type: 'warning',
+            size: 'mini',
+            methods: this.handleTableInfo
+          },
+          {
+            label: '编辑航线',
+            type: 'primary',
+            size: 'mini',
+            methods: this.handleTableInfo
+          },
+          {
+            label: '执行计划',
+            type: 'success',
+            size: 'mini',
+            methods: this.handleTableInfo
+          },
+          {
+            label: '删除',
+            type: 'danger',
+            size: 'mini',
+            methods: this.handleTableInfo
+          }
+        ]
+      }),
+      // 分页配置
+      paginationOptions: {
+        page: PAGE_SIZE.page,
+        size: PAGE_SIZE.size,
+        isSmall: true
+      },
       /********************* 地图相关 *********************/
       // marker偏移量
       offset: [-16, -31]
     }
   },
   methods: {
-    clickPoint() {
+    // 搜索关键字
+    handleButtonSearch() {
+
+    },
+    // 添加航线弹框信息 
+    handleButtonDrag() {
+
+    },
+    // 修改表格信息
+    handleTableInfo() {
+      console.log('修改信息');
+    },
+    clickPoint () {
       console.log('点击了坐标点!');
     }
   },
-  created() {
-    axios.get('/api/plan/query', {
-      params: {
-        Page: 1,
-        Size: 10
-      }
-    }).then(res => {
-      console.log(res)
+  created () {
+    apiGetPlan({
+      Page: 1,
+      Size: 10
+    }).then(({ data: res}) => {
+      this.tableData = res.result;
+      this.total = res.total;
     })
   }
 }
@@ -85,8 +156,8 @@ export default {
 
 <style lang="less" scoped>
 @elColor: #409eff;
-@markerPath: "../../assets/img/map/marker.png";
-@preciseMarkerPath: "../../assets/img/map/precise-marker.png";
+@markerPath: '../../assets/img/map/marker.png';
+@preciseMarkerPath: '../../assets/img/map/precise-marker.png';
 @markerSize: 32px;
 
 .container {
@@ -101,8 +172,9 @@ export default {
   position: absolute;
   top: 0;
   left: 0;
-  width: 600px;
+  width: 500px;
   height: 400px;
+  overflow: hidden;
   z-index: 1;
   background-color: #e7e7e7;
   .el-header {
@@ -110,23 +182,29 @@ export default {
     height: 30px !important;
     text-align: center;
   }
-  /*search input*/
-  /deep/ .el-input-group__append,
-  .el-input-group__prepend {
-    background-color: @elColor;
-    color: #fafafa;
-    &:hover {
-      cursor: pointer;
-    }
+  /deep/ .el-row {
+    width: 900px;
   }
-  .col-btn {
-    direction: rtl;
+  /deep/ .el-table--small .el-table__cell {
+    padding: 3px 0;
+    user-select: none;
+  }
+  /deep/ .el-button--mini, .el-button--mini.is-round {
+    padding: 5px 3px;
+  }
+  /deep/ .el-pagination {
+    margin-top: 0 !important;
+    text-align: center;
+  }
+  /deep/ .el-pagination__sizes {
+    display: none;
   }
 }
 
 /*************** 地图相关 ***************/
 /* 坐标点 */
-.marker, .precise-marker{
+.marker,
+.precise-marker {
   position: relative;
   width: @markerSize;
   height: @markerSize;

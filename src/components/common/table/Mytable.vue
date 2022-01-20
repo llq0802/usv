@@ -3,13 +3,14 @@
     <!-- 表格开始 -->
     <el-table
       ref="table"
+      style="width: 100%"
+      stripe
+      fit
       v-loading="tableLoading"
       :data="tableData"
       :border="border"
-      stripe
-      fit
+      :show-header="showHeader"
       :size="size"
-      style="width: 100%"
       @sort-change="handleSortChange"
       @cell-click="handleCellClick"
       @row-click="handleRowClick"
@@ -19,10 +20,12 @@
       <el-table-column v-if="selectionOption.selection" v-bind="selectionOption"> </el-table-column>
       <!-- 普通项 -->
       <el-table-column
+        show-overflow-tooltip
         v-for="(item, index) in tableColumn"
         :key="index"
         v-bind="item"
         :align="item.align || 'center'"
+        :width="item.width || ''"
       >
         <!-- 因为有些参数需要判定比如性别所以判断一下 -->
         <template slot-scope="scope">
@@ -118,7 +121,11 @@ export default {
       type: String,
       default: 'small'
     },
-
+    // 是否显示表头
+    showHeader: {
+      type: Boolean,
+      default: true
+    },
     // 预加载loading
     tableLoading: {
       type: Boolean,
