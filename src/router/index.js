@@ -2,11 +2,7 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import { getStorage } from '@/utils/localStorage';
 Vue.use(Router);
-const routes = [
-  // {
-  //     path: '/',
-  //     redirect: '/dashboard'
-  // },
+export const routes = [
   {
     path: '/',
     component: () => import(/* webpackChunkName: "home" */ '../components/common/layout/Index.vue'),
@@ -15,24 +11,49 @@ const routes = [
       {
         path: '/',
         component: () => import(/* webpackChunkName: "dashboard" */ '../pages/home/Dashboard.vue'),
-        meta: { title: '运行状态' }
+        meta: { title: '运行状态', icon: 'el-icon-lx-home' }
+      },
+
+      {
+        path: '/waterway',
+        component: () =>
+          import(/* webpackChunkName: "waterway" */ '../pages/waterway/WaterWay.vue'),
+        meta: { title: '航道航标管理', icon: 'el-icon-lx-home' }
+      },
+      {
+        path: '/portberth',
+        component: () =>
+          import(/* webpackChunkName: "portberth" */ '../pages/portberth/PortBerth.vue'),
+        meta: { title: '港口泊位管理', icon: 'el-icon-lx-home' }
+      },
+      {
+        path: '/chartshow',
+        component: () =>
+          import(/* webpackChunkName: "portberth" */ '../pages/chartshow/ChartShow.vue'),
+        meta: { title: '航图展示管理', icon: 'el-icon-lx-home' }
       },
       {
         path: '/user',
         component: () => import(/* webpackChunkName: "user" */ '../pages/user/User.vue'),
-        meta: { title: '用户管理' }
+        meta: { title: '用户信息管理', icon: 'el-icon-lx-home' }
+      },
+      {
+        path: '/organ',
+        component: () =>
+          import(/* webpackChunkName: "organization" */ '../pages/organization/Organ.vue'),
+        meta: { title: '组织机构管理', icon: 'el-icon-lx-home' }
+      },
+      {
+        path: '/shipinfo',
+        component: () =>
+          import(/* webpackChunkName: "shipinfo" */ '../pages/shipinfo/ShipInfo.vue'),
+        meta: { title: '船舶信息管理', icon: 'el-icon-lx-home' }
       },
 
-      // {
-      //     // 权限页面
-      //     path: '/permission',
-      //     component: () => import(/* webpackChunkName: "permission" */ '../pages/permissions/Permission.vue'),
-      //     meta: { title: '权限测试', permission: true }
-      // },
       {
         path: '/404',
         component: () => import(/* webpackChunkName: "404" */ '../pages/404/404.vue'),
-        meta: { title: '404' }
+        meta: { title: '404', icon: 'el-icon-lx-home' }
       }
     ]
   },

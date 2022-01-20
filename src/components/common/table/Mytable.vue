@@ -8,7 +8,8 @@
       :border="border"
       stripe
       fit
-      :size="size"
+      :show-header="showHeader"
+      :size="tableSize"
       style="width: 100%"
       @sort-change="handleSortChange"
       @cell-click="handleCellClick"
@@ -17,10 +18,12 @@
     >
       <!-- 多选项 -->
       <el-table-column v-if="selectionOption.selection" v-bind="selectionOption"> </el-table-column>
+      <!-- 序号项 -->
+      <el-table-column type="index" label="序号" align="center" v-if="tableIndex" />
       <!-- 普通项 -->
       <el-table-column
-        v-for="(item, index) in tableColumn"
-        :key="index"
+        v-for="(item, i) in tableColumn"
+        :key="i"
         v-bind="item"
         :align="item.align || 'center'"
       >
@@ -29,7 +32,6 @@
           <span v-if="item.render">
             {{ item.render(scope.row[item.prop], scope.row) }}
           </span>
-          <span v-else-if="item.type === 'index'">{{ index + 1 }}</span>
           <span v-else-if="item.tag">
             <template v-for="tag in ROLE">
               <el-tag v-if="scope.row[item.prop] === tag.value" :type="tag.type" :key="tag.value">{{
@@ -46,7 +48,7 @@
         v-if="tableOption.label"
         :label="tableOption.label"
         :align="tableOption.align || 'center'"
-        class-name="small-padding fixed-width"
+        :width="tableOption.width && tableOption.width"
       >
         <template slot-scope="scope">
           <template v-for="(item, index) in tableOption.options">
@@ -114,7 +116,15 @@ export default {
       type: Boolean,
       default: true
     },
-    size: {
+    showHeader: {
+      type: Boolean,
+      default: true
+    },
+    tableIndex: {
+      type: Boolean,
+      default: true
+    },
+    tableSize: {
       type: String,
       default: 'small'
     },
@@ -172,6 +182,7 @@ export default {
       default: true
     }
   },
+
   methods: {
     // 切换当前一页展示多少条事件
     handleSizeChange(val) {

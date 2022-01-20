@@ -4,9 +4,8 @@
     :visible.sync="isShow"
     width="30%"
     center
-    :before-close="beforeClose"
+    :before-close="cancalClick"
     @open="openDialog"
-    @close="closeDialog"
   >
     <el-form
       ref="editPasswordForm"
@@ -229,24 +228,18 @@ export default {
   },
   methods: {
     /**
-     *组件关闭事件重置数据
-     */
-    closeDialog() {
-      if (['edit', 'add'].includes(this.title)) {
-        this.$refs.from.resetFields();
-        this.$refs.from.clearValidate();
-      } else if (this.title === 'editPassword') {
-        this.$refs.editPasswordForm.resetFields();
-        this.$refs.editPasswordForm.clearValidate();
-      }
-    },
-    /**
      * 编辑模式打开的回调
      */
     openDialog() {
       if (this.title === 'edit') {
+        this.$nextTick(() => {
+          this.$refs.from.clearValidate();
+        });
         this.from = deepClone(this.currentRow);
       } else if (this.title === 'add') {
+        this.$nextTick(() => {
+          this.$refs.from.clearValidate();
+        });
         this.from = {
           userName: '',
           displayName: '',
@@ -256,7 +249,10 @@ export default {
           role: null
         };
       } else {
-        console.log(this.editPasswordFrom);
+        this.$nextTick(() => {
+          this.$refs.editPasswordForm.resetFields();
+          this.$refs.editPasswordForm.clearValidate();
+        });
       }
     },
     /**
@@ -290,7 +286,7 @@ export default {
             if (+data.errorCode === 0) this.$message.success('添加成功');
           }
           this.userLoading = false;
-          this.$emit('update:isShow');
+          this.cancalClick();
           this.$parent.getUserList();
         });
       }
@@ -299,12 +295,6 @@ export default {
      * 取消
      */
     cancalClick() {
-      this.$emit('update:isShow');
-    },
-    /**
-     * 取消
-     */
-    beforeClose() {
       this.$emit('update:isShow');
     }
   }

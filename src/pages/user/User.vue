@@ -12,7 +12,6 @@
       <!-- 封装的表格 -->
       <base-table
         :total="total"
-        :tableLoading="loading"
         :tableData="tableData"
         :tableColumn="tableColumn"
         :tableOption="tableOption"
@@ -33,6 +32,7 @@
 
 <script>
 import { PAGE_SIZE } from '@/config';
+import { confirmMsg } from '@/utils';
 import * as userApi from '@/api/user';
 import * as organApi from '@/api/organization';
 import BaseTable from '@/components/common/table/Mytable.vue';
@@ -57,14 +57,9 @@ export default {
         'Condition.Keyword': ''
       },
       total: 0,
-      loading: false,
       tableData: [],
       organInfoList: [],
       tableColumn: Object.freeze([
-        {
-          type: 'index',
-          label: '序号'
-        },
         { prop: 'userName', label: '用户名' },
         {
           prop: 'organization',
@@ -109,9 +104,15 @@ export default {
     this.getOrganList();
   },
   methods: {
+    /**
+     *  表格操作项调用事件
+     */
     tableButtonClick(options) {
       options.methods.call(this, options.row, options.index);
     },
+    /**
+     *  获取用户列表
+     */
     async getUserList() {
       const params = this.userParams;
       let { data } = await userApi.apiGetUserByQuery(params);
@@ -120,51 +121,56 @@ export default {
         this.total = data.total;
       }
     },
-
+    /**
+     *  获取组织列表
+     */
     async getOrganList() {
       let { data } = await organApi.apiGetOrganAll();
       if (data) {
         this.organInfoList = data;
       }
     },
-    // 删除用户
+    /**
+     *  删除用户
+     */
     async delUser(row, index) {
-      const confirmRlust = await this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).catch((err) => err);
-      if (confirmRlust === 'confirm') {
+      let confirmRes = await confirmMsg(this, row.userName);
+      if (confirmRes === 'confirm') {
         const { data } = await userApi.apiDelUser;
         if (+data.errorCode === 0) {
           this.tableData.splice(index, 1);
+          this.$message.success('删除成功');
         }
       }
     },
-    //搜索用户
+    /**
+     *  搜索用户
+     */
     handleButtonSearch(val) {
       this.userParams.Page = 1;
       this.userParams['Condition.Keyword'] = val;
       this.getUserList();
     },
-
+    /**
+     *  点击添加用户按钮
+     */
     handleButtonDrag(val) {
-      console.log('handleButtonDrag');
       this.title = 'add';
       this.isShowEditAdd = true;
     },
+    /**
+     *  点击下拉菜单事件
+     */
     dropdownChange(val) {
-      if (val === 'userInfo') {
-        this.title = 'edit';
-      } else if (val === 'passWord') {
-        this.title = 'editPassword';
-      }
+      this.title = val === 'userInfo' ? 'edit' : 'editPassword';
       this.isShowEditAdd = true;
     },
+    /**
+     *  获取当前行的值
+     */
     dropdownShow(row) {
       if (this.currentRow.id === row.id) return;
       this.currentRow = row;
-      console.log(this.currentRow);
     }
   }
 };
