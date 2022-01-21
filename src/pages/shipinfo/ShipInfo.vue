@@ -33,6 +33,8 @@
     <state-info :isShow.sync="isShowState" :currentRow="currentRow" />
     <!-- 无人船弹修改配置组件 -->
     <edit-config :isShow.sync="isShowConfig" :currentRow="currentRow" />
+    <!-- 视频组件 -->
+    <on-video :isShow.sync="isShowVideo" :accessToken="videoData.token" :url="videoData.url" />
   </div>
 </template>
 
@@ -42,6 +44,7 @@ import BaseTable from 'components/common/table/Mytable.vue';
 import EditAdd from './components/S-AddOrEdit.vue';
 import StateInfo from './components/S-StateInfo.vue';
 import EditConfig from './components/S-EditConfig.vue';
+import OnVideo from './components/S-LineVideo.vue';
 import * as shipApi from 'api/shipinfo';
 import * as organApi from 'api/organization';
 import * as liveApi from 'api/camera';
@@ -56,7 +59,8 @@ export default {
     BaseTable,
     EditAdd,
     StateInfo,
-    EditConfig
+    EditConfig,
+    OnVideo
   },
   data() {
     return {
@@ -66,6 +70,7 @@ export default {
       isShowEditAdd: false,
       isShowState: false,
       isShowConfig: false,
+      isShowVideo: false,
       currentRow: {},
       organInfoList: [],
       shipList: [],
@@ -158,8 +163,8 @@ export default {
     this.getShipList();
     this.getOrganList();
   },
-  beforeDestroy() {
-    clearInterval(this.checkTokenInterval);
+  deactivated() {
+    this.checkTokenInterval && clearInterval(this.checkTokenInterval);
   },
   methods: {
     //表格按钮事件调用
@@ -185,7 +190,7 @@ export default {
         if (+item.runtimeInfo.state === 0) {
           const items = this.tableOption.options[0].items;
           items.find((val) => val.command === 'reset').state = 0;
-          items.find((val) => val.command === 'onlineVideo').state = 1;
+          items.find((val) => val.command === 'onlineVideo').state = 0;
           items.find((val) => val.command === 'returnHome').state = 0;
           items.find((val) => val.command === 'config').state = 0;
           items.find((val) => val.command === 'viewStatusInfo').state = 0;
@@ -251,18 +256,30 @@ export default {
         this.toRunStatus();
       } else if (val === 'onlineVideo') {
         this.contentLineVideo();
-
-        // //十秒检查一次token是否快过期,还有3600秒,给新的token
+        // //30秒检查一次token是否快过期,还有3600秒,给新的token
         this.checkTokenInterval = setInterval(() => {
-          if (checkTokenTime(this.videoData.cTime, 3600)) {
-            getOnlineVideoToken();
-          }
-        }, 10000);
+          if (checkTokenTime(this.videoData.cTime, 3600)) getOnlineVideoToken();
+          console.log('checkTokenInterval');
+        }, 3e4);
       } else if (val === 'action') {
         console.log('action');
       }
     },
-
+    /**
+     * 获取视频地址
+     */
+    async contentLineVideo() {
+      this.isShowVideo = true;
+      let { errorCode, data } = await liveApi.apiOnlineVideo(this.currentRow.id, this.currentRow);
+      if (+errorCode === 0) {
+        let videoUrl = data;
+        this.videoData.url = videoUrl;
+        await this.getOnlineVideoToken();
+      }
+    },
+    /**
+     * 获取视频token ,time
+     */
     async getOnlineVideoToken() {
       let result = await liveApi.apiGetOnlineVideoToken();
       if (+result.errorCode === 0) {
@@ -270,14 +287,6 @@ export default {
         this.videoData.cTime = +(new Date(result.data.expiry).getTime() / 1000);
         this.videoData.token = result.data.token;
         console.log(this.videoData);
-      }
-    },
-    async contentLineVideo() {
-      let { errorCode, data } = await liveApi.apiOnlineVideo(this.currentRow.id, this.currentRow);
-      if (+errorCode === 0) {
-        let videoUrl = data;
-        this.videoData.url = videoUrl;
-        await this.getOnlineVideoToken();
       }
     },
 
@@ -300,6 +309,10 @@ export default {
      */
     async handleSetReturnHome() {
       const currentShip = this.currentRow;
+      const { data, errorCode } = await shipApi.apiGetReturnPointShip(currentShip.id);
+      if (+errorCode === 0) {
+        console.log(data);
+      }
       // 开启事件流
       // this.wsReturnHome = signalr.connected(this.showShipStatusInfo);
     },
@@ -321,12 +334,11 @@ export default {
 </script>
 
 <style scoped lang="less">
-@w100: 100%;
 .ship-content {
-  height: @w100;
+  height: 100%;
   position: relative;
 }
 /deep/ .el-card {
-  height: @w100;
+  height: 100%;
 }
 </style>
