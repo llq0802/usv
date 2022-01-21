@@ -38,14 +38,17 @@ service.interceptors.response.use(
   (response) => {
     NProgress.done();
     if (response.status === 200) {
+      if (+response.data.errorCode === 0) {
+        return response.data;
+      }
       // 响应请求为200,但是有错误提示时,统一提示给用户
-      if (response.data.errorCode) {
+      if (response.data.errorCode !== 0 && response.data.message) {
         Message({
           message: response.data.message,
           type: 'error'
         });
+        return response.data;
       }
-      return response.data;
     } else {
       Promise.reject();
     }
@@ -54,11 +57,10 @@ service.interceptors.response.use(
     NProgress.done();
     //身份过期
     if (err.response.status === 401) {
-      console.log(err.response.data);
       Message({
         message: err.response.data.message || '身份信息过期,请重新登录',
         type: 'error',
-        duration: 3000
+        duration: 3500
       });
       router.replace('/login');
     } else {
@@ -77,8 +79,7 @@ service.interceptors.response.use(
         });
       }
     }
-
-    console.log('response error', err);
+    console.log('响应错误', err);
     return Promise.reject();
   }
 );

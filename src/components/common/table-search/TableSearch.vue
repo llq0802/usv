@@ -33,7 +33,7 @@ export default {
       this.$emit('handleDrag', val);
     },
     handleClear() {
-      this.$emit('clear');
+      this.$emit('clear', '');
       console.log(this.keyWords);
     }
   }

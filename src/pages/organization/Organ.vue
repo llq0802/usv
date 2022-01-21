@@ -7,8 +7,10 @@
         @handleDrag="handleButtonDrag"
         @clear="handleButtonSearch"
       />
+      <el-divider />
       <!-- 封装的表格 -->
       <base-table
+        :tableIndex="!!total"
         :total="total"
         :tableData="tableData"
         :tableColumn="tableColumn"
@@ -16,19 +18,17 @@
         @buttonClick="tableButtonClick"
       />
     </el-card>
-
     <!-- 弹框组件 -->
     <edit-add :isShow.sync="isShowEditAdd" :title="title" :currentRow="currentRow" />
   </div>
 </template>
 
 <script>
-import BaseTable from '@/components/common/table/Mytable.vue';
-import TableSearch from '@/components/common/table-search/TableSearch.vue';
+import BaseTable from 'components/common/table/Mytable.vue';
+import TableSearch from 'components/common/table-search/TableSearch.vue';
 import EditAdd from './components/S-AddOrEdit.vue';
 import { confirmMsg } from '@/utils';
-import { PAGE_SIZE } from '@/config';
-import * as organApi from '@/api/organization';
+import * as organApi from 'api/organization';
 
 export default {
   name: 'organ',
@@ -81,10 +81,10 @@ export default {
      * 获取组织列表
      */
     async getOrganList() {
-      let res = await organApi.apiGetOrganAll();
-      if (res.errorCode === 0) {
-        this.tableData = res.data;
-        this.total = res.data.length;
+      let { errorCode, data } = await organApi.apiGetOrganAll();
+      if (+errorCode === 0) {
+        this.tableData = data;
+        this.total = data.length;
       }
     },
     /**
@@ -99,7 +99,6 @@ export default {
     handleButtonDrag() {
       this.isShowEditAdd = true;
       this.title = 'add';
-      console.log('handleButtonDrag');
     },
     /**
      * 修改组织
@@ -113,10 +112,13 @@ export default {
      * 删除组织
      */
     async delOrgan(row, index) {
-      let confirmRes = await confirmMsg(this, row.name);
+      let confirmRes = await confirmMsg(this);
       if (confirmRes === 'confirm') {
-        this.tableData.splice(index, 1);
-        this.$message.success('删除成功');
+        const { errorCode } = await organApi.apiDelOrgan(row.id);
+        if (+errorCode === 0) {
+          this.tableData.splice(index, 1);
+          this.$message.success('删除成功');
+        }
       }
     }
   }

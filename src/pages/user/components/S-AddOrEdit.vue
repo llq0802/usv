@@ -234,8 +234,8 @@ export default {
       if (this.title === 'edit') {
         this.$nextTick(() => {
           this.$refs.from.clearValidate();
+          this.from = deepClone(this.currentRow);
         });
-        this.from = deepClone(this.currentRow);
       } else if (this.title === 'add') {
         this.$nextTick(() => {
           this.$refs.from.clearValidate();
@@ -263,8 +263,8 @@ export default {
         this.$refs.editPasswordForm.validate(async (valid) => {
           if (!valid) return;
           this.userLoading = true;
-          const data = await userApi.apiEditPassword;
-          if (+data.errorCode === 0) {
+          const { errorCode } = await userApi.apiEditPassword;
+          if (+errorCode === 0) {
             this.userLoading = false;
             this.$message.success('修改密码成功,即将重新登录!');
             setTimeout(() => {
@@ -278,12 +278,12 @@ export default {
           if (!valid) return;
           if (this.title === 'edit') {
             this.userLoading = true;
-            const data = await userApi.apiEditUser(this.from);
-            if (+data.errorCode === 0) this.$message.success('修改成功');
+            const { errorCode } = await userApi.apiEditUser(this.from);
+            if (+errorCode === 0) this.$message.success('修改成功');
           } else if (this.title === 'add') {
             this.userLoading = true;
-            const data = await userApi.apiAddUser(this.from);
-            if (+data.errorCode === 0) this.$message.success('添加成功');
+            const { errorCode } = await userApi.apiAddUser(this.from);
+            if (+errorCode === 0) this.$message.success('添加成功');
           }
           this.userLoading = false;
           this.cancalClick();

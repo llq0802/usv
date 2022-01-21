@@ -25,6 +25,7 @@
         v-for="(item, i) in tableColumn"
         :key="i"
         v-bind="item"
+        :prop="item.prop"
         :align="item.align || 'center'"
       >
         <!-- 因为有些参数需要判定比如性别所以判断一下 -->
@@ -72,13 +73,17 @@
               style="margin-right: 10px"
             >
               <el-button type="primary" size="mini">
-                编辑
+                {{ item.label }}
                 <i class="el-icon-arrow-down el-icon--right"></i>
               </el-button>
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item :command="val.command" v-for="(val, i) in item.items" :key="i">{{
-                  val.label
-                }}</el-dropdown-item>
+                <template v-for="(val, i) in item.items">
+                  <template v-if="val.state !== 0">
+                    <el-dropdown-item :command="val.command" :key="i">
+                      {{ val.label }}
+                    </el-dropdown-item>
+                  </template>
+                </template>
               </el-dropdown-menu>
             </el-dropdown>
           </template>

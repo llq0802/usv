@@ -1,3 +1,4 @@
+//无人船状态
 let UsvStates = new Map([
   [0, '离线'],
   [1, '空闲'],
@@ -63,7 +64,14 @@ let colorArray = new Map([
   ['Y', '#E65100bb'],
   ['Z', '#FFEB3Bbb']
 ]);
-
+//电量百分比进度条的颜色样式
+let powerColors = [
+  { color: '#f56c6c', percentage: 20 },
+  { color: '#e6a23c', percentage: 40 },
+  { color: '#5cb87a', percentage: 60 },
+  { color: '#1989fa', percentage: 80 },
+  { color: '#6f7ad3', percentage: 99 }
+];
 //航线颜色、船状态常量
 export const BASE_CONSTANTS = {
   usvState: (val) => UsvStates.get(val),
@@ -71,7 +79,8 @@ export const BASE_CONSTANTS = {
   channelRouter: (val) => ChannelRouters.get(val),
   returnMode: (val) => ReturnModes.get(val),
   strokeColorList: (val) => strokeColorList.get(val),
-  colorArray: (val) => colorArray.get(val)
+  colorArray: (val) => colorArray.get(val),
+  powerColors: () => powerColors
 };
 //系统名称
 export const HEADER_TITLE = '船舶智能调度管理平台';

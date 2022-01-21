@@ -9,8 +9,10 @@
         @clear="handleButtonSearch"
       >
       </table-search>
+      <el-divider />
       <!-- 封装的表格 -->
       <base-table
+        :tableIndex="!!total"
         :total="total"
         :tableData="tableData"
         :tableColumn="tableColumn"
@@ -33,10 +35,10 @@
 <script>
 import { PAGE_SIZE } from '@/config';
 import { confirmMsg } from '@/utils';
-import * as userApi from '@/api/user';
-import * as organApi from '@/api/organization';
-import BaseTable from '@/components/common/table/Mytable.vue';
-import TableSearch from '@/components/common/table-search/TableSearch.vue';
+import * as userApi from 'api/user';
+import * as organApi from 'api/organization';
+import BaseTable from 'components/common/table/Mytable.vue';
+import TableSearch from 'components/common/table-search/TableSearch.vue';
 import EditAdd from './components/S-AddOrEdit.vue';
 
 export default {
@@ -115,8 +117,8 @@ export default {
      */
     async getUserList() {
       const params = this.userParams;
-      let { data } = await userApi.apiGetUserByQuery(params);
-      if (data.result.length) {
+      let { data, errorCode } = await userApi.apiGetUserByQuery(params);
+      if (+errorCode === 0) {
         this.tableData = data.result;
         this.total = data.total;
       }
@@ -125,8 +127,8 @@ export default {
      *  获取组织列表
      */
     async getOrganList() {
-      let { data } = await organApi.apiGetOrganAll();
-      if (data) {
+      let { data, errorCode } = await organApi.apiGetOrganAll();
+      if (+errorCode === 0) {
         this.organInfoList = data;
       }
     },
@@ -134,10 +136,10 @@ export default {
      *  删除用户
      */
     async delUser(row, index) {
-      let confirmRes = await confirmMsg(this, row.userName);
+      let confirmRes = await confirmMsg(this);
       if (confirmRes === 'confirm') {
-        const { data } = await userApi.apiDelUser;
-        if (+data.errorCode === 0) {
+        const { errorCode } = await userApi.apiDelUser;
+        if (+errorCode === 0) {
           this.tableData.splice(index, 1);
           this.$message.success('删除成功');
         }

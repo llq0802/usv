@@ -111,9 +111,9 @@ export function returnMessage(message) {
  * @param {*} val
  * @returns
  */
-export const confirmMsg = async (context, val = '该项') => {
+export const confirmMsg = async (context, val = '此操作将永久删除该项') => {
   const confirmRlust = await context
-    .$confirm(`此操作将永久删除${val}, 是否继续？`, '提示', {
+    .$confirm(`${val}, 是否继续？`, '提示', {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
       type: 'warning'
