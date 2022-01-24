@@ -12,6 +12,7 @@
       <el-divider />
       <!-- 封装的表格 -->
       <base-table
+        :tableLoading="loading"
         :tableIndex="!!total"
         :total="total"
         :tableData="shipList"
@@ -71,6 +72,7 @@ export default {
       isShowState: false,
       isShowConfig: false,
       isShowVideo: false,
+      loading: false,
       currentRow: {},
       organInfoList: [],
       shipList: [],
@@ -159,7 +161,7 @@ export default {
     };
   },
   created() {
-    console.log(shipApi);
+    // console.log(shipApi);
     this.getShipList();
     this.getOrganList();
   },
@@ -182,18 +184,22 @@ export default {
      *  获取无人船列表
      */
     async getShipList() {
-      const { data } = await shipApi.apiGetShipByQuery(this.shipParams);
-      this.shipList = data.result;
-      this.total = data.result.length;
-      for (let item of this.shipList) {
-        // 当无人船的状态为0(离线) 不渲染下拉菜单中的一些项
-        if (+item.runtimeInfo.state === 0) {
-          const items = this.tableOption.options[0].items;
-          items.find((val) => val.command === 'reset').state = 0;
-          items.find((val) => val.command === 'onlineVideo').state = 0;
-          items.find((val) => val.command === 'returnHome').state = 0;
-          items.find((val) => val.command === 'config').state = 0;
-          items.find((val) => val.command === 'viewStatusInfo').state = 0;
+      this.loading = true;
+      const { data, errorCode } = await shipApi.apiGetShipByQuery(this.shipParams);
+      if (+errorCode === 0) {
+        this.loading = false;
+        this.shipList = data.result;
+        this.total = data.result.length;
+        for (let item of this.shipList) {
+          // 当无人船的状态为0(离线) 不渲染下拉菜单中的一些项
+          if (+item.runtimeInfo.state === 0) {
+            const items = this.tableOption.options[0].items;
+            items.find((val) => val.command === 'reset').state = 0;
+            items.find((val) => val.command === 'onlineVideo').state = 0;
+            items.find((val) => val.command === 'returnHome').state = 0;
+            items.find((val) => val.command === 'config').state = 0;
+            items.find((val) => val.command === 'viewStatusInfo').state = 0;
+          }
         }
       }
     },
@@ -201,7 +207,8 @@ export default {
      *  获取组织列表
      */
     async getOrganList() {
-      const { data } = await organApi.apiGetOrganAll();
+      const { data, errorCode } = await organApi.apiGetOrganAll();
+      if (+errorCode !== 0) return;
       if (data) this.organInfoList = data;
     },
     async getConfigShip() {

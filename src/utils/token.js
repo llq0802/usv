@@ -11,10 +11,11 @@ export const updateToken = async (timer, config) => {
   const nTime = Date.now() / 1000;
   let tokenTime = getStorage('tokenTime');
   let res = +tokenTime - nTime;
-  // token过期时间减去当前时间的值是否小于半小时且大于0,如果是就更新token,
+  // token过期时间减去当前时间的值大于0 表示没过期,并且离过期时间还有1800秒时就更新token,
   if (res > 0 && res < timer) {
-    const { data } = await apiRefreshToken(config.headers.Authorization);
+    const { data, errorCode } = await apiRefreshToken(config.headers.Authorization);
     console.log('updateToken', data);
+    if (+errorCode !== 0) return;
     if (data && data.token) {
       const objToken = jwt_decode(data.token);
       const arrayToken = [];
@@ -34,7 +35,7 @@ export const updateToken = async (timer, config) => {
       // 当前用户关联的公司id
       setStorage('organizationId', arrayToken[5]);
       config.headers.Authorization = `Bearer ${data.token}`;
-      // 事件流更新token
+      // signalR连接更新token
       // authenticate(data.token);
     }
   }
@@ -48,7 +49,8 @@ export const updateToken = async (timer, config) => {
  */
 export const checkTokenTime = (tokenTime, cTime = 0) => {
   // 现在的时间
-  const nowTime = Date.now() / 1000;
+  const nowTime = Number.parseInt(Date.now() / 1000);
+  console.log('当前时间', nowTime, '---', 'token时间', tokenTime);
   // 如果<=cTime证明过期了
   return tokenTime - nowTime <= cTime ? true : false;
 };

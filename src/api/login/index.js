@@ -11,7 +11,7 @@ export const apiSigninLogin = (params) => {
 //更新token
 export const apiRefreshToken = (token) => {
   return request({
-    url: `/auth/refreshtoken/${token}`,
+    url: `/auth/refreshtoken`,
     method: 'get'
   });
 };

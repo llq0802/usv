@@ -103,7 +103,7 @@ export default {
     return {
       powerColors: Object.freeze(BASE_CONSTANTS.powerColors()),
       loading: false,
-      // 新增数据表单数据
+      //表单数据
       form: {
         enableServerCommunicationCircuitBreaker: true,
         enableRemoteControlCommunicationCircuitBreaker: true,
