@@ -60,7 +60,7 @@
               :type="item.type"
               :icon="item.icon"
               :size="item.size || 'mini'"
-              @click="handleButton(item.methods, scope.row, scope.$index)"
+              @click="handleButton($event, item.methods, scope.row, scope.$index)"
             >
               {{ item.label }}
             </el-button>
@@ -195,8 +195,8 @@ export default {
     },
     // 按钮点击事件
     // methods方法名 row当前点击列数据 index当前点击的index
-    handleButton(methods, row, index) {
-      this.$emit('buttonClick', { methods: methods, row: row, index: index });
+    handleButton(event, methods, row, index) {
+      this.$emit('buttonClick', {event, methods: methods, row: row, index: index });
     },
     // 当表格的排序条件发生变化的时候会触发该事件	{ column, prop, order }
     handleSortChange(column, prop, order) {

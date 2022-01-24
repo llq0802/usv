@@ -1,18 +1,20 @@
 <template>
   <div class="container">
+    <h3 v-show="isEdit" class="title">{{ currentPlan && currentPlan.name }}</h3>
     <!--表格区域-->
-    <div class="table-part">
-      <!-- <el-header>table</el-header> -->
+    <div class="table-part" v-show="!isEdit">
       <!-- 搜索组件 -->
       <table-search
         :buttonName="'添加航线'"
         :placeholder="'请输入计划航线名称'"
-        @buttonSearch="handleButtonSearch"
-        @handleDrag="handleButtonDrag"
+        @keydownEnter="keywordSearch"
+        @buttonSearch="keywordSearch"
+        @handleDrag="addPlanDialog"
+        @clear="keyword=''"
       >
       </table-search>
       <!-- 表格 -->
-      <MyTable
+      <my-table
         :showHeader="false"
         :tableIndex="false"
         :total="total"
@@ -21,11 +23,40 @@
         :tableColumn="tableColumn"
         :tableOption="tableOption"
         :paginationOptions="paginationOptions"
-      ></MyTable>
+        @rowClick="handleRowClick"
+        @buttonClick="clickButton"
+        @pageChange="pageChange"
+      ></my-table>
     </div>
-
+    <!-- 编辑按钮区域 -->
+    <div class="plan-edit" v-show="isEdit">
+      <el-button type="warning" @click="reversePoint">反转航线方向</el-button>
+      <el-button type="primary" @click="updateRoute">确认上传</el-button>
+      <el-button type="danger" @click="cancelEdit">取消编辑</el-button>
+    </div>
+    <!--计划对话框-->
+    <!-- 添加航线 -->
+    <add-dialog 
+      :addlogVisible="addlogVisible"
+      @getAddForm="addPlan"
+    ></add-dialog>
+    <!-- 修改计划信息 -->
+    <template v-if="editlogVisible">
+      <edit-dialog
+        :editlogVisible="editlogVisible"
+        :editForm="currentPlan"
+        @getEditForm="handleTableInfo"></edit-dialog>
+    </template>
+    <!-- 执行计划 -->
+    <template v-if="actionlogVisible">
+      <action-dialog
+        :actionlogVisible=actionlogVisible
+        :planId=currentPlan.id>
+      </action-dialog>
+    </template>
+    
     <!--地图-->
-    <Map>
+    <Map :isEdit="isEdit" @getLngLat="getLngLat">
       <template #plan>
         <!--坐标点-->
         <template>
@@ -57,25 +88,28 @@
 </template>
 
 <script>
-// 导入地图组件
+// 地图组件
 import Map from 'components/amap/Amap';
-// 导入表格
+// 表格
 import MyTable from 'components/common/table/Mytable';
 import TableSearch from 'components/common/table-search/TableSearch';
-import { PAGE_SIZE } from '@/config'
-import { apiGetPlan } from 'api/plan';
+// dialog对话框
+import AddDialog from './components/AddDialog.vue';
+import EditDialog from './components/EditDialog.vue';
+import ActionDialog from './components/ActionDialog.vue';
+
+import { confirmMsg, deepClone } from '@/utils';
+// 常量
+import { PAGE_SIZE } from '@/config';
+// api
+import { apiGetPlan, apiPostPlanInfo, apiPostDeletePlan } from 'api/plan';
 
 export default {
   components: {
-    Map, MyTable, TableSearch
+    Map, MyTable, TableSearch, AddDialog, EditDialog, ActionDialog
   },
   data () {
     return {
-      // 表格搜索框样式
-      tableSearchStyle: {
-        width: '200px',
-        marginRight: '50px'
-      },
       // 表格数据
       tableData: [],
       total: 0,
@@ -83,35 +117,35 @@ export default {
       // 表头配置
       tableColumn: Object.freeze([
         { prop: 'id', label: 'id', width: 60 },
-        { prop: 'name',label: 'name', width: 180},
+        { prop: 'name', label: 'name', width: 180 },
       ]),
       // 操作配置
       tableOption: Object.freeze({
         label: '操作',
         options: [
           {
+            label: '执行计划',
+            type: 'success',
+            size: 'mini',
+            methods: this.executePlanConfig
+          },
+          {
             label: '修改信息',
             type: 'warning',
             size: 'mini',
-            methods: this.handleTableInfo
+            methods: this.changePlanInfo
           },
           {
             label: '编辑航线',
             type: 'primary',
             size: 'mini',
-            methods: this.handleTableInfo
-          },
-          {
-            label: '执行计划',
-            type: 'success',
-            size: 'mini',
-            methods: this.handleTableInfo
+            methods: this.editPlanRoute
           },
           {
             label: '删除',
             type: 'danger',
             size: 'mini',
-            methods: this.handleTableInfo
+            methods: this.deletePlan
           }
         ]
       }),
@@ -121,36 +155,134 @@ export default {
         size: PAGE_SIZE.size,
         isSmall: true
       },
+      keyword: '',
+      // 是否正在编辑
+      isEdit: false,
+      // 当前计划
+      currentPlan: null,
+      // 原始计划数据
+      originPlanData: null,
+      
+      /********************* 计划dialog *********************/
+      addlogVisible: false,
+      editlogVisible: false,
+      actionlogVisible: false,
       /********************* 地图相关 *********************/
       // marker偏移量
-      offset: [-16, -31]
+      offset: [-16, -31],
+      // 坐标点
+      pointList: [],
     }
   },
   methods: {
-    // 搜索关键字
-    handleButtonSearch() {
-
+    // 获取计划列表
+    async getPlanList () {
+      this.tableLoading = true;
+      const { data: res } = await apiGetPlan({
+        page: this.paginationOptions.page,
+        size: 10,
+        'Condition.Keyword': this.keyword
+      });
+      this.tableLoading = false;
+      this.tableData = res.result;
+      this.total = res.total;
+    },
+    // 关键字搜索
+    keywordSearch(keyword) {
+      this.keyword = keyword;
+      this.getPlanList();
+    },
+    // 翻页
+    pageChange(page) {
+      this.paginationOptions.page = page;
+      this.getPlanList();
     },
     // 添加航线弹框信息 
-    handleButtonDrag() {
-
+    addPlanDialog () {
+      this.addlogVisible = true;
+    },
+    // 添加计划
+    addPlan (planForm) {
+      this.isEdit = true;
+      this.addlogVisible = false;
+      this.currentPlan = planForm;
+      this.currentPlan.fixes = this.pointList;
     },
     // 修改表格信息
-    handleTableInfo() {
-      console.log('修改信息');
+    async handleTableInfo (form) {
+      const res = await apiPostPlanInfo(form);
+      if (!res.errorCode) {
+        this.$message.success('计划信息修改成功！');
+        this.editlogVisible = false;
+        this.getPlanList();
+      } else {
+        this.$message.warning(res.message);
+      }
+    },
+    // 点击行
+    handleRowClick (row) {
+      console.log(row)
+      this.currentPlan = row;
+      this.pointList = row.fixes;
+    },
+    // 点击操作按钮
+    clickButton (option) {
+      option.event.stopPropagation();
+      option.methods.call(this, option.row);
+    },
+    // 修改计划信息
+    changePlanInfo (row) {
+      this.editlogVisible = true;
+      this.currentPlan = row;
+      this.pointList = row.fixes;
+    },
+    // 编辑航线
+    editPlanRoute (row) {
+      console.log(row)
+      // 保存初始数据
+      this.originPlanData = deepClone(row);
+      this.currentPlan = row;
+      this.pointList = row.fixes;
+      this.isEdit = true;
+    },
+    // 执行计划
+    executePlanConfig (row) {
+      this.currentPlan = row;
+      this.pointList = row.fixes;
+      this.actionlogVisible = true;
+    },
+    // 删除计划
+    async deletePlan (row) {
+      const cf = await confirmMsg(this, row.name);
+      if (cf === 'cancel') return;
+      const res = await apiPostDeletePlan(row.id);
+      if (!res.errorCode) {
+        this.$message.success(`${row.name} 删除成功！`);
+        this.tableData.filter(v => v.id != row.id);
+      }
+    },
+    // 反转航线方向
+    reversePoint() {},
+    // 更新计划航线
+    updateRoute() {},
+    // 取消编辑
+    cancelEdit() {
+      this.isEdit = false;
+    },
+
+    /********************* 地图相关 *********************/
+    // 获取经纬度
+    getLngLat(point) {
+      
     },
     clickPoint () {
       console.log('点击了坐标点!');
     }
   },
+  watch: {
+  },
   created () {
-    apiGetPlan({
-      Page: 1,
-      Size: 10
-    }).then(({ data: res}) => {
-      this.tableData = res.result;
-      this.total = res.total;
-    })
+    this.getPlanList();
   }
 }
 </script>
@@ -166,6 +298,14 @@ export default {
   position: relative;
   width: 100%;
   height: 100%;
+  .title {
+    position: absolute;
+    top: 0;
+    left: 8px;
+    z-index: 1;
+    color: #f5f0f0;
+    text-shadow: 1px 1px 0 #333, -1px -1px 0 #333, 1px -1px 0 #333, -1px 1px 0 #333;
+  }
 }
 
 /***************表格区域***************/
@@ -174,10 +314,9 @@ export default {
   top: 0;
   left: 0;
   width: 500px;
-  height: 400px;
   overflow: hidden;
   z-index: 1;
-  background-color: #e7e7e7;
+  background-color: #f0f0f0;
   .el-header {
     padding: 0;
     height: 30px !important;
@@ -190,7 +329,8 @@ export default {
     padding: 3px 0;
     user-select: none;
   }
-  /deep/ .el-button--mini, .el-button--mini.is-round {
+  /deep/ .el-button--mini,
+  .el-button--mini.is-round {
     padding: 5px 3px;
   }
   /deep/ .el-pagination {
@@ -202,6 +342,13 @@ export default {
   }
 }
 
+/***************编辑按钮区域***************/
+.plan-edit {
+  position: absolute;
+  bottom: 8px;
+  left: 90px;
+  z-index: 1;
+}
 /*************** 地图相关 ***************/
 /* 坐标点 */
 .marker,

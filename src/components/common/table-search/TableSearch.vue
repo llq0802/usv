@@ -1,7 +1,12 @@
 <template>
   <el-row>
     <el-col :span="6" style="min-width: 160px; margin-right: 10px">
-      <el-input :placeholder="placeholder" v-model="keyWords" @clear='handleClear' clearable>
+      <el-input
+        clearable
+        :placeholder="placeholder" 
+        v-model="keyWords" 
+        @keydown.enter="handleEnter(keyWords)" 
+        @clear='handleClear'>
         <el-button slot="append" icon="el-icon-search" @click="handleSearch(keyWords)"></el-button>
       </el-input>
     </el-col>
@@ -30,6 +35,10 @@ export default {
   },
 
   methods: {
+    handleEnter(val) {
+      console.log(val)
+      this.$emit('keydownEnter', val)
+    },
     handleSearch(val) {
       this.$emit('buttonSearch', val);
     },
@@ -38,7 +47,6 @@ export default {
     },
     handleClear() {
       this.$emit('clear');
-      console.log(this.keyWords);
     }
   }
 };

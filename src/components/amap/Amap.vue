@@ -78,13 +78,23 @@ export default {
         },
         // 点击事件
         click: (e) => {
+          if (!this.isEdit) return;
           // 获取坐标点
-          console.log(e.lnglat);
+          let p = e.lnglat;
+          p.location = `${p.lat},${p.lng}`;
+          p.pointArray = [p.lng, p.lat];
+          this.$emit('getLngLat', p);
         }
       }
     };
   },
-
+  props: {
+    // 是否可编辑
+    isEdit: {
+      type: Boolean,
+      default: false,
+    }
+  },
   methods: {
     // 设置卫星图层
     setSateLayer() {

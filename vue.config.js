@@ -6,14 +6,15 @@ module.exports = {
   lintOnSave: process.env.NODE_ENV !== 'production',
   productionSourceMap: process.env.NODE_ENV !== 'production',
   configureWebpack: {
-    devtool: process.env.NODE_ENV === 'production' ? 'eval-cheap-source-map' : 'source-map', //'source-map',
+    devtool: process.env.NODE_ENV === 'production' ? 'hidden-noresource-source-map' : 'source-map',
     resolve: {
       // 重定义路径
       alias: {
         components: '@/components',
         assets: '@/assets',
         pages: '@/pages',
-        api: '@/api'
+        api: '@/api',
+        utils: '@utils'
       }
     }
   },
