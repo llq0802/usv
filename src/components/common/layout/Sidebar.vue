@@ -58,7 +58,7 @@ export default {
     items() {
       return routes[0].children
         .filter((item) => {
-          if (item.path !== '/404') return item;
+          if (item.path !== '/404' && !item.meta.hidden) return item;
         })
         .map((item) => {
           return {

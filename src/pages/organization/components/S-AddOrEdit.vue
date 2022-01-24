@@ -22,7 +22,7 @@
 
 <script>
 import { deepClone } from '@/utils';
-import * as organApi from '@/api/organization';
+import * as organApi from 'api/organization';
 
 export default {
   props: {
@@ -75,11 +75,11 @@ export default {
       if (this.title === 'edit') {
         this.$nextTick(() => {
           this.$refs.from.clearValidate();
+          this.from.name = this.currentRow.name;
         });
-        this.from.name = this.currentRow.name;
       } else {
         this.$nextTick(() => {
-          this.$refs.from.resetFields();
+          this.from.name = '';
         });
       }
     },
@@ -95,7 +95,7 @@ export default {
         }
       } else {
         let res = await organApi.apiEditOrgan(this.from);
-        if (res.errorCode === 0) {
+        if (+res.errorCode === 0) {
           this.$message.success('修改成功');
         }
       }

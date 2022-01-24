@@ -7,8 +7,9 @@ export const apiGetPortByIdent = (ident) => {
     method: 'get'
   });
 };
+
 // 通过返回分页条件查询港口并返回
-export const apiQueryPort = (params) => {
+export const apiGetPortByQuery = (params) => {
   return request({
     url: `/port/search`,
     method: 'get',

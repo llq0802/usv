@@ -12,6 +12,7 @@
     "axios": "^0.24.0",
     "babel-polyfill": "^6.26.0",
     "element-ui": "^2.11.0",
+    "ezuikit-js": "^0.2.2",
     "jwt-decode": "^3.1.2",
     "nprogress": "^0.2.0",
     "vue": "^2.6.10",
