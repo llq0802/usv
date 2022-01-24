@@ -10,14 +10,13 @@ import request from '../request';
 //     pattern: ^[-]?\d+(\.\d+)?,[-]?\d+(\.\d+)?$
 //     Condition.Rect.BottomRight
 //     pattern: ^[-]?\d+(\.\d+)?,[-]?\d+(\.\d+)?$
-//     Condition.ZoomLevel
 //     Condition.Keyword
 //     Page
 //     Size
 // }
-export const apiGetNavaByQuery = (params) => {
+export const apiGetWayByQuery = (params) => {
   return request({
-    url: '/navaid/search',
+    url: '/waterway/search',
     method: 'get',
     params
   });

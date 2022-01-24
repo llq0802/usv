@@ -16,3 +16,11 @@ export const apiGetPortByQuery = (params) => {
     params
   });
 };
+// 删除港口
+export const apiDelPort = (id) => {
+  return request({
+    url: `/port/delete`,
+    method: 'post',
+    params: { id }
+  });
+};

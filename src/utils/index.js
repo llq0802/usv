@@ -5,7 +5,7 @@
  * @param {number} [ms=0]
  * @return {*}
  */
-export const debounce = (fn, ms = 0) => {
+export const debounce = (fn, ms = 300) => {
   let timeoutId;
   return function (...args) {
     clearTimeout(timeoutId);
@@ -20,7 +20,7 @@ export const debounce = (fn, ms = 0) => {
  * @param {wait} [ms=0]
  * @return {*}
  */
-export const throttle = (fn, wait) => {
+export const throttle = (fn, wait = 300) => {
   let inThrottle, lastFn, lastTime;
   return function () {
     const context = this,
