@@ -59,8 +59,12 @@
     <Map :isEdit="isEdit" @getLngLat="getLngLat">
       <template #plan>
         <!--坐标点-->
-        <template>
-          <el-amap-marker :position="[106.556342, 29.592314]" :draggable="true" :offset="offset">
+        <template v-if="pointList.length">
+          <el-amap-marker
+            v-for="point in pointList"
+            :key="point.order"
+            :draggable="true"
+            :offset="offset">
             <div class="marker" @click="clickPoint">
               <p>3</p>
             </div>
@@ -99,6 +103,7 @@ import EditDialog from './components/EditDialog.vue';
 import ActionDialog from './components/ActionDialog.vue';
 
 import { confirmMsg, deepClone } from '@/utils';
+// import {  }
 // 常量
 import { PAGE_SIZE } from '@/config';
 // api
@@ -172,6 +177,14 @@ export default {
       offset: [-16, -31],
       // 坐标点
       pointList: [],
+      point: {
+        location: {
+          latitude: null,
+          longitude: null
+        },
+        order: null,
+        requirePrecisionNavigation: false
+      },
     }
   },
   methods: {
@@ -272,8 +285,11 @@ export default {
 
     /********************* 地图相关 *********************/
     // 获取经纬度
-    getLngLat(point) {
-      
+    getLngLat(data) {
+      this.point.location.latitude = data.lat;
+      this.point.location.longitude = data.lng;
+      this.point.order = this.pointList.length + 1;
+      this.$set(this.pointList, this.pointList.length, this.point);
     },
     clickPoint () {
       console.log('点击了坐标点!');
