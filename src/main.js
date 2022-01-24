@@ -6,7 +6,7 @@ import 'nprogress/nprogress.css';
 import './assets/css/icon.less';
 import './plugins/directives';
 import 'babel-polyfill';
-import '@/plugins/amap';
+import './plugins/amap';
 import './plugins/signalR';
 
 Vue.config.productionTip = false;

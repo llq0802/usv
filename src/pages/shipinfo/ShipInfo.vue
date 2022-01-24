@@ -42,16 +42,16 @@
 <script>
 import TableSearch from 'components/common/table-search/TableSearch.vue';
 import BaseTable from 'components/common/table/Mytable.vue';
-import EditAdd from './components/S-AddOrEdit.vue';
-import StateInfo from './components/S-StateInfo.vue';
 import EditConfig from './components/S-EditConfig.vue';
+import StateInfo from './components/S-StateInfo.vue';
+import EditAdd from './components/S-AddOrEdit.vue';
 import OnVideo from './components/S-LineVideo.vue';
-import * as shipApi from 'api/shipinfo';
 import * as organApi from 'api/organization';
+import * as shipApi from 'api/shipinfo';
 import * as liveApi from 'api/camera';
 import { PAGE_SIZE, BASE_CONSTANTS } from '@/config';
-import { confirmMsg } from '@/utils';
 import { checkTokenTime } from '@/utils/token';
+import { confirmMsg } from '@/utils';
 
 export default {
   name: 'shipinfo',
@@ -68,16 +68,16 @@ export default {
       checkTokenInterval: null,
       total: 0,
       title: 'add',
+      /**组件是否弹窗 */
       isShowEditAdd: false,
       isShowState: false,
       isShowConfig: false,
       isShowVideo: false,
       loading: false,
-      currentRow: {},
+      currentRow: {}, // 当前表格行的信息
       organInfoList: [],
       shipList: [],
-      tableColumn: [],
-      // 视频信息
+      // 视频组件信息
       videoData: {
         url: null,
         token: null,

@@ -80,6 +80,7 @@ export default {
       } else {
         this.$nextTick(() => {
           this.from.name = '';
+          this.$refs.from.clearValidate();
         });
       }
     },
