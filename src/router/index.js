@@ -45,19 +45,19 @@ export const routes = [
       },
       {
         path: '/shipinfo',
-        component: () => import(/* webpackChunkName: "shipinfo" */ '../pages/shipinfo/ShipInfo.vue'),
-          meta: { title: '船舶信息管理', icon: 'el-icon-lx-home' }
+        component: () =>
+          import(/* webpackChunkName: "shipinfo" */ '../pages/shipinfo/ShipInfo.vue'),
+        meta: { title: '船舶信息管理', icon: 'el-icon-lx-home' }
       },
       {
         path: '/plan',
         component: () => import(/* webpackChunkName: "plan" */ 'pages/plan/Plan'),
-        meta: { title: '计划航线管理', icon: 'el-icon-lx-home'}
-    
+        meta: { title: '计划航线管理', icon: 'el-icon-lx-home' }
       },
       {
         path: '/404',
         component: () => import(/* webpackChunkName: "404" */ '../pages/404/404.vue')
-      },
+      }
     ]
   },
   {
@@ -72,11 +72,17 @@ export const routes = [
 ];
 
 // 解决ElementUI导航栏中的vue-router在3.0版本以上重复点菜单报错问题
+//push
 const originalPush = Router.prototype.push;
+const originalReplace = Router.prototype.replace;
 Router.prototype.push = function push(location) {
   return originalPush.call(this, location).catch((err) => err);
 };
-
+// replace
+Router.prototype.replace = function push(location, onResolve, onReject) {
+  if (onResolve || onReject) return originalReplace.call(this, location, onResolve, onReject);
+  return originalReplace.call(this, location).catch((err) => err);
+};
 const router = new Router({
   routes,
   mode: 'history'

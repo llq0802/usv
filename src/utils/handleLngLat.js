@@ -1,3 +1,27 @@
+// 字符串经纬度转成路径二维数组
+export const str2Path = (str) => {
+  const res = [];
+  const tempArr = str.split(' ');
+  for (const item of tempArr) {
+    let bound = item.split(',').map(Number);
+    res.push([bound[1], bound[0]]);
+  }
+  return res;
+};
+// 路径二维数组转成字符串经纬度
+export function path2Str(arr) {
+  let bounds = '';
+  // bounds格式转换
+  for (const item of arr) {
+    if (item.lng) {
+      bounds += `${item.lng},${item.lat} `;
+    } else {
+      bounds += `${item[1]},${item[0]} `;
+    }
+  }
+  return bounds.trim();
+}
+
 // 'a,b' <=> [b, a]
 export const turnLngLat = (o) => {
   const res = Object.prototype.toString.call(o).slice(8, -1);
@@ -6,6 +30,12 @@ export const turnLngLat = (o) => {
     return [+strs[1], +strs[0]];
   } else if (res === 'Array') {
     return `${o[1]},${o[0]}`;
+  } else if (res === 'Object') {
+    if (o.lng) {
+      return `${o.lng},${o.lat}`;
+    } else {
+      return `${o.longitude},${o.latitude}`;
+    }
   }
 };
 

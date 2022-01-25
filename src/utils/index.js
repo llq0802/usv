@@ -2,13 +2,13 @@
  *防抖
  *
  * @param {*} fn
- * @param {number} [ms=0]
+ * @param {number} [ms=300]
  * @return {*}
  */
 export const debounce = (fn, ms = 300) => {
-  let timeoutId;
+  let timeoutId = null;
   return function (...args) {
-    clearTimeout(timeoutId);
+    if (timeoutId) clearTimeout(timeoutId);
     timeoutId = setTimeout(() => fn.apply(this, args), ms);
   };
 };
@@ -17,7 +17,7 @@ export const debounce = (fn, ms = 300) => {
  *节流
  *
  * @param {*} fn
- * @param {wait} [ms=0]
+ * @param {wait} [ms=300]
  * @return {*}
  */
 export const throttle = (fn, wait = 300) => {
