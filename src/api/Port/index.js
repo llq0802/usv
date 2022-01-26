@@ -104,3 +104,27 @@ export const apiDeleteBerth = (id) => {
     params: { id }
   });
 };
+//删除端点
+export const apiDelPoint = (id) => {
+  return request({
+    url: `/procedure/deleteendpoint`,
+    method: 'post',
+    params: { id }
+  });
+};
+//删除过渡路径
+export const apiDelTransition = (id) => {
+  return request({
+    url: `/transition/delete`,
+    method: 'post',
+    params: { id }
+  });
+};
+//删除程序
+export const apiDelProcedure = (id) => {
+  return request({
+    url: `/procedure/delete`,
+    method: 'post',
+    params: { id }
+  });
+};

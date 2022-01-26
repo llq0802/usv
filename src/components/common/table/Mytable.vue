@@ -30,7 +30,7 @@
         :align="item.align || 'center'"
         :width="item.width || ''"
       >
-        <!-- 因为有些参数需要判定比如性别所以判断一下 -->
+        <!-- 作用域插槽 -->
         <template slot-scope="scope">
           <span v-if="item.render">
             {{ item.render(scope.row[item.prop], scope.row) }}
@@ -94,7 +94,7 @@
     </el-table>
     <!-- 表格结束 -->
 
-    <!-- 翻页 -->
+    <!-- 翻页器 -->
     <el-pagination
       v-if="total"
       small
@@ -127,6 +127,7 @@ export default {
       type: Boolean,
       default: true
     },
+    // 序号
     tableIndex: {
       type: Boolean,
       default: true
@@ -201,7 +202,7 @@ export default {
     // 按钮点击事件
     // methods方法名 row当前点击列数据 index当前点击的index
     handleButton(event, methods, row, index) {
-      this.$emit('buttonClick', {event, methods: methods, row: row, index: index });
+      this.$emit('buttonClick', { event, methods: methods, row: row, index: index });
     },
     // 当表格的排序条件发生变化的时候会触发该事件	{ column, prop, order }
     handleSortChange(column, prop, order) {

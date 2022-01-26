@@ -1,6 +1,9 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 import { getStorage } from '@/utils/localStorage';
+import { checkTokenTime } from '@/utils/token';
+import { Message } from 'element-ui';
+
 Vue.use(Router);
 export const routes = [
   {
@@ -8,6 +11,7 @@ export const routes = [
     component: () => import(/* webpackChunkName: "home" */ '../components/common/layout/Index.vue'),
     meta: { title: '首页' },
     children: [
+      //meta中hidden表示是否在侧边菜单栏中显示,默认显示,为true则不显示
       {
         path: '/',
         component: () => import(/* webpackChunkName: "dashboard" */ '../pages/home/Dashboard.vue'),
@@ -88,12 +92,19 @@ const router = new Router({
   mode: 'history'
 });
 
-//使用钩子函数对路由进行权限跳转
+//使用钩子函数对路由进行拦截跳转
 router.beforeEach((to, from, next) => {
   const token = getStorage('token');
+  const tokenTime = getStorage('tokenTime');
+  // token是否过期
+  const isPast = checkTokenTime(tokenTime, 0);
   if (to.path === '/login') return next();
-  if (!token) {
-    // this.$message.error('用户登录信息失效,请重新登录')
+  if (!token || isPast) {
+    Message({
+      message: '用户身份信息失效，请重新登录',
+      type: 'error',
+      duration: 3500
+    });
     return next('./login');
   } else {
     return next();

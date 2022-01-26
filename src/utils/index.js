@@ -1,6 +1,5 @@
 /**
  *防抖
- *
  * @param {*} fn
  * @param {number} [ms=300]
  * @return {*}
@@ -15,7 +14,6 @@ export const debounce = (fn, ms = 300) => {
 
 /**
  *节流
- *
  * @param {*} fn
  * @param {wait} [ms=300]
  * @return {*}
@@ -114,9 +112,8 @@ export function returnMessage(message) {
 export const confirmMsg = async (context, val = '此操作将永久删除该项') => {
   const confirmRlust = await context
     .$confirm(`${val}, 是否继续？`, '提示', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
+      type: 'warning',
+      closeOnClickModal: false
     })
     .catch((err) => err);
   return confirmRlust;

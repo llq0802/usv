@@ -161,6 +161,7 @@
               </div>
             </div>
           </el-amap-marker>
+          <!-- 泊位范围 -->
           <el-amap-polygon
             v-for="bound in berthList"
             :key="bound.id + 'bb'"
@@ -187,7 +188,7 @@
             :events="pointEvents"
             :extData="point"
           >
-            <div @click.stop="handleCurrentClick('point', point)" class="berth-point"></div>
+            <div class="point-point" @click.stop="handleCurrentClick('point', point)"></div>
             <div class="text-style shadow" @click.stop="handleCurrentClick('point', point)">
               {{ point.ident }}
             </div>
@@ -218,7 +219,7 @@
                 </div>
               </div>
               <div class="port-btn-box">
-                <el-button type="danger" @click.stop="delPoint(point.id)" size="mini"
+                <el-button type="danger" @click.stop="deletePoint(point.id)" size="mini"
                   >删除</el-button
                 >
                 <el-button type="primary" @click.stop="editPoint(point)" size="mini"
@@ -230,15 +231,15 @@
         </template>
 
         <!--进出港程序-->
-        <!--     <template v-if="procedureList.length" id="channeDom">
+        <template v-if="procedureList.length" id="procedure">
           <div v-for="item in procedureList" :key="item.id + 'cc'">
             <el-amap-polyline
-              :strokeColor="item.type === 1 ? '#00C227' : ' #976F02'"
+              :strokeColor="item.type === 1 ? '#00000' : ' #8af22d'"
               strokeStyle="solid"
               :geodesic="true"
-              :path="item.path"
+              :path="item.boundList"
               :strokeWeight="currentProcedure && currentProcedure.id === item.id ? 6 : 2"
-              :events="procedureEvents"
+              :events="procedureLineEvents"
               :bubble="true"
               :editable="currentProcedure && currentProcedure.id === item.id"
               :extData="item"
@@ -246,16 +247,20 @@
             >
             </el-amap-polyline>
 
-            <div v-if="currentProcedure && currentProcedure.id === item.id">
-              <el-amap-marker
-                :position="[item.centerPoint[0], item.centerPoint[1]]"
-                :offset="[-3, -3]"
-                :extData="item"
-              >
-                <div class="ident-box" @click.stop="handleCurrentClick('procedure', item)">
-                  {{ item.ident + BASE_CONSTANTS.portType(item.type) }}
-                </div>
+            <el-amap-marker
+              :position="item.centerPoint"
+              :offset="[-9, -4]"
+              :events="procedureMarkerEvents"
+              :extData="item"
+            >
+              <div class="text-style" @click.stop="handleCurrentClick('procedure', item)">
+                {{ item.ident + BASE_CONSTANTS.procedureType(item.type) }}
+              </div>
+            </el-amap-marker>
 
+            <template v-if="currentProcedure && currentProcedure.id === item.id">
+              <el-amap-marker :position="item.centerPoint" :offset="[-3, -3]" :extData="item">
+                <!-- 程序信息框 -->
                 <div
                   class="port-box"
                   @mousemove="eventStopPropagation('div', $event)"
@@ -264,17 +269,17 @@
                 >
                   <i class="el-icon-close" @click.stop="handleBoxClose('procedure')"></i>
                   <div class="item-box-title">
-                    {{ BASE_CONSTANTS.portType(item.type) }}程序 {{ item.ident }}
+                    {{ BASE_CONSTANTS.procedureType(item.type) }}程序 {{ item.ident }}
                   </div>
                   <div class="item-box">
                     <div>起点</div>
-                    <div>
-                      <el-select v-model="item.startId" placeholder="请选择" clearable size="mini">
+                    <div class="item-select">
+                      <el-select v-model="item.startId" placeholder="请选择" size="mini">
                         <el-option
-                          v-for="(item, index) in pointList"
-                          :key="index + 'cc'"
-                          :label="item.ident"
-                          :value="item.id"
+                          v-for="(point, index) in pointList"
+                          :key="index + 'ee'"
+                          :label="point.ident"
+                          :value="point.id"
                         >
                         </el-option>
                       </el-select>
@@ -282,20 +287,20 @@
                   </div>
                   <div class="item-box">
                     <div>终点</div>
-                    <div>
-                      <el-select v-model="item.endId" placeholder="请选择" clearable size="mini">
+                    <div class="item-select">
+                      <el-select v-model="item.endId" placeholder="请选择" size="mini">
                         <el-option
-                          v-for="(item, index) in pointList"
+                          v-for="(point, index) in pointList"
                           :key="index + 'dd'"
-                          :label="item.ident"
-                          :value="item.id"
+                          :label="point.ident"
+                          :value="point.id"
                         >
                         </el-option>
                       </el-select>
                     </div>
                   </div>
                   <div class="port-btn-box">
-                    <el-button type="danger" @click="delProcedure(item.id)" size="mini"
+                    <el-button type="danger" @click="deleteProcedure(item.id)" size="mini"
                       >删除</el-button
                     >
                     <el-button type="primary" @clic.stop="editProcedure(item)" size="mini"
@@ -304,9 +309,9 @@
                   </div>
                 </div>
               </el-amap-marker>
-            </div>
+            </template>
           </div>
-        </template> -->
+        </template>
       </template>
     </Amap>
   </div>
@@ -315,9 +320,9 @@
 <script>
 import Amap from 'components/amap/Amap';
 import TableSearch from 'components/common/table-search/TableSearch';
+import * as portApi from 'api/port';
 import { apiGetNavaByQuery } from 'api/nava';
 import { apiGetWayByQuery } from 'api/waterway';
-import * as portApi from 'api/port';
 import { turnLngLat, turnLngLatObj, str2Path, path2Str } from '@/utils/handleLngLat';
 import { debounce, confirmMsg } from '@/utils';
 import { BASE_CONSTANTS } from '@/config';
@@ -344,6 +349,7 @@ export default {
       currentBerth: null,
       currentPoint: null,
       currentProcedure: null,
+
       isRequst: true,
       zoomLevel: 15,
       publicQuery: {
@@ -378,9 +384,11 @@ export default {
           }
         }
       }),
-      procedureEvents: Object.freeze({}),
+      procedureLineEvents: Object.freeze({}),
+      procedureMarkerEvents: Object.freeze({}),
       portLineEvents: Object.freeze({
         adjust: (e) => {
+          if (!this.currentPort.id) return;
           let bounds = e.target.getPath();
           this.currentPort.bounds = path2Str(bounds);
           // let area = Math.round(AMap.GeometryUtil.ringArea(bounds));
@@ -388,8 +396,10 @@ export default {
       }),
       BerthEvents: Object.freeze({
         adjust: (e) => {
-          let bounds = e.target.getPath();
-          this.currentBerth.bounds = path2Str(bounds);
+          if (this.currentBerth) {
+            let bounds = e.target.getPath();
+            this.currentBerth.bounds = path2Str(bounds);
+          }
         }
       })
     };
@@ -479,7 +489,7 @@ export default {
           item.locationArr = turnLngLat(item.location);
           item.ident = item.ident.toLocaleUpperCase();
         }
-        console.log(data);
+        // console.log(data);
       }
     },
     /**
@@ -494,14 +504,14 @@ export default {
           item.boundList = str2Path(item.path);
           item.ident = item.ident.toLocaleUpperCase();
           item.centerPoint =
-            item.path.length % 2 == 0
-              ? item.path[item.path.length / 2]
-              : item.path[(item.path.length - 1) / 2];
+            item.boundList.length % 2 == 0
+              ? item.boundList[item.boundList.length / 2]
+              : item.boundList[(item.boundList.length - 1) / 2];
 
           item.tableShowPoint = `${item.start.ident.toLocaleUpperCase()} → ${item.end.ident.toLocaleUpperCase()}`;
         }
-        this.procedureList = data.result.sort((a, b) => a.type - b.type);
-        // console.log(this.procedureList);
+        this.procedureList = data.result.sort((a, b) => a.type - b.type); //type: 1离港,2进港
+        console.log(this.procedureList);
       }
     },
 
@@ -572,10 +582,12 @@ export default {
         // console.log(this.currentPort);
         this.showPortArea(this.currentPort, amap);
       } else {
-        // 重置
+        // 重置数据
         this.currentPort = { isPortEdit: false };
         this.currentBerth = null;
-        this.berthList = [];
+        this.currentPoint = null;
+        this.berthList.length = 0;
+        this.pointList.length = 0;
         currentPort = null;
       }
     }, 400),
@@ -596,7 +608,7 @@ export default {
     async getTransitionList(id) {},
 
     /**
-     * 点击不同的maker标
+     * 点击不同的maker标显示信息
      */
     handleCurrentClick(type, value) {
       if (type === 'port') {
@@ -616,6 +628,7 @@ export default {
         this.currentProcedure = null;
       } else if (type === 'procedure') {
         this.currentProcedure = value;
+        console.log(this.pointList);
         this.currentPort.isPortEdit = false;
         this.currentPoint = null;
         this.currentBerth = null;
@@ -629,7 +642,7 @@ export default {
         this.currentPort.isPortEdit = false;
       } else if (type === 'berth') {
         this.currentBerth = null;
-      } else if (type === 'procedureo') {
+      } else if (type === 'procedure') {
         this.currentProcedure = null;
       } else if (type === 'point') {
         this.currentPoint = null;
@@ -684,8 +697,44 @@ export default {
     },
 
     async editProcedure(val) {},
-    async delProcedure(id) {},
-    async delPoint(id) {},
+
+    /**
+     * 删除程序
+     */
+    async deleteProcedure(id) {
+      const confirmRlust = await confirmMsg(this);
+      if (confirmRlust === 'confirm') {
+        const { errorCode } = await portApi.apiDelProcedure(id);
+        if (+errorCode === 0) {
+          this.$message.success('删除成功');
+        }
+      }
+    },
+
+    /**
+     * 删除端点
+     */
+    async deletePoint(id) {
+      const confirmRlust = await confirmMsg(this);
+      if (confirmRlust === 'confirm') {
+        const { errorCode } = await portApi.apiDelPoint(id);
+        if (+errorCode === 0) {
+          this.$message.success('删除成功');
+        }
+      }
+    },
+    /**
+     * 删除过渡路径
+     */
+    async deleteTransition(id) {
+      const confirmRlust = await confirmMsg(this);
+      if (confirmRlust === 'confirm') {
+        const { errorCode } = await portApi.apiDelTransition(id);
+        if (+errorCode === 0) {
+          this.$message.success('删除成功');
+        }
+      }
+    },
     /**
      * 删除港口
      */
@@ -785,20 +834,30 @@ export default {
     background-color: @port-maker-color;
     color: #242f42;
   }
+  /* 泊位圆点 */
   .berth-point {
-    width: 6px;
-    height: 6px;
+    width: 7px;
+    height: 7px;
     background-color: rgb(137, 128, 145);
     border-radius: 50%;
   }
+
   .berth-maker {
     border: 2px solid rgb(137, 128, 145);
     border-radius: 50%;
   }
-  /**公共信息框中的每一项*/
+  /* 端点圆点 */
+  .point-point {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgb(29, 57, 136);
+  }
+
+  /**公共框中的每一项*/
   .item-box {
     display: flex;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
     justify-content: space-between;
     align-items: center;
     white-space: nowrap;
@@ -807,13 +866,16 @@ export default {
       padding-left: 2px;
     }
   }
-  /**公共信息框中的标题项*/
+  .item-select {
+    width: 170px;
+  }
+  /**公共框中的标题项*/
   .item-box-title {
     font-size: 16px;
     line-height: 35px;
     font-weight: bold;
   }
-  /**公共信息框*/
+  /**公共框*/
   /deep/ .port-box {
     position: absolute;
     left: 15px;

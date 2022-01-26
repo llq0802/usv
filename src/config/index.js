@@ -22,7 +22,7 @@ let ChannelRouters = new Map([
   [0, '自动规划'],
   [1, '手动规划']
 ]);
-let portType = new Map([
+let procedureType = new Map([
   [1, '离港'],
   [2, '进港']
 ]);
@@ -86,7 +86,7 @@ export const BASE_CONSTANTS = {
   strokeColorList: (val) => strokeColorList.get(val),
   colorArray: (val) => colorArray.get(val),
   powerColors: () => powerColors,
-  portType: (val) => portType.get(val)
+  procedureType: (val) => procedureType.get(val)
 };
 //系统名称
 export const HEADER_TITLE = '船舶智能调度管理平台';
