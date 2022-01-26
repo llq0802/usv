@@ -79,6 +79,7 @@ export default {
         // 点击事件
         click: (e) => {
           if (!this.isEdit) return;
+          if (this.preventClickMap) return;
           // 获取坐标点
           let p = e.lnglat;
           p.location = `${p.lat},${p.lng}`;
@@ -91,6 +92,11 @@ export default {
   props: {
     // 是否可编辑
     isEdit: {
+      type: Boolean,
+      default: false,
+    },
+    // 防止误点地图
+    preventClickMap: {
       type: Boolean,
       default: false,
     }

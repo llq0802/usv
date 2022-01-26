@@ -26,6 +26,7 @@
 <script>
 import { deepClone } from '@/utils';
 import { apiGetOrganAll } from 'api/organization';
+import { apiPostAddPlan } from 'api/plan';
 
 export default {
   props: {
@@ -96,10 +97,15 @@ export default {
     },
     // 确认
     confirm () {
-      this.$refs.addFormRef.validate(val => {
-        if(!val) return;
-        // 传递克隆数据，否则对话框关闭父组件接收到的数据被清空
-        this.$emit('getAddForm', deepClone(this.addFrom));
+      this.$refs.addFormRef.validate(async val => {
+        if (!val) return;
+        const res = await apiPostAddPlan(this.addFrom);
+        if (!res.errorCode) {
+          this.$message.success('计划添加成功！');
+          this.closeAdd();
+          // 更新计划列表
+          this.$parent.getPlanList();
+        }
       })
     }
   },

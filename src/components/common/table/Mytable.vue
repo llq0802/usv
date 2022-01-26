@@ -11,6 +11,7 @@
       :border="border"
       :show-header="showHeader"
       :size="tableSize"
+      :highlight-current-row="highlightCurrentRow"
       @sort-change="handleSortChange"
       @cell-click="handleCellClick"
       @row-click="handleRowClick"
@@ -134,6 +135,11 @@ export default {
     tableSize: {
       type: String,
       default: 'small'
+    },
+    // 高亮显示当前行
+    highlightCurrentRow: {
+      type: Boolean,
+      default: false
     },
     // 预加载loading
     tableLoading: {

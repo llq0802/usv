@@ -1,22 +1,22 @@
 // 'a,b' <=> [b, a]
 export const turnLngLat = o => {
-  if (Object.prototype.toString.call(o) === '[object, String]') {
+  if (Object.prototype.toString.call(o) === '[object String]') {
     let strs = o.split(',');
-    return [strs[1], strs[0]];
-  } else if (Object.prototype.toString.call(o) === '[object, Array]') {
+    return [Number(strs[1]), Number(strs[0])];
+  } else if (Object.prototype.toString.call(o) === '[object Array]') {
     return `${o[1]},${o[0]}`;
   }
 }
 
 // 'a,b' | [b, a] => {latitude: a, longitude: b}
 export const turnLngLatObj = o => {
-  if (Object.prototype.toString.call(o) === '[object, String]') {
+  if (Object.prototype.toString.call(o) === '[object String]') {
     let strs = o.split(',');
     return {
       latitude: parseFloat(strs[0]),
       longitude: parseFloat(strs[1])
     }
-  } else if (Object.prototype.toString.call(o) === '[object, Array]') {
+  } else if (Object.prototype.toString.call(o) === '[object Array]') {
     return {
       latitude: o[1],
       longitude: o[0]
@@ -65,6 +65,11 @@ export const strArrToTdArr = arr => {
   }
   return location;
 }
+
+// [a, b], [c, d] => [[a, b], [c, d]]
+export const arrToTdArr = arr => {
+  
+};
 
 // 字符串转换路径坐标 '1,2 /n 3,4' => [[2,1],[4,3]]
 export const translatePath = string => {
