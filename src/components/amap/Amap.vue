@@ -1,4 +1,3 @@
-
 <template>
   <div class="map-container" v-loading="mapLoading">
     <el-amap
@@ -24,7 +23,6 @@
       <slot name="port_berth"></slot>
       <!--航图展示管理-->
       <slot name="show"></slot>
-
     </el-amap>
 
     <!-- 卫星按钮 -->
@@ -52,11 +50,13 @@ export default {
       mapLoading: false,
       // 地图实例
       mapInstance: null,
-      // 事件队列
+      // 地图实例是否加载完成
       isCompleted: false,
+      // 地图实例加载完成后执行的回调函数数组
       completedCallbacks: [],
-      // 卫星图层
+      // 是否卫星图层
       isSate: false,
+      // 卫星图层实例
       sateLayer: null,
       // 地图事件
       amapEvents: {
@@ -67,6 +67,11 @@ export default {
             self.mapInstance = instance;
             // 获取卫星图层
             self.sateLayer = new AMap.TileLayer.Satellite();
+            //初始化完成时就获取地图可视范围
+            self.getMapBounds();
+            // 当地图拖动,或者层级改变获取地图可视范围
+            self.mapInstance.on('zoomchange', self.getMapBounds);
+            self.mapInstance.on('dragend', self.getMapBounds);
             // 设置鼠标样式
             self.mapInstance.setDefaultCursor();
             // 事件队列依次执行
@@ -90,7 +95,7 @@ export default {
     };
   },
   props: {
-    // 是否可编辑
+    // 是否可点击编辑
     isEdit: {
       type: Boolean,
       default: false,
@@ -127,6 +132,29 @@ export default {
     setCursor(target = 'default') {
       // 'default' | 'pointer' | 'move' | 'crosshair'
       this.mapInstance.setDefaultCursor(target);
+    },
+
+    // 获取地图的可视范围范围, 将地图范围,地图层级,中心点发送
+    getMapBounds() {
+      if (this.mapInstance) {
+        this.$nextTick(() => {
+          const mapBounds = this.mapInstance.getBounds();
+          let southWest = mapBounds.southwest,
+            northEast = mapBounds.northeast;
+          const boundPath = [
+            [northEast.lng, southWest.lat],
+            [southWest.lng, southWest.lat],
+            [southWest.lng, northEast.lat],
+            [northEast.lng, northEast.lat]
+          ];
+          this.$emit(
+            'getMapBounds',
+            boundPath,
+            this.mapInstance.getZoom(),
+            this.mapInstance.getCenter()
+          );
+        });
+      }
     }
   }
 };

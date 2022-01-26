@@ -1,26 +1,24 @@
 /**
  *防抖
- *
  * @param {*} fn
- * @param {number} [ms=0]
+ * @param {number} [ms=300]
  * @return {*}
  */
-export const debounce = (fn, ms = 0) => {
-  let timeoutId;
+export const debounce = (fn, ms = 300) => {
+  let timeoutId = null;
   return function (...args) {
-    clearTimeout(timeoutId);
+    if (timeoutId) clearTimeout(timeoutId);
     timeoutId = setTimeout(() => fn.apply(this, args), ms);
   };
 };
 
 /**
  *节流
- *
  * @param {*} fn
- * @param {wait} [ms=0]
+ * @param {wait} [ms=300]
  * @return {*}
  */
-export const throttle = (fn, wait) => {
+export const throttle = (fn, wait = 300) => {
   let inThrottle, lastFn, lastTime;
   return function () {
     const context = this,
@@ -114,9 +112,8 @@ export function returnMessage(message) {
 export const confirmMsg = async (context, val = '此操作将永久删除该项') => {
   const confirmRlust = await context
     .$confirm(`${val}, 是否继续？`, '提示', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
+      type: 'warning',
+      closeOnClickModal: false
     })
     .catch((err) => err);
   return confirmRlust;

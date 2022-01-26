@@ -67,7 +67,7 @@ export default {
                 //设置本地存储
                 setStorage('token', data.token);
                 //过期时间
-                setStorage('tokenTime', objToken.nbf || arrayToken[7]);
+                setStorage('tokenTime', arrayToken[7] || objToken.nbf);
                 //用户名
                 setStorage('userName', this.param.userName);
                 // 角色

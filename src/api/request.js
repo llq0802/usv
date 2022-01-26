@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { returnMessage } from '@/utils';
-import { getStorage } from '@/utils/localStorage';
+import { getStorage, delStorage } from '@/utils/localStorage';
 import { updateToken } from '@/utils/token';
 import { API } from '../config';
 import router from '@/router';
@@ -58,11 +58,12 @@ service.interceptors.response.use(
     //身份过期
     if (err.response.status === 401) {
       Message({
-        message: err.response.data.message || '身份信息过期,请重新登录',
+        message: err.response.data.message || '用户身份信息过期，请重新登录',
         type: 'error',
         duration: 3500
       });
       router.replace('/login');
+      delStorage();
     } else {
       // 接收返回的信息,并提示用户
       if (err.response.data.message) {
@@ -79,7 +80,7 @@ service.interceptors.response.use(
         });
       }
     }
-    console.log('响应错误', err);
+    console.log('响应错误', err.response);
     return Promise.reject();
   }
 );

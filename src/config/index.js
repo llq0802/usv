@@ -22,6 +22,11 @@ let ChannelRouters = new Map([
   [0, '自动规划'],
   [1, '手动规划']
 ]);
+let procedureType = new Map([
+  [1, '离港'],
+  [2, '进港']
+]);
+
 // 多条船只显示不同的颜色数组
 let strokeColorList = new Map([
   [0, '#ff3838a0'],
@@ -80,7 +85,8 @@ export const BASE_CONSTANTS = {
   returnMode: (val) => ReturnModes.get(val),
   strokeColorList: (val) => strokeColorList.get(val),
   colorArray: (val) => colorArray.get(val),
-  powerColors: () => powerColors
+  powerColors: () => powerColors,
+  procedureType: (val) => procedureType.get(val)
 };
 //系统名称
 export const HEADER_TITLE = '船舶智能调度管理平台';
