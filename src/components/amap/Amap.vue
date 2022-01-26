@@ -98,12 +98,12 @@ export default {
     // 是否可点击编辑
     isEdit: {
       type: Boolean,
-      default: false,
+      default: false
     },
     // 防止误点地图
     preventClickMap: {
       type: Boolean,
-      default: false,
+      default: false
     }
   },
   methods: {

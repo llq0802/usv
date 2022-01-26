@@ -22,9 +22,18 @@ let ChannelRouters = new Map([
   [0, '自动规划'],
   [1, '手动规划']
 ]);
+// 港口泊位页面常量
 let procedureType = new Map([
   [1, '离港'],
   [2, '进港']
+]);
+let transitionType = new Map([
+  [1, '泊位'],
+  [2, '航标']
+]);
+let transitionDirectione = new Map([
+  [1, '进港'],
+  [2, '离港']
 ]);
 
 // 多条船只显示不同的颜色数组
@@ -86,7 +95,9 @@ export const BASE_CONSTANTS = {
   strokeColorList: (val) => strokeColorList.get(val),
   colorArray: (val) => colorArray.get(val),
   powerColors: () => powerColors,
-  procedureType: (val) => procedureType.get(val)
+  procedureType: (val) => procedureType.get(val),
+  transitionDirectione: (val) => transitionDirectione.get(val),
+  transitionType: (val) => transitionType.get(val)
 };
 //系统名称
 export const HEADER_TITLE = '船舶智能调度管理平台';
