@@ -113,6 +113,13 @@ export const PAGE_SIZE = {
   size: 10,
   page_sizes: [10, 20, 30, 50]
 };
+//地图常数
+export const AMAP = {
+  center: [106.551842, 29.592214],
+  zoom: 12,
+  zooms: [2, 20]
+};
+
 //权限对应表
 export const ROLE = [
   {

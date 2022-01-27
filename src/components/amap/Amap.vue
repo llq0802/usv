@@ -34,6 +34,7 @@
 </template>
 
 <script>
+import { AMAP } from '@/config';
 // 引入地图
 import VueAMap, { lazyAMapApiLoaderInstance } from 'vue-amap';
 // 引入实例懒加载api
@@ -44,9 +45,9 @@ export default {
     let self = this;
     return {
       // 地图基本参数
-      center: [106.551842, 29.592214],
-      zoom: 12,
-      zooms: [2, 20],
+      center: AMAP.center,
+      zoom: AMAP.zoom,
+      zooms: AMAP.zooms,
       mapLoading: false,
       // 地图实例
       mapInstance: null,

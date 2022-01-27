@@ -856,6 +856,7 @@ export default {
         this.currentPoint = null;
         this.currentProcedure = null;
         this.currentTransition = null;
+
         this.berthList.length = 0;
         this.pointList.length = 0;
         this.procedureList.length = 0;

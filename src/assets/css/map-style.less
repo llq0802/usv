@@ -6,3 +6,62 @@
 .amap-copyright {
   opacity: 0;
 }
+
+/*地图中弹窗阴影*/
+.shadow {
+  box-shadow: 0 0 8px -2px;
+}
+/**弹窗中的字体样式*/
+.text-style {
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: bold;
+  text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;
+}
+
+/**地图中的公共框dialog*/
+.port-box {
+  position: absolute;
+  left: 15px;
+  top: 50px;
+  padding: 10px 15px 15px 15px;
+  border-radius: 10px;
+  font-size: 15px;
+  background-color: rgba(255, 255, 255, 0.9);
+}
+.port-box:hover {
+  cursor: default;
+}
+.port-box:after {
+  content: '';
+  width: 0;
+  height: 0;
+  border-bottom: 10px solid rgba(255, 255, 255, 0.9);
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  position: absolute;
+  top: -10px;
+  left: 10px;
+}
+
+/**公共框中的标题项*/
+.item-box-title {
+  font-size: 16px;
+  line-height: 35px;
+  font-weight: bold;
+}
+/**框中的每一项*/
+.item-box {
+  display: flex;
+  margin-bottom: 12px;
+  justify-content: space-between;
+  align-items: center;
+  white-space: nowrap;
+}
+.item-left {
+  margin-right: 18px;
+  padding-left: 2px;
+}
+.item-select {
+  width: 170px;
+}

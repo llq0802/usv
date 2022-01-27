@@ -26,8 +26,7 @@ export const routes = [
       },
       {
         path: '/portberth',
-        component: () =>
-          import(/* webpackChunkName: "portberth" */ '../pages/portberth/PortBerth.vue'),
+        component: () => import(/* webpackChunkName: "portberth" */ '../pages/portberth/Port.vue'),
         meta: { title: '港口泊位管理', icon: 'el-icon-lx-home' }
       },
       {
@@ -103,7 +102,7 @@ router.beforeEach((to, from, next) => {
     Message({
       message: '用户身份信息失效，请重新登录',
       type: 'error',
-      duration: 3500
+      duration: 4000
     });
     return next('./login');
   } else {

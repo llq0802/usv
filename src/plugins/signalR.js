@@ -38,9 +38,9 @@ export default class SocketService {
       .build();
 
     try {
-      // const isTokenPast = !checkTokenTime(tokenTime, 0);
+      const isTokenPast = !checkTokenTime(tokenTime, 0);
       //存在token，并且没有过期
-      if (token) {
+      if (token && isTokenPast) {
         // 开始连接
         await this.ws.start();
         //表示连接成功
