@@ -87,16 +87,17 @@ export default {
 </script>
 
 <style scoped lang="less">
+@berth-background-color: rgba(137, 128, 145, 1);
 /* 泊位圆点 */
 .berth-point {
   width: 7px;
   height: 7px;
-  background-color: rgb(137, 128, 145);
+  background-color: @berth-background-color;
   border-radius: 50%;
 }
 
 .berth-maker {
-  border: 2px solid rgb(137, 128, 145);
+  border: 2px solid @berth-background-color;
   border-radius: 50%;
 }
 </style>

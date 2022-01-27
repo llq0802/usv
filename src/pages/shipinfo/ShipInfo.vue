@@ -84,7 +84,6 @@ export default {
         exp: null,
         cTime: null
       },
-      tableOption: {},
       shipParams: {
         // 'Condition.States': [0, 1, 2, 3, 4, 5].join(','),
         'Condition.Keyword': '',

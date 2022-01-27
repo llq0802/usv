@@ -82,11 +82,12 @@ export default {
 </script>
 
 <style scoped lang="less">
+@point-background-color: rgb(29, 57, 136);
 /* 端点圆点 */
 .point-point {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: rgb(29, 57, 136);
+  background: @point-background-color;
 }
 </style>

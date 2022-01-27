@@ -1,10 +1,8 @@
 <template>
   <!-- 按钮 -->
   <div class="port-btn-box">
-    <el-button type="danger" size="mini" @click.stop="handleDelete(item.id, 'apiDelPort')"
-      >删除</el-button
-    >
-    <el-button type="primary" size="mini" @click.stop="handleEdit(item)"> 保存</el-button>
+    <el-button type="danger" size="mini" @click.stop="handleDelete">删除</el-button>
+    <el-button type="primary" size="mini" @click.stop="handleEdit"> 保存</el-button>
   </div>
 </template>
 

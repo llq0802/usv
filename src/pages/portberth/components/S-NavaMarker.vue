@@ -19,7 +19,7 @@ export default {
 </script>
 
 <style scoped lang="less">
-@nava-box_color: rgba(80, 114, 209, 0.8);
+@nava-background-color: rgba(80, 114, 209, 0.8);
 @nava-maker-color: rgba(90, 115, 141, 1);
 
 /**航标点样式 */
@@ -38,13 +38,13 @@ export default {
   text-align: center;
   border-radius: 3px;
   color: rgb(76, 113, 212);
-  background: @nava-box_color;
+  background: @nava-background-color;
 
   &::after {
     content: '';
     width: 0;
     height: 0;
-    border-bottom: 8px solid rgba(80, 114, 209, 0.397);
+    border-bottom: 8px solid @nava-background-color;
     border-left: 4px solid transparent;
     border-right: 4px solid transparent;
     position: absolute;

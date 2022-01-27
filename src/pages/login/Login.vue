@@ -82,6 +82,7 @@ export default {
             }
           } catch (error) {
             this.loginLoading = false;
+            this.$message.error('服务器繁忙，请稍后再试！');
           }
         }
       });
@@ -95,7 +96,7 @@ export default {
   position: relative;
   width: 100%;
   height: 100%;
-  background-image: url(../../assets/img/login-bg.jpg);
+  background-image: url(../../assets/img/login/login-bg.jpg);
   background-size: 100%;
 }
 .ms-title {
@@ -131,6 +132,6 @@ export default {
 .login-tips {
   font-size: 12px;
   line-height: 30px;
-  color: #fff;
+  color: #f2f2f2;
 }
 </style>

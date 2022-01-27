@@ -93,20 +93,24 @@ const router = new Router({
 
 //使用钩子函数对路由进行拦截跳转
 router.beforeEach((to, from, next) => {
+  console.log(router);
   const token = getStorage('token');
   const tokenTime = getStorage('tokenTime');
   // token是否过期
   const isPast = checkTokenTime(tokenTime, 0);
-  if (to.path === '/login') return next();
-  if (!token || isPast) {
-    Message({
-      message: '用户身份信息失效，请重新登录',
-      type: 'error',
-      duration: 4000
-    });
-    return next('./login');
-  } else {
+  if (to.path === '/login') {
     return next();
+  } else {
+    if (!token || isPast) {
+      Message({
+        message: '用户身份信息失效，请重新登录',
+        type: 'error',
+        duration: 4000
+      });
+      return next('./login');
+    } else {
+      return next();
+    }
   }
 });
 

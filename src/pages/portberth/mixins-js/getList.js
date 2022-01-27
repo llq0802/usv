@@ -7,7 +7,14 @@ import { BASE_CONSTANTS } from '@/config';
 export default {
   data() {
     return {
-      BASE_CONSTANTS: Object.freeze(BASE_CONSTANTS)
+      BASE_CONSTANTS: Object.freeze(BASE_CONSTANTS),
+      portList: [], //港口数据
+      berthList: [], //泊位数据
+      navaList: [], //航标数据
+      waterwayList: [], //航道数据
+      pointList: [], //端点数据
+      procedureList: [], //程序数据
+      transitionList: [] //过渡路径数据
     };
   },
   methods: {

@@ -103,7 +103,8 @@ export default {
 </script>
 
 <style scoped lang="less">
-@port-maker-color: #1c6db9;
+@port-background-color: #1c6db9;
+@port-color: #242f42;
 
 /* 港口maker */
 .port-maker {
@@ -114,7 +115,7 @@ export default {
   font-size: 14px;
   line-height: 25px;
   white-space: nowrap;
-  background-color: @port-maker-color;
-  color: #242f42;
+  background-color: @port-background-color;
+  color: @port-color;
 }
 </style>

@@ -232,12 +232,13 @@ import { turnLngLat, path2Str } from '@/utils/handleLngLat';
 import { debounce, deepClone, confirmMsg } from '@/utils';
 import { BASE_CONSTANTS, PAGE_SIZE } from '@/config';
 //提取的公共js文件
-import getLsit from './js/getList';
-import editList from './js/editList';
+import amapEvents from './mixins-js/amapEvents';
+import getLsit from './mixins-js/getList';
+import editList from './mixins-js/editList';
 
 export default {
   name: 'portberth',
-  mixins: [getLsit, editList], //混入的js
+  mixins: [amapEvents, getLsit, editList], //混入的js
   components: {
     Amap,
     TableSearch,
@@ -255,7 +256,6 @@ export default {
   },
   mounted() {
     // console.log(this.$refs.amap.mapInstance);
-    // console.log(window.AMap);
   },
   data() {
     return {
@@ -282,101 +282,7 @@ export default {
         'Condition.Keyword': '',
         Page: PAGE_SIZE.page,
         Size: PAGE_SIZE.size
-      },
-      portList: [], //港口数据
-      berthList: [], //泊位数据
-      navaList: [], //航标数据
-      waterwayList: [], //航道数据
-      pointList: [], //端点数据
-      procedureList: [], //程序数据
-      transitionList: [], //过渡路径数据
-      waterwayEvents: Object.freeze({}),
-      transitionMarkerEvents: Object.freeze({}),
-      procedureMarkerEvents: Object.freeze({}),
-      transitionLineEvents: Object.freeze({
-        adjust: (e) => {
-          this.isRequest = false;
-          if (this.currentTransition) this.currentTransition.path = e.target.getPath();
-        },
-        click: (e) => {
-          if (this.transitionList.length) {
-            const value = e.target.getExtData();
-            this.handleCurrentClick('transition', value);
-          }
-        },
-        mouseover: (e) => {
-          if (this.transitionList.length) {
-            this.$refs.transition.style.cursor = 'pointer';
-            e.target.getExtData().strokeWeight = 6;
-          }
-        },
-        mouseout: (e) => {
-          if (this.transitionList.length) {
-            this.$refs.transition.style.cursor = 'pointer';
-            e.target.getExtData().strokeWeight = 2;
-          }
-        }
-      }),
-      pointEvents: Object.freeze({
-        // 鼠标拖动修改对应的经纬度
-        dragging: debounce((e) => {
-          // 港口端点拖动事件
-          if (this.currentPoint) {
-            const id = e.target.getExtData().id;
-            const point = this.pointList.find((item) => item.id === id);
-            point.locationObj.latitude = location.lat;
-            point.locationObj.longitude = location.lng;
-            this.currentPoint.location = turnLngLat(e.target.getPosition());
-          }
-        })
-      }),
-      procedureLineEvents: Object.freeze({
-        adjust: (e) => {
-          this.isRequest = false;
-          if (this.currentProcedure) {
-            let path = e.target.getPath();
-            this.currentProcedure.path = path2Str(path);
-          }
-        },
-        mouseover: (e) => {
-          if (this.procedureList.length) {
-            this.$refs.procedure.style.cursor = 'pointer';
-            e.target.getExtData().strokeWeight = 6;
-          }
-        },
-        mouseout: (e) => {
-          if (this.procedureList.length) {
-            this.$refs.procedure.style.cursor = 'pointer';
-            e.target.getExtData().strokeWeight = 2;
-          }
-        },
-        click: (e) => {
-          if (this.procedureList.length) {
-            const value = e.target.getExtData();
-            this.handleCurrentClick('procedure', value);
-          }
-        }
-      }),
-      portLineEvents: Object.freeze({
-        adjust: (e) => {
-          this.isRequest = false;
-          if (!this.currentPort.id) return;
-          const id = e.target.getExtData().id;
-          const bounds = e.target.getPath();
-          this.currentPort.bounds = path2Str(bounds);
-          let area = Math.round(AMap.GeometryUtil.ringArea(bounds));
-          this.portList.find((item) => item.id === id).area = area;
-        }
-      }),
-      BerthLineEvents: Object.freeze({
-        adjust: (e) => {
-          this.isRequest = false;
-          if (this.currentBerth) this.currentBerth.bounds = path2Str(e.target.getPath());
-        },
-        click: (e) => {
-          this.handleCurrentClick('berth', e.target.getExtData());
-        }
-      })
+      }
     };
   },
   methods: {
@@ -397,8 +303,7 @@ export default {
         await Promise.all([this.getPortList(this.publicQuery), this.getNavaList(this.publicQuery)]);
       }
       if (!this.portList.length) return;
-      //获取距离地图正中心最近的港口
-      let currentPort = {};
+      let currentPort = {}; //获取距离地图正中心最近的港口
       if (this.portList.length === 1) {
         currentPort = currentPort = this.portList[0];
       } else if (this.portList.length > 1) {
@@ -495,8 +400,7 @@ export default {
      * 关闭信息框
      */
     handleBoxClose(type) {
-      //关闭编辑或者成功编辑过会打开网络请求
-      this.isRequest = true;
+      this.isRequest = true; //关闭编辑或者成功编辑过会打开网络请求
       if (type === 'port') {
         this.currentPort.isPortEdit = false;
         this.currentPort.boundList = this.cacheCurrentPort.boundList; //从上一次港口取值
@@ -520,7 +424,6 @@ export default {
      * 删除港口,泊位,程序,端点,过渡路径
      */
     async handleDelete(id, api) {
-      console.log();
       const requestFun = portApi[api];
       const confirmRlust = await confirmMsg(this);
       if (confirmRlust === 'confirm') {
