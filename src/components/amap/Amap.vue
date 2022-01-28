@@ -134,7 +134,19 @@ export default {
       // 'default' | 'pointer' | 'move' | 'crosshair'
       this.mapInstance.setDefaultCursor(target);
     },
-
+    // 地图自适应范围 默认是展示二维数组线
+    async setMapFitView(pathArr, isTwoArray = true) {
+      await this.$nextTick();
+      if (pathArr) {
+        //判断是marker还是line 即是不是二维数组
+        const instance = isTwoArray
+          ? new AMap.Polyline({ path: pathArr })
+          : new AMap.Marker({ position: pathArr });
+        this.mapInstance.setFitView(instance);
+      } else {
+        this.mapInstance.setFitView(); // 无参数，默认包括所有覆盖物的情况
+      }
+    },
     // 获取地图的可视范围范围, 将地图范围,地图层级,中心点发送
     getMapBounds() {
       if (this.mapInstance) {

@@ -89,7 +89,7 @@ npm run build
 
 ## 二、如何切换主题色呢？
 
-第一步：打开 src/main.js 文件，找到引入 element 样式的地方，换成浅绿色主题。
+第一步：打开 src/plugins 文件找到 elementui.js，换成浅绿色主题。
 
 ```javascript
 import 'element-ui/lib/theme-default/index.css'; // 默认主题
@@ -100,26 +100,27 @@ import 'element-ui/lib/theme-default/index.css'; // 默认主题
 
 ```javascript
 @import "./assets/css/main.css";
-@import "./assets/css/color-dark.css";     /*深色主题*/
-/*@import "./assets/css/theme-green/color-green.css";   !*浅绿色主题*!*/
-第三步：打开 src/components/common/Sidebar.vue 文件，找到 el-menu 标签，把 background-color/text-color/active-text-color 属性去掉即可。
+@import "./assets/css/theme-dark/color-dark.css";     /*深色主题*/
+/*@import "./assets/css/theme-green/color-green.css";   /*浅绿色主题*/
 ```
+
+第三步：打开 src/components/common/Sidebar.vue 文件，找到 el-menu 标签，把 background-color/text-color/active-text-color 属性去掉即可。
 
 ## 三、说明
 
-1.  > 航段的类型未指定 'Unspecified' type = 0
-    > 坐标导航航段 'DirectToLocation' type = 1
-    > 航标导航航段 'DirectToNavaid' type = 2
-    > 航道导航航段 'ViaWaterway' type = 3
-    > 标准离港程序航段 'Sid' type = 4
-    > 标准进港程序航段 'Star' type = 5
-    > 进港泊位过渡段 'InboundBerthTransition' type = 6
-    > 离港泊位过渡段 'OutboundBerthTransition' type = 7
-    > 进港航道过渡段 'InboundEnrouteTransition' type = 8
-    > 离港航道过渡段 'OutboundEnrouteTransition' type = 9
+1.  航段的类型未指定 'Unspecified' type = 0
+    坐标导航航段 'DirectToLocation' type = 1
+    航标导航航段 'DirectToNavaid' type = 2
+    航道导航航段 'ViaWaterway' type = 3
+    标准离港程序航段 'Sid' type = 4
+    标准进港程序航段 'Star' type = 5
+    进港泊位过渡段 'InboundBerthTransition' type = 6
+    离港泊位过渡段 'OutboundBerthTransition' type = 7
+    进港航道过渡段 'InboundEnrouteTransition' type = 8
+    离港航道过渡段 'OutboundEnrouteTransition' type = 9
 
-2.  > 当前航线:'#227be0', 进港航段:'#976F02', 离港航段:'#00C227';
-    > 航道高亮:'#26A4BA', 航段高亮:'#011932';
+2.  当前航线:'#227be0', 进港航段:'#976F02', 离港航段:'#00C227';
+    航道高亮:'#26A4BA', 航段高亮:'#011932';
 
 ## 四、相关规范
 
@@ -137,28 +138,28 @@ import 'element-ui/lib/theme-default/index.css'; // 默认主题
 
 2. 变量和方法名采用小驼峰形式，常量名采用全大写加下划线形式，类名采用大驼峰形式
 
-    ```javascript
-    // 变量
-    let testNum = 1;
+   ```javascript
+   // 变量
+   let testNum = 1;
 
-    // 方法
-    function testFunc() {}
+   // 方法
+   function testFunc() {}
 
-    // 常量
-    const MAX_NUM = 20;
+   // 常量
+   const MAX_NUM = 20;
 
-    // 类名
-    function BigPerson() {}
-    class Dep {}
-    ```
+   // 类名
+   function BigPerson() {}
+   class Dep {}
+   ```
 
 3. 所有文件名用小写，过长时写加 "-" 分割的形式，如 "cultural-boutique "、 "tourism-boutique，不允许大写文件名"
 
-4. 公共组件，放在 src/components 文件夹中
+4. 公共组件，放在 src/components 文件 common 中
 
 5. 私有组件，存放在对应页面下的 "components" 文件夹中，并且组件文件夹以 "S-" 开头命名，如私有 login "S-Login-说明功能 "
 
-6. vue 文件名必须大写字母开头，文件代码控制在 500 行内，必要时应抽取部分代码在对应页面下的 JS 文件中
+6. vue 文件名必须大写字母开头，文件代码控制在 500 行内，必要时应抽取部分代码在对应页面下的 mixins-js 文件中 并以模块或者功能分类
 
 7. 事件处理方法命名由 "handle" + "相关元素" + "事件名" 组成。 如处理导航栏子元素点击事件的方法 `handleNavItemClick`
 

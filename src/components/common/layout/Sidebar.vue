@@ -11,17 +11,17 @@
       router
     >
       <template v-for="item in items">
-        <template v-if="item.subs">
+        <template v-if="item.children">
           <el-submenu :index="item.index" :key="item.index">
             <template slot="title">
               <i :class="item.icon"></i>
               <span slot="title">{{ item.title }}</span>
             </template>
-            <template v-for="subItem in item.subs">
-              <el-submenu v-if="subItem.subs" :index="subItem.index" :key="subItem.index">
+            <template v-for="subItem in item.children">
+              <el-submenu v-if="subItem.children" :index="subItem.index" :key="subItem.index">
                 <template slot="title">{{ subItem.title }}</template>
                 <el-menu-item
-                  v-for="(threeItem, i) in subItem.subs"
+                  v-for="(threeItem, i) in subItem.children"
                   :key="i"
                   :index="threeItem.index"
                   >{{ threeItem.title }}</el-menu-item
@@ -56,12 +56,13 @@ export default {
   },
   computed: {
     items() {
-      return routes[0].children
+      return this.routes[0].children
         .filter((item) => {
           if (item.path !== '/404' && !item.meta.hidden) return item;
         })
         .map((item) => {
           return {
+            // 如果是有二级菜单则添加children属性
             index: item.path,
             title: item.meta.title,
             icon: item.meta.icon

@@ -93,7 +93,6 @@ const router = new Router({
 
 //使用钩子函数对路由进行拦截跳转
 router.beforeEach((to, from, next) => {
-  console.log(router);
   const token = getStorage('token');
   const tokenTime = getStorage('tokenTime');
   // token是否过期

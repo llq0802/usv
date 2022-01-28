@@ -1,7 +1,7 @@
 <template>
   <div class="port-content">
     <table-search buttonName="添加港口" class="port-search" />
-    <Amap ref="amap" :isEdit="isClickMap" @getMapBounds="getMapBounds" @getLngLat="getLngLat">
+    <Amap ref="amap" :isEdit="isClickMap" @getMapBounds="getMapBounds" @getLngLat="getMapLngLat">
       <template #port_berth>
         <!-- 港口航道 -->
         <template v-if="waterwayList">
@@ -355,15 +355,17 @@ export default {
     /**
      * 点击地图获取坐标
      */
-    getLngLat(p) {
+    getMapLngLat(p) {
       console.log(p);
     },
 
     /**
      * 点击不同的maker标显示信息
      */
-    handleCurrentClick(type, value) {
+    async handleCurrentClick(type, value) {
+      const amap = this.$refs.amap;
       if (type === 'port') {
+        await amap.setMapFitView(value.boundList); //地图自适应
         this.currentPort = { ...value, isPortEdit: true };
         this.cacheCurrentPort = deepClone(this.currentPort); //缓存当前港口
         this.currentBerth = null;
