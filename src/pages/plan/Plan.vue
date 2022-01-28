@@ -31,10 +31,22 @@
       ></my-table>
     </div>
     <!-- 编辑航线按钮区域 -->
-    <div class="plan-edit" v-show="isEdit">
-      <el-button type="warning" @click="reversePoint">反转航线方向</el-button>
-      <el-button type="primary" @click="updateRoute">确认上传</el-button>
-      <el-button type="danger" @click="cancelEdit">取消编辑</el-button>
+    <div class="plan-edit">
+      <input class="upload-track-tail" ref="uploadFile" type="file" @change="readFile"/>
+      <el-button v-if="!realRouteTrack.length" type="warning" @click="uploadTrack">加载轨迹</el-button>
+      <el-button v-if="realRouteTrack.length" type="danger" @click="clearTrack">清除轨迹</el-button>
+      <el-button v-if="realRouteTrack.length" type="success" @click="downloadTrack">下载轨迹</el-button>
+      <el-button v-if="isEdit && realRouteTrack.length" type="warning" @click="drawPointlogVisible=true">生成航线</el-button>
+      <el-button v-if="!isTracking && !realRouteTrack.length" type="success" @click="trackinglogVisible=true">轨迹跟踪</el-button>
+      <el-button v-if="isTracking" type="danger">停止轨迹跟踪</el-button>
+      <el-button v-if="isEdit" type="warning" @click="reversePoint">反转航线方向</el-button>
+      <el-button v-if="isEdit" type="primary" @click="updateRoute">确认上传</el-button>
+      <el-button v-if="isEdit" type="danger" @click="cancelEdit">取消编辑</el-button>
+    </div>
+    <!-- 两种轨迹类型 -->
+    <div class="track-type-area" v-show="realRouteTrack.length">
+      <el-checkbox v-model="trackType.showReal">实际轨迹</el-checkbox>
+      <el-checkbox v-model="trackType.showSmooth">平滑轨迹</el-checkbox>
     </div>
     <!--计划对话框-->
     <!-- 添加航线 -->
@@ -47,15 +59,26 @@
         @getEditForm="handleTableInfo"
       ></edit-dialog>
     </template>
+    <!-- 轨迹跟踪 -->
+    <template v-if="trackinglogVisible">
+      <tracking-dialog :trackinglogVisible="trackinglogVisible" @getUsvId="trackingRoute"></tracking-dialog>
+    </template>
     <!-- 执行计划 -->
     <template v-if="actionlogVisible">
       <action-dialog :actionlogVisible="actionlogVisible" :planId="currentPlan.id"> </action-dialog>
     </template>
+    <!-- 生成计划点 -->
+    <drawpoint-dialog 
+      :drawPointlogVisible="drawPointlogVisible"
+      :realRouteTrack="realRouteTrack"
+      :smoothRouteTrack="smoothRouteTrack"
+      @generatePoint="generatePoint">
+    </drawpoint-dialog>
 
-    <!--地图-->
+    <!-- 地图 -->
     <Map :isEdit="isEdit" :preventClickMap="preventClickMap" @getLngLat="getLngLat">
       <template #plan>
-        <!--坐标点-->
+        <!-- 坐标点 -->
         <template v-if="pointList.length">
           <el-amap-marker
             v-for="point in pointList"
@@ -66,14 +89,11 @@
             :events="pointEvents"
             :extData="point"
           >
-            <div
-              :class="point.requirePrecisionNavigation ? 'precise-marker' : 'marker'"
-              @click="showPointInfo"
-            >
+            <div :class="point.requirePrecisionNavigation ? 'precise-marker' : 'marker'" @click="showPointInfo">
               {{ point.order }}
             </div>
             <!--删除计划点-->
-            <div v-if="isEdit" class="del-marker"><i class="el-icon-close"></i></div>
+            <div v-if="isEdit" class="del-marker" @click="deletePoint(point.order)"><i class="el-icon-close"></i></div>
             <!-- 气泡框 -->
             <div
               class="point-bubble"
@@ -84,24 +104,14 @@
               @mousedown="preventEvent"
             >
               <div class="long-demo"></div>
-              <div
-                class="close-Btn"
-                @click="
-                  currentOrder = null;
-                  preventClickMap = false;
-                "
-              >
-                ×
-              </div>
+              <div class="close-Btn" @click="currentOrder = null; preventClickMap = false;">×</div>
               <div v-if="point.order < 3"><span class="span-text">离港航点</span></div>
               <div v-else-if="point.order > pointList.length - 2">
                 <span class="span-text">进港航点</span>
               </div>
               <div v-else>
-                <span class="precise-point"
-                  >精确导航航点
-                  <el-checkbox v-model="point.requirePrecisionNavigation" :disabled="!isEdit">
-                  </el-checkbox>
+                <span class="precise-point">精确导航航点
+                  <el-checkbox v-model="point.requirePrecisionNavigation" :disabled="!isEdit"></el-checkbox>
                 </span>
               </div>
               <div>
@@ -135,9 +145,9 @@
             </div>
           </el-amap-marker>
         </template>
-        <!--计划航线-->
+        <!-- 折线 -->
         <template>
-          <!--计划点航线-->
+          <!-- 计划点航线 -->
           <el-amap-polyline
             geodesic="true"
             stype="dashed"
@@ -148,7 +158,7 @@
             zIndex="100"
             :path="path"
           ></el-amap-polyline>
-          <!--精确导航区间航线-->
+          <!-- 精确导航区间航线 -->
           <template v-if="precisePath.length">
             <el-amap-polyline
               geodesic="true"
@@ -161,6 +171,24 @@
               :path="path"
             ></el-amap-polyline>
           </template>
+          <!-- 实际轨迹线 -->
+          <el-amap-polyline
+            v-if="trackType.showReal"
+            geodesic="true"
+            strokeColor="#777"
+            strokeStyle="solid"
+            strokeWeight="1"
+            :path="realRouteTrack"
+          ></el-amap-polyline>
+          <!-- 平滑轨迹线 -->
+          <el-amap-polyline
+            v-if="trackType.showSmooth"
+            geodesic="true"
+            strokeColor="#0b7b54"
+            strokeStyle="solid"
+            strokeWeight="2"
+            :path="smoothRouteTrack"
+          ></el-amap-polyline>
         </template>
       </template>
     </Map>
@@ -177,18 +205,21 @@ import TableSearch from 'components/common/table-search/TableSearch';
 import AddDialog from './components/AddDialog.vue';
 import EditDialog from './components/EditDialog.vue';
 import ActionDialog from './components/ActionDialog.vue';
+import DrawpointDialog from './components/DrawPointDialog.vue';
+import TrackingDialog from './components/TrackingDialog.vue';
 // 工具函数
-import { confirmMsg, deepClone, throttle, debounce } from '@/utils';
+import { confirmMsg, deepClone, throttle, debounce, getTime } from '@/utils';
 import { turnLngLat, turnLngLatObj } from '@/utils/handleLngLat';
 // 常量
-import { PAGE_SIZE } from '@/config';
+import { PAGE_SIZE, BASE_CONSTANTS } from '@/config';
 // api
 import { apiGetPlan, apiPostPlanInfo, apiPostDeletePlan, apiPostUpdatePlan } from 'api/plan';
 import { convert } from 'api/geography';
+import { apiGetShipById } from 'api/usv';
 
 export default {
   components: {
-    Map, MyTable, TableSearch, AddDialog, EditDialog, ActionDialog
+    Map, MyTable, TableSearch, AddDialog, EditDialog, ActionDialog, DrawpointDialog, TrackingDialog,
   },
   data () {
     return {
@@ -249,6 +280,9 @@ export default {
       addlogVisible: false,
       editlogVisible: false,
       actionlogVisible: false,
+      drawPointlogVisible: false,
+      trackinglogVisible: false,
+
       /********************* 地图相关 *********************/
       pointEvents: {
         // 鼠标拖动修改对应的经纬度
@@ -295,6 +329,17 @@ export default {
       // 是否编辑坐标
       isEditCoordGCJ: false,
       isEditCoordWGS: false,
+      // 轨迹显示类型
+      trackType: {
+        showReal: true,
+        showSmooth: true
+      },
+      // 实际航线
+      realRouteTrack: [],
+      // 平滑航线
+      smoothRouteTrack: [],
+      // 轨迹跟踪
+      isTracking: false,
     }
   },
   methods: {
@@ -357,8 +402,6 @@ export default {
       }
       // 设置高亮
       this.$refs.planTable.$refs.table.setCurrentRow(row);
-      // 保存初始数据
-      this.originPlanData = deepClone(row);
     },
     // 点击操作按钮
     clickButton (option) {
@@ -396,9 +439,9 @@ export default {
     reversePoint () {
       this.currentOrder = null;
       this.pointList.reverse();
-      this.pointList.forEach((p, i) => {
-        p.order = i + 1;
-      })
+      for (let i in this.pointList) {
+        this.$set(this.pointList[i], 'order', +i + 1);
+      }
     },
     // 更新计划航线
     async updateRoute () {
@@ -407,7 +450,7 @@ export default {
         return;
       }
       let newPlan = {};
-      newPlan.fixes = deepClone(this.currentPlan.fixes);
+      newPlan.fixes = deepClone(this.pointList);
       for (let point of newPlan.fixes) {
         newPlan.telemetryPlanId = point.telemetryPlanId;
         this.$delete(point, 'id');
@@ -415,6 +458,7 @@ export default {
         this.$delete(point, 'wgs84');
         this.$delete(point, 'position');
       };
+      console.log(newPlan);
       const res = await apiPostUpdatePlan(newPlan);
       if (!res.errorCode) {
         this.$message.success('更新成功！');
@@ -425,25 +469,163 @@ export default {
     async cancelEdit () {
       this.isEdit = false;
       this.currentOrder = null;
-      // 替换为起始数据
-      this.handleRowClick(this.originPlanData);
+      this.getPlanList();
     },
-
+    
     /********************* 地图相关 *********************/
+    // 上传轨迹
+    uploadTrack() {
+      this.$refs.uploadFile.click();
+    },
+    // 读取文件
+    readFile() {
+      let file = this.$refs.uploadFile.files[0];
+      if (!file) return;
+      if (file.name.substr(file.name.length - 3, 3) != 'txt') {
+        this.$message.warning('文件类型识别出错!');
+        return;
+      }
+      this.realRouteTrack = [];
+      this.smoothRouteTrack = [];
+      let reader = new FileReader();
+      reader.readAsText(file, 'utf-8');
+      let self = this;
+      reader.onload = function() {
+        let tempArray = reader.result.split('\n').slice(1, reader.result.split('\n').length - 1);
+        let index = tempArray.findIndex(val => val == '平滑轨迹');
+        let strOne = tempArray.slice(0, index);
+        let strTwo = tempArray.slice(index + 1);
+        // 实际轨迹
+        strOne.forEach(point => {
+          let arr = point.split(',');
+          if (arr.length) {
+            self.realRouteTrack.push([+arr[1], +arr[0]]);
+          }
+        })
+        // 平滑轨迹
+        strTwo.forEach(point => {
+          let arr = point.split(',');
+          if (arr.length) {
+            self.smoothRouteTrack.push([+arr[1], +arr[0]]);
+          }
+        })
+        
+      }
+    },
+    // 下载轨迹
+    async downloadTrack() {
+      let arr = [];
+      let simpleArr = [];
+      let str = '';
+      let realLine = deepClone(this.realRouteTrack);
+      let smoothLine = deepClone(this.smoothRouteTrack);
+      let time = getTime();
+      // 实际轨迹
+      for (let item of realLine) {
+        if (Object.prototype.toString.call(item) === '[object Array]') {
+          arr.push(item.reverse().toString());
+        } else {
+          let _item = item.Q + ',' + item.R;
+          arr.push(_item);
+        }
+      }
+      arr.unshift('实际轨迹');
+      // 平滑轨迹
+      for (let item of smoothLine) {
+        if (Object.prototype.toString.call(item) === '[object Array]') {
+          simpleArr.push(item.reverse().toString());
+        } else {
+          let _item = item.Q + ',' + item.R;
+          simpleArr.push(_item);
+        }
+      }
+      // simpleArr = await this.simpleTrack(simpleArr);
+      // simpleArr.unshift('简化轨迹');
+      simpleArr.unshift('平滑轨迹');
+      for (let item of simpleArr) {
+        arr.push(item.toString());
+      }
+      for (let i in arr) {
+        str += arr[i];
+        str += '\n';
+      }
+      // console.log(str);
+      this.$prompt('请输入文件名：', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        inputValue: '轨迹坐标' + '-' + time,
+        inputErrorMessage: '输入不能为空',
+        inputValidator: value => {
+          if (!value) {
+            return '输入不能为空';
+          }
+        },
+      })
+        .then(({ value }) => {
+          const blob = new Blob([str]);
+          let fileURL = window.webkitURL.createObjectURL(blob);
+          // 创建一个虚拟标签元素
+          const fileDownload = document.createElement('a');
+          fileDownload.download = value + '.txt';
+          fileDownload.href = fileURL;
+          fileDownload.click();
+        })
+        .catch(err => err);
+    },
+    // 清除轨迹
+    clearTrack() {
+      this.realRouteTrack = [];
+      this.smoothRouteTrack = [];
+      this.$refs.uploadFile.files = [];
+    },
+    // 轨迹跟踪，绘制轨迹
+    async trackingRoute(usvId) {
+      const res = await apiGetShipById(usvId);
+      if (res.errorCode) return;
+      let { data: { runtimeInfo: { state } } } = res;
+      if (state === 0 || state === 1) {
+        this.$message.warning(`当前船只处于${BASE_CONSTANTS.usvState(state)}状态,无法绘制轨迹`);
+        return;
+      }
+
+    },
+    // 生成计划点
+    generatePoint(path) {
+      this.pointList = [];
+      for(let p of path) {
+        let point = {
+          location: `${p[1]},${p[0]}`,
+          order: this.pointList.length + 1,
+          telemetryPlanId: this.currentPlan.id,
+          position: p,
+          gcj02: '',
+          wgs84: '',
+          requirePrecisionNavigation: false
+        };
+        this.pointList.push(point);
+      }
+    },
     // 添加点，获取经纬度
     getLngLat (data) {
       let point = {
         location: data.location,
         order: this.pointList.length + 1,
         position: data.pointArray,
+        telemetryPlanId: this.currentPlan.id,
         gcj02: '',
         wgs84: '',
         requirePrecisionNavigation: false
       };
-      if (this.currentPlan.id) {
-        point.telemetryPlanId = this.currentPlan.id;
-      }
       this.$set(this.pointList, this.pointList.length, point);
+    },
+    // 删除计划点
+    async deletePoint(order) {
+      const cf = await confirmMsg(this, `删除${order}计划点`);
+      if (cf === 'cancel') return;
+      this.pointList.splice(order - 1, 1);
+      for (let i in this.pointList) {
+        this.$set(this.pointList[i], 'order', +i + 1);
+      }
     },
     // 转换wsg84和gcj02坐标
     async convertCoord (coord, srid) {
@@ -543,7 +725,7 @@ export default {
 
   },
   watch: {
-    // 更新计划航线
+    // 计划点改变时更新计划航线
     pointList: {
       handler() {
         this.path = [];
@@ -622,7 +804,7 @@ export default {
   }
   /deep/ .el-table__body tr.current-row > td.el-table__cell {
     background-color: #add2ff;
-    color: #fafafa;
+    color: #222;
   }
   /deep/ .el-table--small .el-table__cell {
     padding: 3px 0;
@@ -647,6 +829,23 @@ export default {
   bottom: 8px;
   left: 90px;
   z-index: 1;
+  .upload-track-tail {
+    width: 0;
+    height: 0;
+  }
+}
+.track-type-area {
+  position: absolute;
+  bottom: 50px;
+  left: 10px;
+  z-index: 1;
+  .el-checkbox {
+    font-size: 20px;
+    margin-right: 20px;
+    /deep/ .el-checkbox__label {
+      font-size: 15px;
+    }
+  }
 }
 /*************** 地图相关 ***************/
 /* 坐标点 */
@@ -743,8 +942,5 @@ export default {
   /deep/ .el-input__inner {
     padding: 0 !important;
   }
-}
-.high-priority {
-  z-index: 999;
 }
 </style>

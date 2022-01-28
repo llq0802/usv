@@ -118,3 +118,15 @@ export const confirmMsg = async (context, val = '此操作将永久删除该项'
     .catch((err) => err);
   return confirmRlust;
 };
+
+// 获取当前时刻
+export const getTime = () => {
+  let date = new Date();
+  let year = date.getFullYear();
+  let month = (date.getMonth() + 1).toString().padStart(2, '0');
+  let day = date.getDate().toString().padStart(2, '0');
+  let hour = date.getHours().toString().padStart(2, '0');
+  let min = date.getMinutes().toString().padStart(2, '0');
+  let sec = date.getSeconds().toString().padStart(2, '0');
+  return year + month + day + hour + min + sec;
+};

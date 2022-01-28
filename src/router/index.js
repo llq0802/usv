@@ -14,7 +14,7 @@ export const routes = [
       //meta中hidden表示是否在侧边菜单栏中显示,默认显示,为true则不显示
       {
         path: '/',
-        component: () => import(/* webpackChunkName: "dashboard" */ '../pages/home/Dashboard.vue'),
+        component: () => import(/* webpackChunkName: "homepage" */ '../pages/home/HomePage.vue'),
         meta: { title: '运行状态', icon: 'el-icon-lx-home' }
       },
 

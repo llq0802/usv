@@ -4,12 +4,12 @@
         <el-form ref="actionFormRef" label-width="110px" :rules="actionRules" :model="actionForm">
           <el-form-item label="执行计划船只" prop="usvId">
             <el-select
-              placeholder="请选择"
+              placeholder="请选择在线船只"
               v-model="actionForm.usvId"
               clearable
               filterable
-              :filter-method="keyword => filterShipData(keyword, (states = [1, 2]))"
-              @visible-change="getShipData($event, (states = [1, 2]))"
+              :filter-method="keyword => filterShipData(keyword, (states = [0, 1, 2, 3, 4, 5]))"
+              @visible-change="getShipData($event, (states = [0, 1, 2, 3, 4, 5]))"
               :loading="remoteLoading"
             >
               <el-option v-for="item in shipInfoList" :key="item.id" :label="item.displayName" :value="item.id">
@@ -75,8 +75,8 @@ export default {
     async getShipData(flag, states) {
       if (!flag) return this.shipInfoList = [];
       this.remoteLoading = true;
-      const res = await apiGetShip({
-        'Page': 1, 'Size': 999, 'Condition.States': states
+      const { data: res } = await apiGetShip({
+        'Page': 1, 'Size': 999, 'Condition.States': states,
       })
       if (!res.errorCode) {
         this.shipInfoList = res.result;
@@ -86,7 +86,7 @@ export default {
     // 关键字查询船只
     async filterShipData(keyword, states) {
       this.remoteLoading = true;
-      const res = await apiGetShip({
+      const { data: res } = await apiGetShip({
         'Page': 1, 'Size': 999, 'Condition.States': states, 'Condition.Keyword': keyword
       })
       if (!res.errorCode) {

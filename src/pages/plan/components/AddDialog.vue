@@ -42,37 +42,9 @@ export default {
         name: '',
         organizationId: window.localStorage.organizationId,
       },
-      editFrom: {
-        name: '',
-        organizationId: null,
-        organization: {},
-      },
-      actiomFrom: {
-        planId: null,
-        usvId: null,
-        returnMode: 1,
-      },
-      routeTrackFrom: {
-        planId: null,
-        usvId: null,
-      },
-      // 校验规则
-      editRules: {
-        name: [
-          {
-            required: true,
-            message: '请输入计划名称',
-            trigger: 'blur',
-          },
-        ],
-        organizationId: [{ required: true, message: '请选择组织机构', trigger: 'change' }],
-      },
       addRules: {
         name: [{ required: true, message: '请输入计划名称', trigger: 'blur' }],
         organizationId: [{ required: true, message: '请选择组织机构', trigger: 'change' }],
-      },
-      actiomRules: {
-        usvId: [{ required: true, message: '请选择要执行计划的船只', trigger: 'change' }],
       },
       // 加载loading
       remoteLoading: false,
