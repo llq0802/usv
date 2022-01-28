@@ -34,6 +34,7 @@
 </template>
 
 <script>
+import { AMAP } from '@/config';
 // 引入地图
 import VueAMap, { lazyAMapApiLoaderInstance } from 'vue-amap';
 // 引入实例懒加载api
@@ -44,9 +45,9 @@ export default {
     let self = this;
     return {
       // 地图基本参数
-      center: [106.551842, 29.592214],
-      zoom: 12,
-      zooms: [2, 20],
+      center: AMAP.center,
+      zoom: AMAP.zoom,
+      zooms: AMAP.zooms,
       mapLoading: false,
       // 地图实例
       mapInstance: null,
@@ -98,12 +99,12 @@ export default {
     // 是否可点击编辑
     isEdit: {
       type: Boolean,
-      default: false,
+      default: false
     },
     // 防止误点地图
     preventClickMap: {
       type: Boolean,
-      default: false,
+      default: false
     }
   },
   methods: {
@@ -133,7 +134,19 @@ export default {
       // 'default' | 'pointer' | 'move' | 'crosshair'
       this.mapInstance.setDefaultCursor(target);
     },
-
+    // 地图自适应范围 默认是展示二维数组线
+    async setMapFitView(pathArr, isTwoArray = true) {
+      await this.$nextTick();
+      if (pathArr) {
+        //判断是marker还是line 即是不是二维数组
+        const instance = isTwoArray
+          ? new AMap.Polyline({ path: pathArr })
+          : new AMap.Marker({ position: pathArr });
+        this.mapInstance.setFitView(instance);
+      } else {
+        this.mapInstance.setFitView(); // 无参数，默认包括所有覆盖物的情况
+      }
+    },
     // 获取地图的可视范围范围, 将地图范围,地图层级,中心点发送
     getMapBounds() {
       if (this.mapInstance) {

@@ -14,9 +14,9 @@ export function path2Str(arr) {
   // bounds格式转换
   for (const item of arr) {
     if (item.lng) {
-      bounds += `${item.lng},${item.lat} `;
+      bounds += `${item.lat},${item.lng} `;
     } else {
-      bounds += `${item[1]},${item[0]} `;
+      bounds += `${item[0]},${item[1]} `;
     }
   }
   return bounds.trim();
@@ -32,9 +32,9 @@ export const turnLngLat = (o) => {
     return `${o[1]},${o[0]}`;
   } else if (res === 'Object') {
     if (o.lng) {
-      return `${o.lng},${o.lat}`;
+      return `${o.lat},${o.lng}`;
     } else {
-      return `${o.longitude},${o.latitude}`;
+      return `${o.latitude},${o.longitude}`;
     }
   }
 };
@@ -112,9 +112,7 @@ export const strArrToReTdArr = (arr) => {
 };
 
 // [a, b], [c, d] => [[a, b], [c, d]]
-export const arrToTdArr = arr => {
-  
-};
+export const arrToTdArr = (arr) => {};
 
 // '1,2 /n 3,4' => [[2,1],[4,3]]
 export const translatePath = (string) => {
