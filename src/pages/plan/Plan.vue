@@ -76,7 +76,12 @@
     </drawpoint-dialog>
 
     <!-- 地图 -->
-    <Map :isEdit="isEdit" :preventClickMap="preventClickMap" @getLngLat="getLngLat">
+    <Map 
+      ref="amap"
+      :isEdit="isEdit"
+      :preventClickMap="preventClickMap"
+      @getLngLat="getLngLat"
+    >
       <template #plan>
         <!-- 坐标点 -->
         <template v-if="pointList.length">
@@ -388,6 +393,7 @@ export default {
     handleRowClick (row) {
       this.currentPlan = row;
       this.pointList = row.fixes;
+      let path = [];
       if (this.pointList.length) {
         this.pointList.sort((a, b) => a.order - b.order);
         for (let point of this.pointList) {
@@ -398,10 +404,12 @@ export default {
           }
           this.$set(point, 'gcj02', '');
           this.$set(point, 'wgs84', '');
+          path.push(point.position);
         }
       }
       // 设置高亮
       this.$refs.planTable.$refs.table.setCurrentRow(row);
+      this.$refs.amap.setMapFitView(path);
     },
     // 点击操作按钮
     clickButton (option) {

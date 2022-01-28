@@ -81,3 +81,9 @@ export default {
   }
 }
 </script>
+
+<style scoped lang="less">
+/deep/ .el-select {
+  width: 100%;
+}
+</style>

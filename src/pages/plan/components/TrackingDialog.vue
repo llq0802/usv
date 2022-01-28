@@ -13,6 +13,7 @@
           v-model="routeTrackFrom.usvId"
           clearable
           filterable
+          v-loadmore="getNextPageShipList"
           :filter-method="(keyword) => filterShipData(keyword, (states = [0, 1, 2, 3, 4, 5]))"
           @visible-change="getShipData($event, (states = [0, 1, 2, 3, 4, 5]))"
           :loading="remoteLoading"
@@ -69,32 +70,55 @@ export default {
       // 加载loading
       remoteLoading: false,
       // 船只信息
-      shipInfoList: []
+      shipInfoList: [],
+      total: 0,
+      page: 1,
+      keyword: '',
+      states: [0, 1, 2, 3, 4, 5]
     }
   },
   methods: {
     //获取在线船只
     async getShipData(flag, states) {
-      if (!flag) return this.shipInfoList = [];
+      if (!flag) {
+        this.shipInfoList = [];
+        this.total = 0;
+        this.page = 1;
+      }
       this.remoteLoading = true;
-      const { data: res } = await apiGetShip({
-        'Page': 1, 'Size': 999, 'Condition.States': states
+      const res = await apiGetShip({
+        'Page': this.page, 'Size': 10, 'Condition.States': states,
       })
       if (!res.errorCode) {
-        this.shipInfoList = res.result;
+        this.shipInfoList = res.data.result;
+        this.total = res.data.total;
       }
       this.remoteLoading = false;
     },
     // 关键字查询船只
     async filterShipData(keyword, states) {
+      this.keyword = keyword;
       this.remoteLoading = true;
-      const { data: res } = await apiGetShip({
-        'Page': 1, 'Size': 999, 'Condition.States': states, 'Condition.Keyword': keyword
+      const res = await apiGetShip({
+        'Page': this.page, 'Size': 10, 'Condition.States': states, 'Condition.Keyword': keyword
       })
       if (!res.errorCode) {
-        this.shipInfoList = res.result;
+        this.shipInfoList = res.data.result;
+        this.total = res.data.total;
       }
       this.remoteLoading = false;
+    },
+    // 获取下一页数据
+    async getNextPageShipList() {
+      if (this.total === this.shipInfoList.length) return;
+      this.page++;
+      const res = await apiGetShip({
+        'Page': this.page, 'Size': 10, 'Condition.States': this.states, 'Condition.Keyword': this.keyword
+      });
+      if (res.errorCode) return;
+      for (let item of res.data.result) {
+        this.shipInfoList.push(item);
+      }
     },
     // 确认具体船只
     async confirm () {

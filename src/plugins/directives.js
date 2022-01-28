@@ -77,3 +77,18 @@ Vue.directive('dialogDrag', {
     };
   }
 });
+
+// el-select下拉框加载数据 v-loadmore
+Vue.directive('loadmore', {
+  bind (el, binding) {
+    // 获取element-ui定义好的scroll盒子
+    const selectWrapDom = el.querySelector('.el-select-dropdown .el-select-dropdown__wrap');
+    selectWrapDom.addEventListener('scroll', function() {
+      // 触底
+      const bottom = this.scrollHeight - this.scrollTop <= this.clientHeight;
+      if (bottom) {
+        binding.value();
+      }
+    })
+  },
+});

@@ -41,8 +41,8 @@ export default {
   position: absolute;
   top: 0;
   left: 0;
-  width: 300px;
-  background: #bfa;
+  width: 250px;
+  background: #f0f0f0;
   z-index: 1;
 }
 </style>
