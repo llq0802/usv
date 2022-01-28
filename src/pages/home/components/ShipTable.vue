@@ -48,8 +48,9 @@ export default {
       showList: [],
       // 表头配置
       tableColumn: Object.freeze([
-        { prop: 'displayName', label: '无人船名称', width: 100 },
-        { prop: 'runtimeInfo', label: '无人船状态', width: 50 },
+        { prop: 'displayName', label: '无人船名称', width: 150 },
+        { prop: 'runtimeInfo', label: '无人船状态', width: 50,
+          render: val => val.state},
       ]),
       // 图标配置
       tableOption: {
