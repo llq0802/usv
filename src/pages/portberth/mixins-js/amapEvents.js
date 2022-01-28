@@ -7,6 +7,13 @@ export default {
       waterwayEvents: Object.freeze({}),
       transitionMarkerEvents: Object.freeze({}),
       procedureMarkerEvents: Object.freeze({}),
+      addPortLineEvents: Object.freeze({
+        adjust: (e) => {
+          this.isRequest = false;
+          let area = Math.round(AMap.GeometryUtil.ringArea(this.addPortData.bounds));
+          this.addPortData.area = area;
+        }
+      }),
       transitionLineEvents: Object.freeze({
         adjust: (e) => {
           this.isRequest = false;

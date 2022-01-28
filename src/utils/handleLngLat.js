@@ -11,12 +11,11 @@ export const str2Path = (str) => {
 // 路径二维数组转成字符串经纬度
 export function path2Str(arr) {
   let bounds = '';
-  // bounds格式转换
   for (const item of arr) {
     if (item.lng) {
       bounds += `${item.lat},${item.lng} `;
     } else {
-      bounds += `${item[0]},${item[1]} `;
+      bounds += `${item[1]},${item[0]} `;
     }
   }
   return bounds.trim();

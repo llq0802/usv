@@ -89,7 +89,7 @@ export default {
           // 获取坐标点
           let p = e.lnglat;
           p.location = `${p.lat},${p.lng}`;
-          p.pointArray = [p.lng, p.lat];
+          p.pointArray = [+p.lng, +p.lat];
           this.$emit('getLngLat', p);
         }
       }

@@ -1,7 +1,13 @@
 <template>
   <!-- 按钮 -->
   <div class="port-btn-box">
-    <el-button type="danger" size="mini" @click.stop="handleDelete">删除</el-button>
+    <el-button
+      type="danger"
+      size="mini"
+      @click.stop="handleDelete"
+      v-show="item.isStartDraw == undefined"
+      >删除</el-button
+    >
     <el-button type="primary" size="mini" @click.stop="handleEdit"> 保存</el-button>
   </div>
 </template>

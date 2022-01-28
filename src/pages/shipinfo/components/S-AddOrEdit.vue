@@ -85,7 +85,10 @@ export default {
         serialNumber: '',
         displayName: '',
         cameraSN: '',
-        organizationId: null
+        organizationId: null,
+        cameraValidationCode: '',
+        minimumBatteryVoltage: '',
+        maximumBatteryVoltage: ''
       },
       // 添加验证规则
       rules: Object.freeze({

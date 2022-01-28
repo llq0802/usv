@@ -170,3 +170,45 @@ export const apiDelProcedure = (id) => {
     params: { id }
   });
 };
+
+// 添加港口
+// {
+//   "name": "string",
+//   "ident": "string",
+//   "bounds": "string",
+//   "zoomLevel": 0
+// }
+export const apiAddPort = (data) => {
+  return request({
+    url: `/port/add`,
+    method: 'post',
+    data
+  });
+};
+// 添加泊位
+// {
+//   "portId": 0,
+//   "ident": "string",
+//   "bounds": "string"
+// }
+export const apiAddBerth = (data) => {
+  return request({
+    url: `//port/addberth`,
+    method: 'post',
+    data
+  });
+};
+// 添加端点
+// {
+// Id
+// Ident
+// Location
+// }
+
+export const apiAddPoint = (params) => {
+  return request({
+    url: `/procedure/addendpoint`,
+    method: 'post',
+    params
+  });
+};

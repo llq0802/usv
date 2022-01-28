@@ -1,6 +1,18 @@
 <template>
   <div class="port-content">
-    <table-search buttonName="添加港口" class="port-search" />
+    <div class="table-content shadow">
+      <base-table
+        :total="total"
+        :tableIndex="!!total"
+        :tableData="portList"
+        :tableColumn="tableColumn"
+        :tableOption="tableOption"
+        @buttonClick="tableButtonClick"
+      />
+    </div>
+    <table-search buttonName="添加港口" class="port-search" @handleDrag="handleAddPortClick" />
+    <!-- 封装的表格 -->
+
     <Amap ref="amap" :isEdit="isClickMap" @getMapBounds="getMapBounds" @getLngLat="getMapLngLat">
       <template #port_berth>
         <!-- 港口航道 -->
@@ -55,6 +67,35 @@
             ></el-amap-polygon>
           </template>
         </template>
+
+        <!-- 新增港口 -->
+
+        <template v-if="addPortData && addPortData.latitude">
+          <el-amap-marker
+            :position="[addPortData.longitude, addPortData.latitude]"
+            :offset="[-18, -15]"
+            :zIndex="999"
+          >
+            <AddPortDialog
+              :port="addPortData"
+              :currentPort="addPortData"
+              @handleAddBoxClose="handleAddBoxClose"
+              @handleAddSava="handleAddSava"
+            ></AddPortDialog>
+          </el-amap-marker>
+          <!-- 新增港口范围 -->
+          <el-amap-polygon
+            v-if="addPortData.bounds.length"
+            :editable="true"
+            :path="addPortData.bounds"
+            strokeColor="#dfc3cb"
+            fillColor="#dfc3cb"
+            strokeWeight="1"
+            :zIndex="999"
+            :events="addPortLineEvents"
+          ></el-amap-polygon>
+        </template>
+
         <!-- 泊位 -->
         <template v-if="berthList.length">
           <el-amap-marker
@@ -218,11 +259,13 @@
 
 <script>
 import Amap from 'components/amap/Amap';
+import BaseTable from 'components/common/table/Mytable.vue';
 import TableSearch from 'components/common/table-search/TableSearch';
 import NavaMarker from './components/S-NavaMarker';
 import ProcedureMarker from './components/S-ProcedureMarker';
 import TransitionMarker from './components/S-TransitionMarker';
 import PortDialog from './components/S-PortDialog.vue';
+import AddPortDialog from './components/S-AddPortDialog.vue';
 import BerthDialog from './components/S-BerthDialog.vue';
 import PointDialog from './components/S-PointDialog.vue';
 import ProcedureDialog from './components/S-ProcedureDialog.vue';
@@ -241,6 +284,7 @@ export default {
   mixins: [amapEvents, getLsit, editList], //混入的js
   components: {
     Amap,
+    BaseTable,
     TableSearch,
     NavaMarker,
     ProcedureMarker,
@@ -249,7 +293,8 @@ export default {
     BerthDialog,
     PointDialog,
     ProcedureDialog,
-    TransitionDialog
+    TransitionDialog,
+    AddPortDialog
   },
   created() {
     // this.getNavaList();
@@ -259,15 +304,43 @@ export default {
   },
   data() {
     return {
+      tableColumn: Object.freeze([
+        { prop: 'name', label: '名称' },
+        {
+          prop: 'locationObj',
+          label: '坐标',
+          render: (val) => `${val.longitude.toFixed(6)}，${val.latitude.toFixed(6)} `
+        },
+        {
+          prop: 'area',
+          label: '面积',
+          render: (val) => `${val} ㎡`
+        }
+      ]),
+
+      tableOption: Object.freeze({
+        label: '操作',
+        width: 80,
+        options: [
+          {
+            label: '删除',
+            type: 'danger',
+            size: 'mini',
+            methods: (row, index) => {}
+          }
+        ]
+      }),
       BASE_CONSTANTS: Object.freeze(BASE_CONSTANTS),
+      total: 0,
+      tableData: [],
       currentPort: { isPortEdit: false },
-      cacheCurrentPort: {}, //缓存当前港口
+      cachePortBoundList: Object.freeze({}), //缓存当前港口
       currentBerth: null,
       currentPoint: null,
       currentProcedure: null,
       currentTransition: null,
       isRequest: true, //是否可以请求港口信息
-      isClickMap: true, //是否可以点击地图获取坐标
+      isClickMap: false, //是否可以点击地图获取坐标
       zoomLevel: 15,
       publicQuery: {
         'Condition.Id': '',
@@ -282,10 +355,120 @@ export default {
         'Condition.Keyword': '',
         Page: PAGE_SIZE.page,
         Size: PAGE_SIZE.size
+      },
+
+      addPortData: {
+        isClick: false, //是否点击了新增港口按钮
+        isStartDraw: false,
+        name: '',
+        ident: '',
+        zoomLevel: 0,
+        bounds: [],
+        longitude: null,
+        latitude: null,
+        area: ''
+      },
+      addBerthData: {
+        isClick: false, //是否点击了新增泊位按钮
+        isStartDraw: false,
+        portId: null,
+        ident: '',
+        bounds: [],
+        longitude: null,
+        latitude: null,
+        area: ''
+      },
+      addPointData: {
+        isClick: false, //是否点击了新增泊位按钮
+        longitude: null,
+        latitude: null,
+        Id: null,
+        Ident: '',
+        Location: null
       }
     };
   },
   methods: {
+    handleAddPortClick() {
+      this.addPortData.isClick = true;
+      this.isClickMap = true;
+      console.log('点击了新增港口按钮');
+    },
+    handleAddBoxClose(type) {
+      console.log('handleAddBoxClose ', type);
+    },
+    handleAddSava(type, value) {
+      console.log('handleAddSava', value);
+      if (type === 'port') {
+        this.addPort();
+      }
+    },
+    /**
+     * 新增港口
+     */
+    async addPort() {
+      const identReg = /^[A-Z]{4}$/;
+      const data = this.addPortData;
+      if (!identReg.test(data.ident)) {
+        this.$message.warning('标识应由四个大写字母组成');
+        return;
+      }
+      data.bounds = path2Str(data.bounds);
+      if (!data.bounds) {
+        this.$message.warning('港口的范围不能为空');
+        return;
+      }
+      data.location = `${data.latitude},${data.longitude}`;
+      const { errorCode } = await portApi.apiAddPort(data);
+      if (+errorCode === 0) {
+        this.isRequest = true; //新增完成后可以进行网络请求
+        this.isClickMap = false; //新增完成后不能点击地图获取坐标
+        data = {
+          isClick: false, //是否点击了新增港口按钮
+          isStartDraw: false,
+          name: '',
+          ident: '',
+          zoomLevel: 0,
+          bounds: [],
+          longitude: null,
+          latitude: null,
+          area: ''
+        };
+        this.$message.success('添加成功');
+      }
+    },
+
+    /**
+     * 点击地图获取坐标
+     */
+    getMapLngLat(p) {
+      if (!this.isClickMap) return;
+      let lng = p.lng,
+        lat = p.lat;
+      const addPortData = this.addPortData;
+      const addBerthData = this.addBerthData;
+      this.isRequest = false; //当新增,不允许网络请求
+      // 第一次点击,确定港口坐标点,第二次才开始绘制
+      if (addPortData.isStartDraw) {
+        addPortData.bounds.push([lng, lat]); //控制是否可以绘制范围的标识
+        let area = Math.round(AMap.GeometryUtil.ringArea(addPortData.bounds));
+        addPortData.area = area;
+      }
+      if (addPortData.isStartDraw) {
+        // 第一次点击,确定泊位坐标点,第二次才开始绘制
+        addBerthData.bounds.push([lng, lat]);
+        let area = Math.round(AMap.GeometryUtil.ringArea(addBerthData.bounds));
+        addBerthData.area = area;
+      }
+
+      if (addPortData.isClick) {
+        addPortData.isStartDraw = true;
+        addPortData.latitude = lat;
+        addPortData.longitude = lng;
+        addPortData.isClick = false;
+      }
+    },
+
     /**
      * 防抖: 缩放,拖拽地图时请求数据
      */
@@ -346,28 +529,23 @@ export default {
      */
     showPortArea(currentPort, amap) {
       const { id, name } = currentPort;
-      console.log('当前港口:', name);
+      // console.log('当前港口:', name);
       this.getBerthList(id); // 泊位列表方法
       this.getPointList(id); //端点数据的方法
       this.getProcedureList(id); //程序路径列表方法  程序
       this.getTransitionList(id); //过渡路径数据的方法  过渡
     },
     /**
-     * 点击地图获取坐标
-     */
-    getMapLngLat(p) {
-      console.log(p);
-    },
-
-    /**
      * 点击不同的maker标显示信息
      */
     async handleCurrentClick(type, value) {
       const amap = this.$refs.amap;
       if (type === 'port') {
-        await amap.setMapFitView(value.boundList); //地图自适应
         this.currentPort = { ...value, isPortEdit: true };
-        this.cacheCurrentPort = deepClone(this.currentPort); //缓存当前港口
+        this.isRequest = false;
+        this.cachePortBoundList = deepClone(this.currentPort.boundList); //缓存当前港口的范围
+        await amap.setMapFitView(value.boundList); //地图自适应
+        this.isRequest = true;
         this.currentBerth = null;
         this.currentPoint = null;
         this.currentProcedure = null;
@@ -405,7 +583,7 @@ export default {
       this.isRequest = true; //关闭编辑或者成功编辑过会打开网络请求
       if (type === 'port') {
         this.currentPort.isPortEdit = false;
-        this.currentPort.boundList = this.cacheCurrentPort.boundList; //从上一次港口取值
+        this.currentPort.boundList = this.cachePortBoundList; //从上一次港口范围取值
         this.getPortList(this.publicQuery);
       } else if (type === 'berth') {
         this.currentBerth = null;
@@ -437,6 +615,12 @@ export default {
           this.$message.success('删除成功');
         }
       }
+    },
+    /**
+     *  表格操作项调用事件
+     */
+    tableButtonClick(options) {
+      options.methods.call(this, options.row, options.index);
     }
   }
 };
@@ -452,7 +636,29 @@ export default {
     z-index: 99;
     width: 70%;
   }
+
+  .table-content {
+    position: absolute;
+    top: 0px;
+    right: 0;
+    z-index: 99;
+    width: 400px;
+
+    /deep/ .el-table__body tr.current-row > td.el-table__cell {
+      background-color: #add2ff;
+      color: #fafafa;
+    }
+    /deep/ .el-table--small .el-table__cell {
+      padding: 3px 0;
+      user-select: none;
+    }
+    /deep/ .el-button--mini,
+    .el-button--mini.is-round {
+      padding: 6px 5px;
+    }
+  }
 }
+
 /**地图中的公共框中的X*/
 /deep/.port-box {
   .el-icon-close {
