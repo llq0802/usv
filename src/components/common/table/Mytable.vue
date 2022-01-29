@@ -12,6 +12,7 @@
       :show-header="showHeader"
       :size="tableSize"
       :highlight-current-row="highlightCurrentRow"
+      :max-height="maxHeight"
       @sort-change="handleSortChange"
       @cell-click="handleCellClick"
       @row-click="handleRowClick"
@@ -42,6 +43,19 @@
                 tag.label
               }}</el-tag>
             </template>
+          </span>
+
+          <span
+            v-else-if="item.switch"
+            @click="handleSwitchChange(scope.row[item.prop], scope.row, scope.$index)"
+          >
+            <el-switch
+              :width="item.width || 36"
+              v-model="scope.row[item.prop]"
+              active-color="#13ce66"
+              inactive-color="#ff4949"
+            >
+            </el-switch>
           </span>
           <span v-else>{{ scope.row[item.prop] }}</span>
         </template>
@@ -136,6 +150,10 @@ export default {
     tableSize: {
       type: String,
       default: 'small'
+    },
+    maxHeight: {
+      type: String,
+      default: '500'
     },
     // 高亮显示当前行
     highlightCurrentRow: {
@@ -233,15 +251,16 @@ export default {
     //下拉框出现/隐藏时触发
     visibleChange(row) {
       this.$emit('dropdownShow', row);
+    },
+    // switch按钮改变触发
+    handleSwitchChange(newValue, row, index) {
+      this.$emit('handleSwitchChange', newValue, row, index);
     }
   }
 };
 </script>
 
 <style lang="less" scoped>
-/* .table {
-    margin-top: 10px;
-} */
 .el-table {
   margin: 10px 0;
   & td,

@@ -35,7 +35,10 @@ let transitionDirectione = new Map([
   [1, '进港'],
   [2, '离港']
 ]);
-
+let isEffect = new Map([
+  [true, '生效'],
+  [false, '不生效']
+]);
 // 多条船只显示不同的颜色数组
 let strokeColorList = new Map([
   [0, '#ff3838a0'],
@@ -49,7 +52,6 @@ let strokeColorList = new Map([
   [8, '#67e6dca0'],
   [9, '#3d3d3da0']
 ]);
-
 let colorArray = new Map([
   ['A', '#f44336bb'],
   ['B', '#E91E63bb'],
@@ -86,7 +88,7 @@ let powerColors = [
   { color: '#1989fa', percentage: 80 },
   { color: '#6f7ad3', percentage: 99 }
 ];
-//航线颜色、船状态常量
+//航线颜色、船状态等一些列常量
 export const BASE_CONSTANTS = {
   usvState: (val) => UsvStates.get(val),
   planState: (val) => PlanStates.get(val),
@@ -97,7 +99,8 @@ export const BASE_CONSTANTS = {
   powerColors: () => powerColors,
   procedureType: (val) => procedureType.get(val),
   transitionDirectione: (val) => transitionDirectione.get(val),
-  transitionType: (val) => transitionType.get(val)
+  transitionType: (val) => transitionType.get(val),
+  isEffect: (val) => isEffect.get(val)
 };
 //系统名称
 export const HEADER_TITLE = '船舶智能调度管理平台';

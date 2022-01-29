@@ -3,6 +3,7 @@ import { apiGetNavaByQuery } from 'api/nava';
 import { apiGetWayByQuery } from 'api/waterway';
 import { turnLngLat, turnLngLatObj, str2Path } from '@/utils/handleLngLat';
 import { BASE_CONSTANTS } from '@/config';
+import { deepClone } from '@/utils';
 
 export default {
   data() {
@@ -59,6 +60,8 @@ export default {
       if (+errorCode === 0) {
         this.portList = data.result;
         for (let item of data.result) {
+          item.delApi = 'apiDelPort'; //标识删除港口的函数名
+          item.uid = 'port' //标识这是港口 港口页面统一封装处理游泳
           this.$set(item, 'locationObj', turnLngLatObj(item.location)); //响应式
           item.locationArr = turnLngLat(item.location);
           item.boundList = str2Path(item.bounds);
@@ -75,6 +78,8 @@ export default {
       if (+errorCode === 0) {
         this.berthList = data;
         for (let item of data) {
+          item.delApi = 'apiDelBerth'; //标识删除泊位的函数名
+          item.uid = 'berth'; //标识这是泊位
           this.$set(item, 'locationObj', turnLngLatObj(item.location)); //响应式
           item.locationArr = turnLngLat(item.location);
           item.boundList = str2Path(item.bounds);
@@ -92,6 +97,8 @@ export default {
         this.pointList = data;
         for (const item of data) {
           // item.locationObj = turnLngLatObj(item.location);
+          item.delApi = 'apiDelPoint'; //标识删除端点的函数名
+          item.uid = 'point'; //标识这是泊位
           this.$set(item, 'locationObj', turnLngLatObj(item.location)); //响应式
           item.locationArr = turnLngLat(item.location);
           item.ident = item.ident.toLocaleUpperCase();
@@ -108,6 +115,8 @@ export default {
       const { data, errorCode } = await portApi.apiGetProcedureByQuery(this.publicQuery);
       if (+errorCode === 0) {
         for (let item of data.result) {
+          item.delApi = 'apiDelProcedure'; //标识删除过程序的函数名
+          item.uid = 'procedure'; //标识
           item.boundList = str2Path(item.path);
           item.ident = item.ident.toLocaleUpperCase();
           this.$set(item, 'strokeWeight', 2);
@@ -115,7 +124,7 @@ export default {
             item.boundList.length % 2 == 0
               ? item.boundList[item.boundList.length / 2]
               : item.boundList[(item.boundList.length - 1) / 2];
-          item.tableShowPoint = `${item.start.ident.toLocaleUpperCase()} → ${item.end.ident.toLocaleUpperCase()}`;
+          item.showPath = `${item.start.ident.toLocaleUpperCase()} → ${item.end.ident.toLocaleUpperCase()}`;
         }
         this.procedureList = data.result.sort((a, b) => a.type - b.type); //type: 1离港,2进港
         // console.log(this.procedureList);
@@ -128,9 +137,16 @@ export default {
     async getTransitionList(id) {
       this.publicQuery['Condition.Id'] = id;
       const { data, errorCode } = await portApi.apiGetTransitionByQuery(this.publicQuery);
+      //临时存放的数组
+      let type1Arr = [],
+        type2Arr = [],
+        type1ArrList = [],
+        type2ArrList = [];
       if (+errorCode === 0) {
         this.transitionList = data.result; //item.direction == 1 ? '进港' : '出港' , item.type == 1 ? '泊位' : '航标'
         this.transitionList = this.transitionList.map((item) => {
+          item.delApi = 'apiDelTransition'; //标识删除过渡路径的函数名
+          item.uid = 'transition'; //标识
           this.$set(item, 'strokeWeight', 2);
           item.path = str2Path(item.path);
           item.centerPoint =
@@ -143,8 +159,23 @@ export default {
             (item.direction === 1 && item.type === 1) || (item.direction === 2 && item.type === 2)
               ? `${item.procedureEndpoint.ident.toUpperCase()} → ${item.ident}`
               : `${item.ident} → ${item.procedureEndpoint.ident.toUpperCase()}`;
+
+          // 根据类型拆分数组
+          item.type === 1 ? type1Arr.push(item) : type2Arr.push(item);
+
           return item;
         });
+        // 根据方向,类型排序分类
+        type1Arr.map((item) =>
+          item.direction === 1 ? type1ArrList.unshift(item) : type1ArrList.push(item)
+        );
+        type2Arr.map((item) =>
+          item.direction === 1 ? type2ArrList.unshift(item) : type2ArrList.push(item)
+        );
+        type1ArrList = type1ArrList.sort((a, b) => a.showPath - b.showPath);
+        type2ArrList = type2ArrList.sort((a, b) => a.showPath - b.showPath);
+        this.transitionList = [...type1ArrList, ...type2ArrList];
+
         // console.log(this.transitionList);
       }
     }

@@ -204,11 +204,90 @@ export const apiAddBerth = (data) => {
 // Ident
 // Location
 // }
-
 export const apiAddPoint = (params) => {
   return request({
     url: `/procedure/addendpoint`,
     method: 'post',
     params
+  });
+};
+// 添加程序
+// {
+//   "id": 0,
+//   "ident": "string",
+//   "startId": 0,
+//   "endId": 0,
+//   "path": "string",
+//   "type": 1
+// }
+export const apiAddProcedure = (data) => {
+  return request({
+    url: `/procedure/add`,
+    method: 'post',
+    data
+  });
+};
+// 添加过渡路径
+// {
+//   "procedureEndpointId": 0,
+//   "direction": 1,
+//   "path": "string",
+//   "targetId": 0
+// }
+export const apiAddTransition = (data) => {
+  return request({
+    url: `/transition/add/?type=${data.type}`,
+    method: 'post',
+    data
+  });
+};
+
+// 将泊位设置为”生效“的状态
+export const apiEnBerth = (id) => {
+  return request({
+    url: `/port/enableberth`,
+    method: 'post',
+    params: { id }
+  });
+};
+// 将泊位设置为”不生效“的状态
+export const apiDisBerth = (id) => {
+  return request({
+    url: `/port/disableberth`,
+    method: 'post',
+    params: { id }
+  });
+};
+// 将过渡路径设置为”生效“的状态
+export const apiEnTransition = (id) => {
+  return request({
+    url: `/transition/enable`,
+    method: 'post',
+    params: { id }
+  });
+};
+// 将过渡路径设置为”不生效“的状态
+export const apiDisTransition = (id) => {
+  return request({
+    url: `/transition/disable`,
+    method: 'post',
+    params: { id }
+  });
+};
+// 将程序设置为”生效“的状态
+export const apiEnProcedure = (id) => {
+  return request({
+    url: `/procedure/enable`,
+    method: 'post',
+    params: { id }
+  });
+};
+
+// 将程序设置为”不生效“的状态
+export const apiDisProcedure = (id) => {
+  return request({
+    url: `/procedure/disable`,
+    method: 'post',
+    params: { id }
   });
 };

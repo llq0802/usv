@@ -1,17 +1,20 @@
 <template>
   <div class="port-content">
-    <div class="table-content shadow">
-      <base-table
-        :total="total"
-        :tableIndex="!!total"
-        :tableData="portList"
-        :tableColumn="tableColumn"
-        :tableOption="tableOption"
-        @buttonClick="tableButtonClick"
-      />
-    </div>
     <table-search buttonName="添加港口" class="port-search" @handleDrag="handleAddPortClick" />
     <!-- 封装的表格 -->
+    <port-table
+      :tableIndex="false"
+      :berthList="berthList"
+      :pointList="pointList"
+      :portList="portList"
+      :procedureList="procedureList"
+      :transitionList="transitionList"
+      :tableOption="tableOption"
+      @buttonClick="tableButtonClick"
+      @handleTabClick="handleTabClick"
+      @handleSwitchChange="handleSwitchChange"
+      @handleAddBtn="handleAddBtn"
+    />
 
     <Amap ref="amap" :isEdit="isClickMap" @getMapBounds="getMapBounds" @getLngLat="getMapLngLat">
       <template #port_berth>
@@ -57,7 +60,7 @@
             <el-amap-polygon
               v-if="currentPort.id"
               :key="port.id + 'aa'"
-              :path="currentPort.boundList"
+              :path="cachePortBoundList"
               :editable="currentPort.isPortEdit"
               strokeColor="#242f42"
               fillColor="#71b8fe"
@@ -259,7 +262,7 @@
 
 <script>
 import Amap from 'components/amap/Amap';
-import BaseTable from 'components/common/table/Mytable.vue';
+import PortTable from './components/S-PortTable.vue';
 import TableSearch from 'components/common/table-search/TableSearch';
 import NavaMarker from './components/S-NavaMarker';
 import ProcedureMarker from './components/S-ProcedureMarker';
@@ -284,7 +287,7 @@ export default {
   mixins: [amapEvents, getLsit, editList], //混入的js
   components: {
     Amap,
-    BaseTable,
+    PortTable,
     TableSearch,
     NavaMarker,
     ProcedureMarker,
@@ -304,19 +307,7 @@ export default {
   },
   data() {
     return {
-      tableColumn: Object.freeze([
-        { prop: 'name', label: '名称' },
-        {
-          prop: 'locationObj',
-          label: '坐标',
-          render: (val) => `${val.longitude.toFixed(6)}，${val.latitude.toFixed(6)} `
-        },
-        {
-          prop: 'area',
-          label: '面积',
-          render: (val) => `${val} ㎡`
-        }
-      ]),
+      radio3: '',
 
       tableOption: Object.freeze({
         label: '操作',
@@ -326,7 +317,7 @@ export default {
             label: '删除',
             type: 'danger',
             size: 'mini',
-            methods: (row, index) => {}
+            methods: (row, index) => this.handleDelete(row.id, row.delApi)
           }
         ]
       }),
@@ -334,7 +325,7 @@ export default {
       total: 0,
       tableData: [],
       currentPort: { isPortEdit: false },
-      cachePortBoundList: Object.freeze({}), //缓存当前港口
+      cachePortBoundList: Object.freeze({}), //当前港口范围路径
       currentBerth: null,
       currentPoint: null,
       currentProcedure: null,
@@ -342,6 +333,7 @@ export default {
       isRequest: true, //是否可以请求港口信息
       isClickMap: false, //是否可以点击地图获取坐标
       zoomLevel: 15,
+      isSetView: true,
       publicQuery: {
         'Condition.Id': '',
         'Condition.PortId': '',
@@ -353,8 +345,8 @@ export default {
         'Condition.Rect.BottomRight': '',
         'Condition.ZoomLevel': 15,
         'Condition.Keyword': '',
-        Page: PAGE_SIZE.page,
-        Size: PAGE_SIZE.size
+        Page: 1,
+        Size: 1e6
       },
 
       addPortData: {
@@ -389,6 +381,62 @@ export default {
     };
   },
   methods: {
+    //点击Switch按钮事件
+    async handleSwitchChange(value, row, index) {
+      console.log(value, row);
+      this.enableAndDisable(value, row);
+    },
+    handleAddBtn(type) {
+      console.log(type);
+      if (type === 'berth') {
+      }
+    },
+    // 设置泊位 程序 过渡路径是否生效
+    async enableAndDisable(value, row) {
+      const id = row.id;
+      const type = row.uid;
+      let nameFun = type.slice(0, 1).toUpperCase() + type.slice(1);
+      let apiFunc = value ? `apiEn${nameFun}` : `apiDis${nameFun}`;
+      const confirmRes = await confirmMsg(this, `此操作将设置成${value ? '' : '不'}生效`);
+      const { errorCode } = await portApi[apiFunc](id);
+      if (confirmRes === 'confirm') {
+        if (+errorCode === 0) {
+          this.$message.success('设置成功');
+          if (type === 'berth') {
+            this.getBerthList(this.currentPort.id);
+          } else if (type === 'procedure') {
+            this.getProcedureList(this.currentPort.id);
+          } else if (type === 'transition') {
+            this.getTransitionList(this.currentPort.id);
+          }
+        }
+      }
+    },
+
+    handleTabClick(type, current) {
+      return;
+      if (type === 'port') {
+        this.tableData = this.portList;
+        this.tableColumn = [
+          { prop: 'name', label: '名称' },
+          {
+            prop: 'locationObj',
+            label: '坐标',
+            render: (val) => `${val.longitude.toFixed(6)}，${val.latitude.toFixed(6)} `
+          },
+          {
+            prop: 'area',
+            label: '面积',
+            render: (val) => `${val} ㎡`
+          }
+        ];
+        console.log(this.tableData);
+      } else if (type === 'berth') {
+        this.tableData = this.berthList;
+
+        console.log(this.tableData);
+      }
+    },
     handleAddPortClick() {
       this.addPortData.isClick = true;
       this.isClickMap = true;
@@ -484,6 +532,7 @@ export default {
       this.getWaterwayList(this.publicQuery);
       if (this.isRequest) {
         await Promise.all([this.getPortList(this.publicQuery), this.getNavaList(this.publicQuery)]);
+        this.tableData = this.portList;
       }
       if (!this.portList.length) return;
       let currentPort = {}; //获取距离地图正中心最近的港口
@@ -502,12 +551,14 @@ export default {
           return pre > cur ? c : p;
         });
       }
+      this.isSetView = clitentArea <= currentPort.area * 80;
       if (
         currentPort.id &&
-        clitentArea <= currentPort.area * 80 //如果当前港口视口面积为地图视口面积的80倍
+        this.isSetView //如果当前港口视口面积为地图视口面积的80倍
       ) {
         //显示距离正中心最近的港口信息
         this.currentPort = { ...this.currentPort, ...currentPort };
+        this.cachePortBoundList = deepClone(this.currentPort.boundList); //缓存当前港口的范围
         if (this.isRequest) this.showPortArea(this.currentPort, amap);
       } else {
         // 重置数据
@@ -543,8 +594,8 @@ export default {
       if (type === 'port') {
         this.currentPort = { ...value, isPortEdit: true };
         this.isRequest = false;
-        this.cachePortBoundList = deepClone(this.currentPort.boundList); //缓存当前港口的范围
-        await amap.setMapFitView(value.boundList); //地图自适应
+        this.cachePortBoundList = deepClone(this.currentPort.boundList); //当前港口的范围
+        if (!this.isSetView) await amap.setMapFitView(value.boundList); //地图自适应
         this.isRequest = true;
         this.currentBerth = null;
         this.currentPoint = null;
@@ -579,12 +630,12 @@ export default {
     /**
      * 关闭信息框
      */
-    handleBoxClose(type) {
+    async handleBoxClose(type) {
       this.isRequest = true; //关闭编辑或者成功编辑过会打开网络请求
       if (type === 'port') {
+        await this.getPortList(this.publicQuery);
+        this.cachePortBoundList = deepClone(this.currentPort.boundList); //缓存当前港口的范围
         this.currentPort.isPortEdit = false;
-        this.currentPort.boundList = this.cachePortBoundList; //从上一次港口范围取值
-        this.getPortList(this.publicQuery);
       } else if (type === 'berth') {
         this.currentBerth = null;
         this.getBerthList(this.currentPort.id);
@@ -616,9 +667,8 @@ export default {
         }
       }
     },
-    /**
-     *  表格操作项调用事件
-     */
+
+    //表格操作项调用事件
     tableButtonClick(options) {
       options.methods.call(this, options.row, options.index);
     }
@@ -635,27 +685,6 @@ export default {
     top: 0px;
     z-index: 99;
     width: 70%;
-  }
-
-  .table-content {
-    position: absolute;
-    top: 0px;
-    right: 0;
-    z-index: 99;
-    width: 400px;
-
-    /deep/ .el-table__body tr.current-row > td.el-table__cell {
-      background-color: #add2ff;
-      color: #fafafa;
-    }
-    /deep/ .el-table--small .el-table__cell {
-      padding: 3px 0;
-      user-select: none;
-    }
-    /deep/ .el-button--mini,
-    .el-button--mini.is-round {
-      padding: 6px 5px;
-    }
   }
 }
 
