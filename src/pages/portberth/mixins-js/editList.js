@@ -1,5 +1,5 @@
 import * as portApi from 'api/port';
-
+import { path2Str } from '@/utils/handleLngLat';
 export default {
   methods: {
     /**

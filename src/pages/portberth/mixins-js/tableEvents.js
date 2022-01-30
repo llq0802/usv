@@ -19,7 +19,9 @@ export default {
     };
   },
   methods: {
-    //表格操作项调用事件
+    /**
+     * 表格操作项按钮事件调用
+     */
     tableButtonClick(options) {
       options.methods.call(this, options.row, options.index);
     },

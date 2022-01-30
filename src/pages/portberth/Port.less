@@ -1,0 +1,23 @@
+.port-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  .port-search {
+    position: absolute;
+    top: 0px;
+    z-index: 99;
+    width: 70%;
+  }
+}
+/**地图中的公共框中的X*/
+/deep/.port-box {
+  .el-icon-close {
+    padding: 0 3px 3px;
+    position: absolute;
+    right: 10px;
+    font-size: 18px;
+    &:hover {
+      cursor: pointer;
+    }
+  }
+}
