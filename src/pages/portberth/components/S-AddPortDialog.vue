@@ -23,7 +23,7 @@
         <div class="item-box">
           <div class="item-left">标识</div>
           <div>
-            <el-input placeholder="请输入港口标识" v-model="port.ident" size="mini" />
+            <el-input placeholder="请输入四个大写字母" v-model="port.ident" size="mini" />
           </div>
         </div>
         <div class="item-box">

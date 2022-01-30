@@ -193,7 +193,7 @@ export const apiAddPort = (data) => {
 // }
 export const apiAddBerth = (data) => {
   return request({
-    url: `//port/addberth`,
+    url: `/port/addberth`,
     method: 'post',
     data
   });
@@ -205,6 +205,7 @@ export const apiAddBerth = (data) => {
 // Location
 // }
 export const apiAddPoint = (params) => {
+  ///procedure/addendpoint
   return request({
     url: `/procedure/addendpoint`,
     method: 'post',

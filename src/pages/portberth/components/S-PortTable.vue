@@ -1,7 +1,13 @@
 <template>
   <div class="table-content">
     <el-tabs v-model="radio" type="card" @tab-click="handleTabClick">
-      <el-tab-pane v-for="item in items" :key="item.name" :label="item.label" :name="item.name">
+      <el-tab-pane
+        v-for="item in items"
+        :key="item.name"
+        :label="item.label"
+        :name="item.name"
+        :disabled="item.disabled"
+      >
         <base-table
           v-bind="$attrs"
           v-on="$listeners"
@@ -28,9 +34,9 @@ export default {
     BaseTable
   },
   props: {
-    isDisabled: {
+    isShowPortDetail: {
       type: Boolean,
-      default: false
+      default: true //是否禁用
     },
     portList: {
       type: Array,
@@ -100,7 +106,6 @@ export default {
             // }
           ]
         },
-
         {
           name: 'point',
           label: '端点列表',
@@ -169,15 +174,19 @@ export default {
             break;
           case 'berth':
             item.tableData = this.berthList;
+            item.disabled = !this.isShowPortDetail;
             break;
           case 'point':
             item.tableData = this.pointList;
+            item.disabled = !this.isShowPortDetail;
             break;
           case 'procedure':
             item.tableData = this.procedureList;
+            item.disabled = !this.isShowPortDetail;
             break;
           case 'transition':
             item.tableData = this.transitionList;
+            item.disabled = !this.isShowPortDetail;
             break;
         }
         return item;

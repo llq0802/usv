@@ -61,7 +61,7 @@ export default {
         this.portList = data.result;
         for (let item of data.result) {
           item.delApi = 'apiDelPort'; //标识删除港口的函数名
-          item.uid = 'port' //标识这是港口 港口页面统一封装处理游泳
+          item.uid = 'port'; //标识这是港口 港口页面统一封装处理游泳
           this.$set(item, 'locationObj', turnLngLatObj(item.location)); //响应式
           item.locationArr = turnLngLat(item.location);
           item.boundList = str2Path(item.bounds);
@@ -96,7 +96,7 @@ export default {
       if (+errorCode === 0) {
         this.pointList = data;
         for (const item of data) {
-          // item.locationObj = turnLngLatObj(item.location);
+          item.locationObj = turnLngLatObj(item.location);
           item.delApi = 'apiDelPoint'; //标识删除端点的函数名
           item.uid = 'point'; //标识这是泊位
           this.$set(item, 'locationObj', turnLngLatObj(item.location)); //响应式
@@ -112,6 +112,8 @@ export default {
      */
     async getProcedureList(id) {
       this.publicQuery['Condition.PortId'] = id;
+      this.publicQuery['Condition.IsInEffect'] = null;
+      this.publicQuery['Condition.Type'] = null;
       const { data, errorCode } = await portApi.apiGetProcedureByQuery(this.publicQuery);
       if (+errorCode === 0) {
         for (let item of data.result) {

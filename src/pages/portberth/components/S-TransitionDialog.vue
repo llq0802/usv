@@ -10,7 +10,7 @@
       <template #item-box>
         <div class="item-box-title">
           {{ BASE_CONSTANTS.transitionDirectione(value.direction) }}
-          {{ BASE_CONSTANTS.transitionType(value.type) }} }}过渡路径
+          {{ BASE_CONSTANTS.transitionType(value.type) }} 过渡路径
         </div>
         <div v-show="value.type === 2" class="item-box">
           <div class="item-left">航标</div>

@@ -1,11 +1,6 @@
 <template>
   <div>
-    <Dialog
-      :isShow="true"
-      :item="value"
-      @handleAddBoxClose="handleAddBoxClose"
-      @handleAddEdit="handleAddEdit"
-    >
+    <Dialog :isShow="true" :item="value" @handleBoxClose="handleBoxClose" @handleEdit="handleEdit">
       <template #item-box>
         <div class="item-box-title">
           {{ BASE_CONSTANTS.procedureType(value.type) }}程序 {{ value.ident }}
@@ -17,15 +12,15 @@
           </div>
         </div>
         <div class="item-box">
-          <div>起点</div>
+          <div class="item-left">起点</div>
           <div>
-            <el-input v-model="value.ident" size="mini" disabled />
+            <el-input v-model="value.startPoint.ident" size="mini" disabled />
           </div>
         </div>
         <div class="item-box">
           <div class="item-left">终点</div>
           <div>
-            <el-input v-model="value.ident" size="mini" disabled />
+            <el-input v-model="value.endPoint.ident" size="mini" disabled />
           </div>
         </div>
         <div class="item-box">
@@ -65,14 +60,25 @@ export default {
     }
   },
   methods: {
-    handleAddBoxClose() {
+    /**
+     * 关闭弹窗
+     */
+    handleBoxClose() {
       this.$emit('handleAddBoxClose', this.type);
     },
-    handleAddEdit() {
-      this.$emit('handleAddEdit', this.type, this.value);
+    /**
+     * 保存
+     */
+    handleEdit() {
+      this.$emit('handleAddSava', this.type, this.value);
     }
   }
 };
 </script>
 
-<style scoped lang="less"></style>
+<style scoped lang="less">
+.port-box {
+  left: -14px;
+  top: 35px;
+}
+</style>

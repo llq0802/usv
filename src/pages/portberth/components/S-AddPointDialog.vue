@@ -4,19 +4,14 @@
     <div class="text-style shadow">
       {{ value.ident }}
     </div>
-    <Dialog
-      :isShow="true"
-      :item="value"
-      @handleAddBoxClose="handleAddBoxClose"
-      @handleAddEdit="handleAddEdit"
-    >
+    <Dialog :isShow="true" :item="value" @handleBoxClose="handleBoxClose" @handleEdit="handleEdit">
       <template #item-box>
         <!-- 端点信息框 -->
-        <div class="item-box-title">{{ value.ident }} 端点</div>
+        <div class="item-box-title">{{ value.Ident || 'ABC' }} 端点</div>
         <div class="item-box">
           <div class="item-left">名称</div>
           <div>
-            <el-input type="text" v-model="value.ident" size="mini" />
+            <el-input type="text" v-model="value.Ident" placeholder="请输入三个字母" size="mini" />
           </div>
         </div>
         <div class="item-box">
@@ -39,7 +34,6 @@ export default {
   props: {
     value: {
       type: Object,
-      isRequired: true,
       default: () => {}
     },
     type: {
@@ -48,11 +42,17 @@ export default {
     }
   },
   methods: {
-    handleAddBoxClose() {
+    /**
+     * 关闭弹窗
+     */
+    handleBoxClose() {
       this.$emit('handleAddBoxClose', this.type);
     },
-    handleAddEdit() {
-      this.$emit('handleAddEdit', this.type, this.value);
+    /**
+     * 保存
+     */
+    handleEdit() {
+      this.$emit('handleAddSava', this.type, this.value);
     }
   }
 };
@@ -62,9 +62,13 @@ export default {
 @point-background-color: rgb(29, 57, 136);
 /* 端点圆点 */
 .point-point {
-  width: 7px;
-  height: 7px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: @point-background-color;
+}
+.port-box {
+  left: -14px;
+  top: 36px;
 }
 </style>

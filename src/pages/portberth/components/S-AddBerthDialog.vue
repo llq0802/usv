@@ -17,7 +17,12 @@
         <div class="item-box">
           <div class="item-left">名称</div>
           <div>
-            <el-input type="text" v-model="value.ident" size="mini" />
+            <el-input
+              type="text"
+              v-model="value.ident"
+              placeholder="请输入二到四个大写字母或数字"
+              size="mini"
+            />
           </div>
         </div>
         <div class="item-box">
@@ -57,7 +62,7 @@ export default {
      * 关闭弹窗
      */
     handleBoxClose() {
-      this.$emit('handleAddBoxClose', this.value);
+      this.$emit('handleAddBoxClose', this.type);
     },
     /**
      * 保存
