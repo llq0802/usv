@@ -1,6 +1,12 @@
 <template>
   <div>
-    <Dialog :isShow="true" :item="value" @handleBoxClose="handleBoxClose" @handleEdit="handleEdit">
+    <Dialog
+      :isShow="true"
+      :item="value"
+      :isCtrl="isCtrl"
+      @handleBoxClose="handleBoxClose"
+      @handleEdit="handleEdit"
+    >
       <template #item-box>
         <div class="item-box-title">
           {{ BASE_CONSTANTS.procedureType(value.type) }}程序 {{ value.ident }}
@@ -57,6 +63,10 @@ export default {
     type: {
       type: String,
       default: 'procedure'
+    },
+    isCtrl: {
+      type: Boolean,
+      default: false
     }
   },
   methods: {

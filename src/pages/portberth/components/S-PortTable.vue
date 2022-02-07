@@ -213,7 +213,7 @@ export default {
   width: 400px;
   text-align: right;
   .btn {
-    margin: 10px 10px 0 0;
+    margin: 15px 0px 0 0;
   }
   /deep/.el-tabs--card > .el-tabs__header .el-tabs__item.is-active {
     border-bottom-color: #409eff;

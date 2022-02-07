@@ -17,7 +17,7 @@ import AddProcedureDialog from './components/S-AddProcedureDialog.vue';
 import AddTransitionDialog from './components/S-AddTransitionDialog.vue';
 // 工具方法
 import { turnLngLat } from '@/utils/handleLngLat';
-import { debounce, deepClone } from '@/utils';
+import { debounce, deepClone, throttle } from '@/utils';
 //提取的本页公共js文件
 import amapEvents from './mixins-js/amapEvents';
 import tableEvents from './mixins-js/tableEvents';
@@ -48,10 +48,17 @@ export default {
     AddTransitionDialog
   },
   created() {
-    // this.getNavaList();
+    this.$nextTick(() => {
+      document.addEventListener('keydown', this.keydown);
+    });
   },
-  mounted() {
-    // console.log(this.$refs.amap.mapInstance);
+  activated() {
+    this.$nextTick(() => {
+      document.addEventListener('keydown', this.keydown);
+    });
+  },
+  deactivated() {
+    document.removeEventListener('keydown', this.keydown);
   },
   data() {
     return {
@@ -64,6 +71,7 @@ export default {
       isRequest: true, //是否可以请求港口信息
       isClickMap: false, //是否可以点击地图获取坐标
       isShowPortDetail: false, //是否展示当前港口详情
+      isCtrl: false,
       publicQuery: {
         //公共的请求参数
         'Condition.Id': '',
@@ -125,25 +133,13 @@ export default {
         addPointData.longitude = lng;
         addPointData.isClick = false;
       }
+      //点击新增程序
       if (addProcedureData.isClick) {
         if (this.pointList.length < 2) {
           this.$message.error(',当前港口没有两个及以上端点，请先新增端点');
           return false;
         }
-        addProcedureData.path.push([lng, lat]);
-        let num = addProcedureData.path.length > 2 ? 2 : 1;
-        //计算线段中的展示的点
-        addProcedureData.centerPoint = addProcedureData.path[addProcedureData.path.length - num];
-        // 定义最近开始端点
-        let startPoint;
-        // //计算最近开始端点只能第一次 否则会覆盖
-        if (addProcedureData.path.length === 1) {
-          startPoint = this.getMinPoint(addProcedureData.path, this.pointList);
-          this.$set(addProcedureData, 'startPoint', startPoint);
-        }
-        // 每点击一次就更新最近结束端点
-        let endPoint = this.getMinPoint(addProcedureData.path, this.pointList);
-        this.$set(addProcedureData, 'endPoint', endPoint);
+        this.addProcedureClick(lng, lat);
       }
       //点击新增过渡路径
       if (addTransitionData.isClick) {
@@ -151,220 +147,48 @@ export default {
           this.$message.error('请先新增端点和泊位');
           return false;
         }
-        addTransitionData.path.push([lng, lat]);
-        let num = addTransitionData.path.length > 2 ? 2 : 1;
-        //计算线段中的展示的点
-        addTransitionData.centerPoint = addTransitionData.path[addTransitionData.path.length - num];
-        //算出开始点只计算一次
-        if (addTransitionData.path.length === 1) {
-          let startNavaPoint, startBerthPoint, startPoint;
-          if (this.navaList.length)
-            startNavaPoint = this.getMinPoint(addTransitionData.path, this.navaList);
-          //点到泊位中心点的距离
-          // startBerthPoint = this.getMinPoint(addTransitionData.path, this.berthList);
-          //点到泊位线的距离
-          startBerthPoint = this.getDistanceToLine(addTransitionData.path, this.berthList);
-          // 调用计算函数
-          startPoint = this.getMinPoint(addTransitionData.path, this.pointList);
-          // 比较在 泊位点 航标点 端点当中距离最短的点
-          let startTempArr = this.navaList.length
-            ? [startNavaPoint, startBerthPoint, startPoint]
-            : [startBerthPoint, startPoint];
-          let startMinPoint = this.getMinPoint(addTransitionData.path, startTempArr);
-          //根据点自动计算类型,方向  direction:1进港 2离港  type:1泊位 2航标
-          if (this.navaList.some((item) => item.id === startMinPoint.id)) {
-            addTransitionData.direction = 1; //1进港-航道
-            addTransitionData.type = 2;
-            console.log('获得最近航标');
-          } else if (this.berthList.some((item) => item.id === startMinPoint.id)) {
-            // 通过最短的点找到这个点是否在泊位中
-            addTransitionData.direction = 2; //2离港-泊位
-            addTransitionData.type = 1;
-            console.log('获得最近泊位');
-          }
-          //存储最近的开始点
-          this.$set(addTransitionData, 'startMinPoint', startMinPoint);
-        }
-        //开始计算结束点
-        let endNavaPoint;
-        if (this.navaList.length) {
-          endNavaPoint = this.getMinPoint(addTransitionData.path, this.navaList);
-        }
-        //点到泊位中心点的距离
-        // let endBerthPoint = this.getMinPoint(addTransitionData.path, this.berthList);
-        //点到泊位范围的距离
-        let endBerthPoint = this.getDistanceToLine(addTransitionData.path, this.berthList);
-        let endPoint = this.getMinPoint(addTransitionData.path, this.pointList);
-        // 比较在 泊位点 航标点 端点当中距离最短的结束点
-        let endTempArr = this.navaList.length
-          ? [endNavaPoint, endBerthPoint, endPoint]
-          : [endBerthPoint, endPoint];
-        let endMinPoint = this.getMinPoint(addTransitionData.path, endTempArr);
-        console.log(endMinPoint);
-
-        this.$set(addTransitionData, 'endMinPoint', endMinPoint); //存储最近的结束点
-        //根据开始点和结束点自动计算类型,方向 // direction:1进港 2离港  type:1泊位 2航标
-        if (
-          this.pointList.some((item) => item.id === endMinPoint.id) &&
-          addTransitionData.path.length !== 1 // 通过结束最短的点找到这个点是否在端点中
-        ) {
-          if (addTransitionData.type === 2) {
-            addTransitionData.type = 2;
-            addTransitionData.direction = 1;
-          } else {
-            addTransitionData.type = 1;
-            addTransitionData.direction = 2;
-          }
-        } else if (
-          this.navaList.some((item) => item.id === endMinPoint.id) &&
-          addTransitionData.path.length !== 1 // 通过结束最短的点找到这个点是否在航标中
-        ) {
-          addTransitionData.type = 2;
-          addTransitionData.direction = 2;
-        } else if (
-          this.berthList.some((item) => item.id === endMinPoint.id) &&
-          addTransitionData.path.length !== 1 // 通过结束最短的点找到这个点是否在泊位中
-        ) {
-          addTransitionData.type = 1;
-          addTransitionData.direction = 1;
-        }
-        console.log(addTransitionData);
+        this.addTransitionClick(lng, lat);
       }
     },
     /**
      * 点击了港口新增按钮
      */
     handleAddPortClick() {
+      this.resetAddData();
+      this.handleBoxClose();
       this.addPortData.isClick = true;
       this.isClickMap = true;
+      this.isRequest = false;
       this.$message.info('开启了港口添加，请点击地图');
-      if (this.currentPort.isPortEdit) this.handleBoxClose('port');
-      if (this.currentBerth) this.handleBoxClose('berth');
-      if (this.addBerthData.latitude) this.resetAddData('berth');
-      if (this.addBerthData.latitude) this.resetAddData('berth');
-      if (this.addBerthData.latitude) this.resetAddData('berth');
-
       console.log('点击了新增港口按钮');
     },
     /**
      * 点击了泊位,端点,过渡路径,程序的新增按钮
      */
     handleAddBtn(type) {
+      this.resetAddData();
       this.isClickMap = true;
       if (type === 'berth') {
         this.$message.info('开启了泊位添加，请点击地图');
         this.addBerthData.isClick = true;
-        if (this.addPortData.latitude) this.resetAddData('port');
-        if (this.addPointData.latitude) this.resetAddData('point');
-        if (this.currentPoint) this.handleBoxClose('point');
-        if (this.currentBerth) this.handleBoxClose('berth');
-        if (this.currentPort.isPortEdit) this.handleBoxClose('port');
+        this.handleBoxClose();
       }
       if (type === 'point') {
         this.$message.info('开启了端点添加，请点击地图');
         this.addPointData.isClick = true;
-        if (this.addBerthData.latitude) this.resetAddData('berth');
-        if (this.addPortData.latitude) this.resetAddData('port');
-        if (this.currentPoint) this.handleBoxClose('point');
-        if (this.currentPort.isPortEdit) this.handleBoxClose('port');
-        if (this.currentBerth) this.handleBoxClose('berth');
+        this.handleBoxClose();
       }
       if (type === 'procedure') {
         this.$message.info('开启了程序添加，请点击地图');
         this.addProcedureData.isClick = true;
-        if (this.addBerthData.latitude) this.resetAddData('berth');
-        if (this.addPortData.latitude) this.resetAddData('port');
-        if (this.currentPoint) this.handleBoxClose('point');
-        if (this.currentPort.isPortEdit) this.handleBoxClose('port');
-        if (this.currentBerth) this.handleBoxClose('berth');
+        this.handleBoxClose();
       }
       if (type === 'transition') {
         this.$message.info('开启了过渡路径添加，请点击地图');
         this.addTransitionData.isClick = true;
-        if (this.addBerthData.latitude) this.resetAddData('berth');
-        if (this.addPortData.latitude) this.resetAddData('port');
-        if (this.currentPoint) this.handleBoxClose('point');
-        if (this.currentPort.isPortEdit) this.handleBoxClose('port');
-        if (this.currentBerth) this.handleBoxClose('berth');
+        this.handleBoxClose();
       }
     },
-    /**
-     * 关闭新增港口弹框
-     */
-    handleAddBoxClose(type) {
-      console.log('handleAddBoxClose ', type);
-      if (type === 'port') {
-        this.resetAddData('port');
-      } else if (type === 'berth') {
-        this.resetAddData('berth');
-      } else if (type === 'point') {
-        this.resetAddData('point');
-      } else if (type === 'procedure') {
-        this.resetAddData('procedure');
-      } else if (type === 'transition') {
-        this.resetAddData('transition');
-      }
-    },
-    /**
-     * 重置新增数据
-     */
-    resetAddData(type) {
-      if (!type) {
-        return;
-      }
-      if (type === 'port') {
-        this.addPortData = {
-          isClick: false, //是否点击了新增港口按钮
-          isStartDraw: false,
-          name: '',
-          ident: '',
-          zoomLevel: 0,
-          bounds: [],
-          longitude: null,
-          latitude: null,
-          area: ''
-        };
-      } else if (type === 'berth') {
-        this.addBerthData = {
-          isClick: false, //是否点击了新增泊位按钮
-          isStartDraw: false,
-          portId: null,
-          ident: '',
-          bounds: [],
-          longitude: null,
-          latitude: null,
-          area: ''
-        };
-      } else if (type === 'point') {
-        this.addPointData = {
-          isClick: false, //是否点击了新增端点按钮
-          longitude: null,
-          latitude: null,
-          Id: null,
-          Ident: '',
-          Location: null
-        };
-      } else if (type === 'procedure') {
-        this.addProcedureData = {
-          isClick: false, //是否点击了新增程序按钮
-          id: null,
-          ident: '',
-          startId: null,
-          endId: null,
-          path: [],
-          type: 1 //1代表离港，2代表进港
-        };
-      } else if (type === 'transition') {
-        this.addTransitionData = {
-          isClick: false, //是否点击了新增过渡路径按钮
-          procedureEndpointId: null,
-          direction: null,
-          path: [],
-          targetId: null
-        };
-      }
-    },
-
     /**
      * 防抖: 缩放,拖拽地图时请求数据
      */
@@ -399,16 +223,13 @@ export default {
         if (this.isRequest) this.showPortArea(this.currentPort); //显示距离正中心最近的港口信息
       } else {
         // 重置数据
-        this.currentPort = { isPortEdit: false };
-        this.currentBerth = null;
-        this.currentPoint = null;
-        this.currentProcedure = null;
-        this.currentTransition = null;
         this.berthList = [];
         this.pointList = [];
         this.procedureList = [];
         this.transitionList = [];
         currentPort = null;
+        this.handleBoxClose();
+        this.resetAddData('port');
         this.isRequest = true; // 可以继续请求数据
       }
     }, 500),
@@ -429,6 +250,7 @@ export default {
      */
     async handleCurrentClick(type, value) {
       const amap = this.$refs.amap;
+      this.resetAddData();
       if (type === 'port') {
         this.currentPort = { ...value, isPortEdit: true };
         this.isRequest = false;
@@ -469,6 +291,17 @@ export default {
      * 关闭信息框
      */
     async handleBoxClose(type) {
+      if (!type) {
+        if (this.currentPort.boundList) {
+          this.cachePortBoundList = deepClone(this.currentPort.boundList); //缓存当前港口的范围
+        }
+        this.currentPort.isPortEdit = false;
+        this.currentBerth = null;
+        this.currentTransition = null;
+        this.currentPoint = null;
+        this.currentProcedure = null;
+        return;
+      }
       this.isRequest = true; //关闭编辑或者成功编辑过会打开网络请求
       if (type === 'port') {
         await this.getPortList(this.publicQuery);

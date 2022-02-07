@@ -7,6 +7,7 @@
     <Dialog
       :isShow="true"
       :item="value"
+      :isCtrl="isCtrl"
       @handleBoxClose="handleBoxClose"
       @handleDelete="handleDelete"
       @handleEdit="handleEdit"
@@ -55,6 +56,10 @@ export default {
     type: {
       type: String,
       default: 'berth'
+    },
+    isCtrl: {
+      type: Boolean,
+      default: false
     }
   },
   methods: {

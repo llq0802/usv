@@ -29,7 +29,7 @@ service.interceptors.request.use(
     return config;
   },
   (error) => {
-    console.log('request error', error);
+    console.log('请求错误', error);
     return Promise.reject();
   }
 );
@@ -50,7 +50,7 @@ service.interceptors.response.use(
         return response.data;
       }
     } else {
-      Promise.reject();
+      return Promise.reject();
     }
   },
   (err) => {

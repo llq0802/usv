@@ -2,7 +2,7 @@ import request from '../request';
 // 根据IDENT获取港口信息
 export const apiGetPortByIdent = (ident) => {
   return request({
-    url: `/port/get/${ident}`,
+    url: `/port/get?ident=${ident}`,
     method: 'get'
   });
 };
@@ -124,7 +124,7 @@ export const apiEditProcedure = (data) => {
 // }
 export const apiEditTransition = (data) => {
   return request({
-    url: `/transition/update/?id=${data.id}`,
+    url: `/transition/update?id=${data.id}`,
     method: 'post',
     data
   });
@@ -237,7 +237,7 @@ export const apiAddProcedure = (data) => {
 // }
 export const apiAddTransition = (data) => {
   return request({
-    url: `/transition/add/?type=${data.type}`,
+    url: `/transition/add?type=${data.type}`,
     method: 'post',
     data
   });

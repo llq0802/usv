@@ -1,17 +1,20 @@
 <template>
-  <div
-    class="port-box shadow"
-    v-show="isShow"
-    @mousemove="eventStopPropagation('div', $event)"
-    @mousedown="eventStopPropagation('div', $event)"
-    @mouseenter="eventStopPropagation('input')"
-  >
-    <!-- 右上角X -->
-    <i class="el-icon-close" @click.stop="handleBoxClose"></i>
-    <!-- 插槽内容 -->
-    <slot name="item-box"></slot>
-    <!-- 按钮 -->
-    <PortBtn :item="item" @handleDelete="handleDelete" @handleEdit="handleEdit" />
+  <div>
+    <div class="box-mark" v-if="isCtrl"></div>
+    <div
+      v-show="isShow"
+      :class="{ opacity03: isCtrl, 'port-box': true, shadow: true }"
+      @mousemove="eventStopPropagation('div', $event)"
+      @mousedown="eventStopPropagation('div', $event)"
+      @mouseenter="eventStopPropagation('input')"
+    >
+      <!-- 右上角X -->
+      <i class="el-icon-close" @click.stop="handleBoxClose"></i>
+      <!-- 插槽内容 -->
+      <slot name="item-box"></slot>
+      <!-- 按钮 -->
+      <PortBtn :item="item" @handleDelete="handleDelete" @handleEdit="handleEdit" />
+    </div>
   </div>
 </template>
 
@@ -29,6 +32,10 @@ export default {
     item: {
       type: Object,
       default: () => {}
+    },
+    isCtrl: {
+      type: Boolean,
+      default: false
     },
     isShow: {
       type: Boolean,
@@ -74,4 +81,17 @@ export default {
 };
 </script>
 
-<style scoped lang="less"></style>
+<style scoped lang="less">
+.opacity03 {
+  opacity: 0.3;
+}
+//港口信息框的遮罩层
+.box-mark {
+  width: 19vw !important;
+  height: 40vh !important;
+  background-color: transparent;
+  position: absolute;
+  cursor: url(http://webapi.amap.com/theme/v1.3/openhand.cur), pointer !important;
+  z-index: 100;
+}
+</style>

@@ -33,6 +33,8 @@ export default {
         Location: null
       },
       addProcedureData: {
+        startPoint: null,
+        endPoint: null,
         isClick: false, //是否点击了新增程序按钮
         id: null,
         ident: '',
@@ -42,6 +44,8 @@ export default {
         type: 1 //1代表离港，2代表进港
       },
       addTransitionData: {
+        startMinPoint: null,
+        endMinPoint: null,
         isClick: false, //是否点击了新增过渡路径按钮
         procedureEndpointId: null,
         direction: null,
@@ -64,6 +68,8 @@ export default {
         this.addPoint();
       } else if (type === 'procedure') {
         this.addProcedure();
+      } else if (type === 'transition') {
+        this.addTransition();
       }
     },
     /**
@@ -90,7 +96,7 @@ export default {
         await this.getPortList(this.publicQuery);
         this.isRequest = true; //新增完成后可以进行网络请求
         this.isClickMap = false; //新增完成后不能点击地图获取坐标
-        this.resetAddData('port');
+        this.resetAddData();
         this.$message.success('添加成功');
       }
     },
@@ -115,13 +121,12 @@ export default {
       if (+errorCode === 0) {
         data = null; //清理内存
         await this.getBerthList(this.currentPort.id);
-        this.resetAddData('berth');
+        this.resetAddData();
         this.isRequest = true; //新增完成后可以进行网络请求
         this.isClickMap = false; //新增完成后不能点击地图获取坐标
         this.$message.success('添加成功');
       }
     },
-
     /**
      * 新增端点请求
      */
@@ -141,7 +146,7 @@ export default {
         await this.getPointList(this.currentPort.id);
         this.isRequest = true; //新增完成后可以进行网络请求
         this.isClickMap = false; //新增完成后不能点击地图获取坐标
-        this.resetAddData('point');
+        this.resetAddData();
         this.$message.success('添加成功');
       }
     },
@@ -169,7 +174,7 @@ export default {
         await this.getProcedureList(this.currentPort.id);
         this.isRequest = true; //新增完成后可以进行网络请求
         this.isClickMap = false; //新增完成后不能点击地图获取坐标
-        this.resetAddData('procedure');
+        this.resetAddData();
         this.$message.success('添加成功');
       }
     },
@@ -177,18 +182,89 @@ export default {
      *   新增过渡路径
      */
     async addTransition() {
-      let data = this.addTransitionData;
-      // 确定方向
-      data.direction = data.direction;
+      let data = deepClone(this.addTransitionData);
+      data.path = path2Str(data.path);
       // 数据处理
-      if ((data.direction == 1 && data.type == 1) || (data.direction == 2 && data.type == 2)) {
-        data.targetId = this.addTransitionPoint.endPoint.id;
-        data.procedureEndpointId = this.addTransitionPoint.startPoint.id;
+      if ((data.direction === 1 && data.type === 1) || (data.direction === 2 && data.type === 2)) {
+        data.targetId = data.endMinPoint.id;
+        data.procedureEndpointId = data.startMinPoint.id;
       }
-      if ((data.direction == 1 && data.type == 2) || (data.direction == 2 && data.type == 1)) {
-        data.targetId = this.addTransitionPoint.startPoint.id;
-        data.procedureEndpointId = this.addTransitionPoint.endPoint.id;
+      if ((data.direction === 1 && data.type === 2) || (data.direction === 2 && data.type === 1)) {
+        data.targetId = data.startMinPoint.id;
+        data.procedureEndpointId = data.endMinPoint.id;
       }
+      const { errorCode } = await portApi.apiAddTransition(data);
+      if (+errorCode === 0) {
+        data = null; //清理内存
+        await this.getTransitionList(this.currentPort.id);
+        this.isRequest = true; //新增完成后可以进行网络请求
+        this.isClickMap = false; //新增完成后不能点击地图获取坐标
+        this.resetAddData();
+        this.$message.success('添加成功');
+      }
+    },
+    /**
+     * 关闭新增弹框
+     */
+    handleAddBoxClose(type) {
+      this.resetAddData();
+    },
+    /**
+     * 重置新增数据
+     */
+    resetAddData(type) {
+      if (!type) {
+        this.addPortData = {
+          isClick: false, //是否点击了新增港口按钮
+          isStartDraw: false,
+          name: '',
+          ident: '',
+          zoomLevel: 0,
+          bounds: [],
+          longitude: null,
+          latitude: null,
+          area: ''
+        };
+      }
+
+      this.addBerthData = {
+        isClick: false, //是否点击了新增泊位按钮
+        isStartDraw: false,
+        portId: null,
+        ident: '',
+        bounds: [],
+        longitude: null,
+        latitude: null,
+        area: ''
+      };
+      this.addPointData = {
+        isClick: false, //是否点击了新增端点按钮
+        longitude: null,
+        latitude: null,
+        Id: null,
+        Ident: '',
+        Location: null
+      };
+      this.addProcedureData = {
+        isClick: false, //是否点击了新增程序按钮
+        id: null,
+        ident: '',
+        startId: null,
+        endId: null,
+        path: [],
+        type: 1, //1代表离港，2代表进港
+        startPoint: null,
+        endPoint: null
+      };
+      this.addTransitionData = {
+        isClick: false, //是否点击了新增过渡路径按钮
+        procedureEndpointId: null,
+        direction: null,
+        path: [],
+        targetId: null,
+        startMinPoint: null,
+        endMinPoint: null
+      };
     }
   }
 };

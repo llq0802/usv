@@ -7,6 +7,7 @@
     <Dialog
       :isShow="true"
       :item="port"
+      :isCtrl="isCtrl"
       @handleBoxClose="handleBoxClose"
       @handleDelete="handleDelete"
       @handleEdit="handleEdit"
@@ -60,6 +61,10 @@ export default {
     type: {
       type: String,
       default: 'port'
+    },
+    isCtrl: {
+      type: Boolean,
+      default: false
     }
   },
   methods: {

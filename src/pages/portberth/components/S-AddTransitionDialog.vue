@@ -1,6 +1,12 @@
 <template>
   <div>
-    <Dialog :isShow="true" :item="value" @handleBoxClose="handleBoxClose" @handleEdit="handleEdit">
+    <Dialog
+      :isShow="true"
+      :item="value"
+      :isCtrl="isCtrl"
+      @handleBoxClose="handleBoxClose"
+      @handleEdit="handleEdit"
+    >
       <template #item-box>
         <div class="item-box-title">
           {{ BASE_CONSTANTS.transitionDirectione(value.direction) }}
@@ -98,6 +104,7 @@
           </div>
         </div>
 
+        <!-- 类型与方向 -->
         <div class="item-box">
           <div class="item-left">类型</div>
           <div class="item-select">
@@ -141,11 +148,16 @@ export default {
     type: {
       type: String,
       default: 'transition'
+    },
+    isCtrl: {
+      type: Boolean,
+      default: false
     }
   },
   methods: {
     //改变过渡路径的方向
     changeDirection(val) {
+      if (!this.value.startMinPoint || this.value.endMinPoint) return;
       this.value.path = this.value.path.reverse();
       [this.value.startMinPoint, this.value.endMinPoint] = [
         this.value.endMinPoint,

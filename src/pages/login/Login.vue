@@ -82,7 +82,6 @@ export default {
             }
           } catch (error) {
             this.loginLoading = false;
-            this.$message.error('服务器繁忙，请稍后再试！');
           }
         }
       });

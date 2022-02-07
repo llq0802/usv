@@ -80,6 +80,7 @@
           >
             <AddPortDialog
               :port="addPortData"
+              :isCtrl="isCtrl"
               @handleAddBoxClose="handleAddBoxClose"
               @handleAddSava="handleAddSava"
             ></AddPortDialog>
@@ -139,6 +140,7 @@
           >
             <AddBerthDialog
               :value="addBerthData"
+              :isCtrl="isCtrl"
               @handleAddBoxClose="handleAddBoxClose"
               @handleAddSava="handleAddSava"
             />
@@ -259,6 +261,7 @@
           <el-amap-marker :position="addProcedureData.centerPoint" :offset="[-3, -3]" :zIndex="200">
             <AddProcedureDialog
               :value="addProcedureData"
+              :isCtrl="isCtrl"
               @handleAddBoxClose="handleAddBoxClose"
               @handleAddSava="handleAddSava"
             />
@@ -313,12 +316,10 @@
             </template>
           </div>
         </template>
-
         <!-- 新增过渡路径 -->
         <template v-if="addTransitionData && addTransitionData.path">
           <el-amap-polyline
             :path="addTransitionData.path"
-            strokeStyle="dashed"
             strokeColor="#9F6732"
             :editable="true"
             :zIndex="999"
@@ -333,6 +334,7 @@
           >
             <AddTransitionDialog
               :value="addTransitionData"
+              :isCtrl="isCtrl"
               @handleAddBoxClose="handleAddBoxClose"
               @handleAddSava="handleAddSava"
             />

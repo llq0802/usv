@@ -4,7 +4,13 @@
     <div class="text-style shadow">
       {{ value.ident }}
     </div>
-    <Dialog :isShow="true" :item="value" @handleBoxClose="handleBoxClose" @handleEdit="handleEdit">
+    <Dialog
+      :isShow="true"
+      :item="value"
+      :isCtrl="isCtrl"
+      @handleBoxClose="handleBoxClose"
+      @handleEdit="handleEdit"
+    >
       <template #item-box>
         <!-- 端点信息框 -->
         <div class="item-box-title">{{ value.Ident || 'ABC' }} 端点</div>
@@ -39,6 +45,10 @@ export default {
     type: {
       type: String,
       default: 'point'
+    },
+    isCtrl: {
+      type: Boolean,
+      default: false
     }
   },
   methods: {
