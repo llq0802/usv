@@ -70,18 +70,8 @@
       >
         <template slot-scope="scope">
           <template v-for="(item, index) in tableOption.options">
-            <el-button
-              v-if="!item.dropdown"
-              :key="index"
-              :type="item.type"
-              :icon="item.icon"
-              :size="item.size || 'mini'"
-              @click="handleButton($event, item.methods, scope.row, scope.$index)"
-            >
-              {{ item.label }}
-            </el-button>
             <el-dropdown
-              v-else
+              v-if="item.dropdown"
               :key="index"
               :size="item.size || 'small'"
               @command="handleCommand"
@@ -103,6 +93,31 @@
                 </template>
               </el-dropdown-menu>
             </el-dropdown>
+            <el-tooltip
+              v-else-if="item.tooltip"
+              effect="light"
+              placement="right"
+              :key="index"
+              :size="item.size || 'small'"
+              :content="item.content"
+            >
+              <i
+                :class="item.iconClass"
+                @click="iconClick($event, item.methods, scope.row, scope.$index)"
+              >
+              </i>
+            </el-tooltip>
+            <el-button
+              v-else
+              :key="index"
+              :type="item.type"
+              :icon="item.icon"
+              :size="item.size || 'mini'"
+              @click="handleButton($event, item.methods, scope.row, scope.$index)"
+            >
+              {{ item.label }}
+            </el-button>
+            
           </template>
         </template>
       </el-table-column>
@@ -227,6 +242,10 @@ export default {
     // methods方法名 row当前点击列数据 index当前点击的index
     handleButton(event, methods, row, index) {
       this.$emit('buttonClick', { event, methods: methods, row: row, index: index });
+    },
+    // icon图标点击事件
+    iconClick(event, methods, row, index) {
+      this.$emit('iconClick', { event, methods, row, index });
     },
     // 当表格的排序条件发生变化的时候会触发该事件	{ column, prop, order }
     handleSortChange(column, prop, order) {

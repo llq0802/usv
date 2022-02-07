@@ -6,6 +6,7 @@ import { API } from '../config';
 import router from '@/router';
 import { Message } from 'element-ui';
 import NProgress from 'nprogress';
+import qs from 'qs';
 
 const service = axios.create({
   baseURL: process.env.NODE_ENV === 'development' ? API : process.env.VUE_APP_API_BASE_PATH + API, //来判断是否开发环境
@@ -23,6 +24,12 @@ service.interceptors.request.use(
     //发送的是登录请求和更新token请求,那么不能更新token函数,否者会进入回调地狱死循环.
     if (config.url == '/auth/refreshtoken' || config.url == '/auth/signin') {
       return config;
+    }
+    if (config.method === 'get') {
+      // 如果是get请求，将params参数中的数组格式类型如arr=[1,2]，转换成arr=1&arr=2
+      config.paramsSerializer = params => {
+        return qs.stringify(params, { arrayFormat: 'repeat' });
+      }
     }
     // 更新token函数,如果过期时间>0小于30分钟就更新token
     updateToken(1800, config);

@@ -97,12 +97,25 @@ export const strArrToTdArr = (arr) => {
   return location;
 };
 
+// ['a, b', 'c, b'] => [[b, a], [d, c]]
+export const strArrToReTdArr = (arr) => {
+  let location = [];
+  let locationArray;
+  if (arr) {
+    arr.forEach((element) => {
+      locationArray = element.split(',').map(Number);
+      location.push(locationArray.reverse());
+    });
+  }
+  return location;
+};
+
 // [a, b], [c, d] => [[a, b], [c, d]]
 export const arrToTdArr = (arr) => {};
 
-// 字符串转换路径坐标 '1,2 /n 3,4' => [[2,1],[4,3]]
+// '1,2 /n 3,4' => [[2,1],[4,3]]
 export const translatePath = (string) => {
-  const res = Object.prototype.toString.call(o).slice(8, -1);
+  const res = Object.prototype.toString.call(string).slice(8, -1);
   let pointList = [];
   // ['1,2 3,4']
   if (res === 'Array') {

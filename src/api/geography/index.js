@@ -11,3 +11,16 @@ export const convert = params => {
     params
   })
 };
+/**
+ * 简化轨迹
+ * @param {*} tolerance 容差值
+ * @param {*} path 轨迹字符串数组
+ * @returns 
+ */
+export const apiSimpleTrack = (tolerance, path) => {
+  return request({
+    url: `geography/reduce?tolerance=${+tolerance}&algorithmSource=application`,
+    method: 'post',
+    data: path
+  })
+}

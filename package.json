@@ -15,6 +15,7 @@
     "ezuikit-js": "^0.2.2",
     "jwt-decode": "^3.1.2",
     "nprogress": "^0.2.0",
+    "qs": "^6.10.3",
     "vue": "^2.6.10",
     "vue-amap": "^0.5.10",
     "vue-router": "^3.0.3"
