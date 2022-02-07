@@ -130,3 +130,27 @@ export const getTime = () => {
   let sec = date.getSeconds().toString().padStart(2, '0');
   return year + month + day + hour + min + sec;
 };
+
+// 清空属性值
+export const clearProperties = o => {
+  Object.keys(o).forEach(key => {
+    let type = Object.prototype.toString.call(o[key]).slice(8, -1);
+    switch (type) {
+      case 'Object':
+        clearProperties(o[key]);
+        break;
+      case 'Array':
+        o[key] = [];
+        break;
+      case 'String':
+        o[key] = '';
+        break;
+      case 'Function':
+        break;
+      default:
+        o[key] = null;
+        break;
+    }
+  })
+  return o;
+}

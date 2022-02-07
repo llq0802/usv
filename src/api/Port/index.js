@@ -170,3 +170,27 @@ export const apiDelProcedure = (id) => {
     params: { id }
   });
 };
+/**
+ * 查询过渡路径
+ * @param { port:Number, type: Number } params 
+ * @returns 
+ */
+export const apiGetTransition = params => {
+  return request({
+    url: `/port/transitions`,
+    method: 'get',
+    params
+  })
+};
+/**
+ * 查询过渡路径上的航点
+ * @param { port:Number, type: Number } params 
+ * @returns 
+ */
+export const apiGetTransitionNavaids = params => {
+  return request({
+    url: `/port/transitionnavaids`,
+    method: 'get',
+    params
+  })
+};

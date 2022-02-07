@@ -1,35 +1,60 @@
 <template>
   <div class="container">
-
-    <!--地图-->
-    <Map>
-      <template #route>
-        <!--计划航线-->
-        <template>
-          <el-amap-polyline :path="[[106.556342, 29.592314], [106.551342, 29.592314]]"> </el-amap-polyline>
+    <div class="left-panel-part">
+      <!-- 表格部分 -->
+      <div class="table-part">
+        <table-part @getRow="getRouteInfo"></table-part>
+      </div>
+      <!-- 航线细节 -->
+      <div class="route-detail-part">
+        <!-- <route-detail></route-detail> -->
+        <template v-if="routeInfo">
+          <R2 :routeInfo="routeInfo"></R2>
         </template>
-      </template>
-    </Map>
+        
+      </div>
+    </div>
+    <!--地图-->
+    <div class="right-map-part">
+      <Map>
+        <template #route>
+          <!--计划航线-->
+          <template>
+            <el-amap-polyline :path="[[106.556342, 29.592314], [106.551342, 29.592314]]"> </el-amap-polyline>
+          </template>
+        </template>
+      </Map>
+    </div>
+    
   </div>
 </template>
 
 <script>
-// 导入地图组件
+// 地图
 import Map from 'components/amap/Amap';
-
+// 组件
+import TablePart from './components/Table.vue';
+import RouteDetail from './components/RouteDetail.vue';
+import R2 from './components/r2.vue';
 export default {
   components: {
-    Map
+    Map, TablePart, RouteDetail, R2
   },
   data () {
     return {
-
+      routeInfo: null,
       /********************* 地图相关 *********************/
       // marker偏移量
       offset: [-16, -31]
     }
   },
-  methods: {}
+  methods: {
+    getRouteInfo(row) {
+      this.routeInfo = row;
+    }
+  },
+  created() {
+  }
 }
 </script>
 
@@ -41,11 +66,23 @@ export default {
 
 .container {
   padding: 0 !important;
-  position: relative;
   width: 100%;
   height: 100%;
 }
-
+.left-panel-part {
+  float: left;
+  background: #f0f0f0;
+  height: 100%;
+  padding-right: 10px;
+  .table-part {
+    min-height: 278px;
+  }
+}
+.right-map-part {
+  float: right;
+  width: calc(100% - 406px);
+  height: 100%;
+}
 /*************** 地图相关 ***************/
 /* 坐标点 */
 .marker, .precise-marker{

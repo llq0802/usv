@@ -157,7 +157,7 @@ export default {
       }
     },
     // 获取港口
-    async getPortList () {
+    async getPortList (flag) {
       if (!flag) {
         this.portList = [];
         this.page = PAGE_SIZE.page;
@@ -188,7 +188,7 @@ export default {
     async getNextPagePortList() {
       if (this.portList.length === this.total) return;
       this.page++;
-      const res = await apiGetShip({
+      const res = await apiGetPortByQuery({
         'Page': this.page,
         'Size': PAGE_SIZE.size,
         'Condition.Keyword': this.keyword
