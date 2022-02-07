@@ -55,7 +55,12 @@ export const routes = [
       {
         path: '/plan',
         component: () => import(/* webpackChunkName: "plan" */ 'pages/plan/Plan'),
-        meta: { title: '计划航线管理', icon: 'el-icon-lx-home' }
+        meta: { title: '计划管理', icon: 'el-icon-lx-home' }
+      },
+      {
+        path: '/route',
+        component: () => import(/* webpackChunkName: "route" */ 'pages/route/Route'),
+        meta: { title: '航线管理', icon: 'el-icon-lx-home' }
       },
       {
         path: '/404',

@@ -466,7 +466,6 @@ export default {
         this.$delete(point, 'wgs84');
         this.$delete(point, 'position');
       };
-      console.log(newPlan);
       const res = await apiPostUpdatePlan(newPlan);
       if (!res.errorCode) {
         this.$message.success('更新成功！');
