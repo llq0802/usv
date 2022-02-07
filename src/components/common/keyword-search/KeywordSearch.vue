@@ -48,12 +48,7 @@
           @visible-change="getPortList"
           @change="selectPort"
         >
-          <el-option
-            v-for="item in portList"
-            :key="item.id"
-            :label="item.name"
-            :value="item.id"
-          >
+          <el-option v-for="item in portList" :key="item.id" :label="item.name" :value="item.id">
             <span style="float: left">{{ item.name }}</span>
             <span style="float: right">{{ item.ident }}</span>
           </el-option>
@@ -86,7 +81,7 @@ export default {
       default: false
     }
   },
-  data () {
+  data() {
     return {
       shipForm: {
         usvId: null
@@ -101,11 +96,11 @@ export default {
       shipList: [],
       total: 0,
       portList: []
-    }
+    };
   },
   methods: {
     //获取在线船只
-    async getShipList (flag, states) {
+    async getShipList(flag, states) {
       if (!flag) {
         // 关闭下拉框
         this.shipList = [];
@@ -115,7 +110,9 @@ export default {
       }
       this.remoteLoading = true;
       const res = await apiGetShip({
-        'Page': this.page, 'Size': PAGE_SIZE.size, 'Condition.States': states
+        Page: this.page,
+        Size: PAGE_SIZE.size,
+        'Condition.States': states
       });
       this.remoteLoading = false;
       if (res.errorCode) return;
@@ -126,11 +123,14 @@ export default {
       }
     },
     // 关键字查询船只
-    async filterShipList (keyword, states) {
+    async filterShipList(keyword, states) {
       this.keyword = keyword;
       this.remoteLoading = true;
       const res = await apiGetShip({
-        'Page': 1, 'Size': 10, 'Condition.States': states, 'Condition.Keyword': keyword
+        Page: 1,
+        Size: 10,
+        'Condition.States': states,
+        'Condition.Keyword': keyword
       });
       this.remoteLoading = false;
       if (res.errorCode) return;
@@ -145,8 +145,8 @@ export default {
       if (this.shipList.length === this.total) return;
       this.page++;
       const res = await apiGetShip({
-        'Page': this.page,
-        'Size': PAGE_SIZE.size,
+        Page: this.page,
+        Size: PAGE_SIZE.size,
         'Condition.States': this.states,
         'Condition.Keyword': this.keyword
       });
@@ -157,7 +157,7 @@ export default {
       }
     },
     // 获取港口
-    async getPortList (flag) {
+    async getPortList(flag) {
       if (!flag) {
         this.portList = [];
         this.page = PAGE_SIZE.page;
@@ -165,7 +165,8 @@ export default {
       }
       this.remoteLoading = true;
       const res = await apiGetPortByQuery({
-        'Page': this.page, 'Size': PAGE_SIZE.size
+        Page: this.page,
+        Size: PAGE_SIZE.size
       });
       this.remoteLoading = false;
       if (res.errorCode) return;
@@ -173,11 +174,13 @@ export default {
       this.portList = res.data.result;
     },
     // 关键字查询港口
-    async filterPortList (keyword) {
+    async filterPortList(keyword) {
       this.keyword = keyword;
       this.remoteLoading = true;
       const res = await apiGetPortByQuery({
-        'Page': this.page, 'Size': PAGE_SIZE.size, 'Condition.Keyword': keyword
+        Page: this.page,
+        Size: PAGE_SIZE.size,
+        'Condition.Keyword': keyword
       });
       this.remoteLoading = false;
       if (res.errorCode) return;
@@ -189,8 +192,8 @@ export default {
       if (this.portList.length === this.total) return;
       this.page++;
       const res = await apiGetPortByQuery({
-        'Page': this.page,
-        'Size': PAGE_SIZE.size,
+        Page: this.page,
+        Size: PAGE_SIZE.size,
         'Condition.Keyword': this.keyword
       });
       if (res.errorCode) return;
@@ -199,24 +202,23 @@ export default {
       }
     },
     // 选中船只
-    selectShip (id) {
-      let ship = this.shipList.find(v => v.id === id);
+    selectShip(id) {
+      let ship = this.shipList.find((v) => v.id === id);
       this.$emit('selectShip', ship);
       if (this.autoClear) {
         this.shipForm.usvId = null;
       }
     },
     // 选中港口
-    selectPort (id) {
-      let port = this.portList.find(v => v.id === id);
+    selectPort(id) {
+      let port = this.portList.find((v) => v.id === id);
       this.$emit('selectPort', port);
       if (this.autoClear) {
         this.portForm.portId = null;
       }
     }
   }
-}
+};
 </script>
 
-<style>
-</style>
+<style></style>

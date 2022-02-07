@@ -1,7 +1,7 @@
 // 子组件
 import Amap from 'components/amap/Amap';
 import PortTable from './components/S-PortTable.vue';
-import TableSearch from 'components/common/table-search/TableSearch';
+import TableSearch from 'components/common/keyword-search/KeywordSearch';
 import NavaMarker from './components/S-NavaMarker';
 import ProcedureMarker from './components/S-ProcedureMarker';
 import TransitionMarker from './components/S-TransitionMarker';
@@ -16,8 +16,8 @@ import AddPointDialog from './components/S-AddPointDialog.vue';
 import AddProcedureDialog from './components/S-AddProcedureDialog.vue';
 import AddTransitionDialog from './components/S-AddTransitionDialog.vue';
 // 工具方法
-import { turnLngLat } from '@/utils/handleLngLat';
-import { debounce, deepClone, throttle } from '@/utils';
+import { turnLngLat, str2Path } from '@/utils/handleLngLat';
+import { debounce, deepClone } from '@/utils';
 //提取的本页公共js文件
 import amapEvents from './mixins-js/amapEvents';
 import tableEvents from './mixins-js/tableEvents';
@@ -27,7 +27,7 @@ import addList from './mixins-js/addList';
 import delList from './mixins-js/delList';
 import utils from './mixins-js/utils';
 export default {
-  name: 'portberth',
+  name: 'port',
   mixins: [amapEvents, getLsit, editList, addList, delList, tableEvents, utils], //混入的js
   components: {
     Amap,
@@ -90,6 +90,14 @@ export default {
     };
   },
   methods: {
+    /**
+     * 搜索框选择港口
+     */
+    selectPort(value) {
+      this.isShowPortDetail = false;
+      value.boundList = str2Path(value.bounds);
+      this.handleCurrentClick('port', value);
+    },
     /**
      * 点击地图事件,获取坐标
      */
@@ -222,15 +230,8 @@ export default {
         this.cachePortBoundList = deepClone(this.currentPort.boundList); //缓存当前港口的范围
         if (this.isRequest) this.showPortArea(this.currentPort); //显示距离正中心最近的港口信息
       } else {
-        // 重置数据
-        this.berthList = [];
-        this.pointList = [];
-        this.procedureList = [];
-        this.transitionList = [];
         currentPort = null;
-        this.handleBoxClose();
-        this.resetAddData('port');
-        this.isRequest = true; // 可以继续请求数据
+        this.resetMapBounds();
       }
     }, 500),
     /**
@@ -238,13 +239,22 @@ export default {
      */
     showPortArea(currentPort) {
       const { id } = currentPort;
-      // console.log('当前港口:', name);
       this.getBerthList(id); // 泊位列表方法
       this.getPointList(id); //端点数据的方法
       this.getProcedureList(id); //程序路径列表方法
       this.getTransitionList(id); //过渡路径数据的方法
     },
-
+    // 重置数据
+    resetMapBounds() {
+      this.handleBoxClose();
+      this.resetAddData('port');
+      this.berthList = [];
+      this.pointList = [];
+      this.cachePortBoundList = [];
+      this.procedureList = [];
+      this.transitionList = [];
+      this.isRequest = true; // 可以继续请求数据
+    },
     /**
      * 点击不同的maker标显示信息
      */
@@ -255,7 +265,10 @@ export default {
         this.currentPort = { ...value, isPortEdit: true };
         this.isRequest = false;
         this.cachePortBoundList = deepClone(this.currentPort.boundList); //当前港口的范围
-        if (!this.isShowPortDetail) await amap.setMapFitView(value.boundList); //地图自适应显示图标
+        if (!this.isShowPortDetail) {
+          await amap.setMapFitView(value.boundList); //地图自适应显示图标
+          this.isShowPortDetail = true;
+        }
         this.isRequest = true;
         this.currentBerth = null;
         this.currentPoint = null;
@@ -295,7 +308,7 @@ export default {
         if (this.currentPort.boundList) {
           this.cachePortBoundList = deepClone(this.currentPort.boundList); //缓存当前港口的范围
         }
-        this.currentPort.isPortEdit = false;
+        this.currentPort = { isPortEdit: false };
         this.currentBerth = null;
         this.currentTransition = null;
         this.currentPoint = null;
