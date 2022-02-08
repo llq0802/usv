@@ -11,7 +11,6 @@ export const debounce = (fn, ms = 300) => {
     timeoutId = setTimeout(() => fn.apply(this, args), ms);
   };
 };
-
 /**
  *节流
  * @param {*} fn
@@ -38,7 +37,6 @@ export const throttle = (fn, wait = 300) => {
     }
   };
 };
-
 /**
  *深克隆
  *
@@ -52,7 +50,6 @@ export const deepClone = (obj) => {
   );
   return Array.isArray(obj) ? (clone.length = obj.length) && Array.from(clone) : clone;
 };
-
 /**
  *
  *封装网络状态码
@@ -132,8 +129,8 @@ export const getTime = () => {
 };
 
 // 清空属性值
-export const clearProperties = o => {
-  Object.keys(o).forEach(key => {
+export const clearProperties = (o) => {
+  Object.keys(o).forEach((key) => {
     let type = Object.prototype.toString.call(o[key]).slice(8, -1);
     switch (type) {
       case 'Object':
@@ -151,6 +148,6 @@ export const clearProperties = o => {
         o[key] = null;
         break;
     }
-  })
+  });
   return o;
-}
+};

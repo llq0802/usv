@@ -3,7 +3,6 @@ import { apiGetNavaByQuery } from 'api/nava';
 import { apiGetWayByQuery } from 'api/waterway';
 import { turnLngLat, turnLngLatObj, str2Path } from '@/utils/handleLngLat';
 import { BASE_CONSTANTS } from '@/config';
-import { deepClone } from '@/utils';
 
 export default {
   data() {

@@ -94,4 +94,16 @@ export default {
   cursor: url(http://webapi.amap.com/theme/v1.3/openhand.cur), pointer !important;
   z-index: 100;
 }
+/**地图中的公共框中的X*/
+/deep/.port-box {
+  .el-icon-close {
+    padding: 0 3px 3px;
+    position: absolute;
+    right: 10px;
+    font-size: 18px;
+    &:hover {
+      cursor: pointer;
+    }
+  }
+}
 </style>

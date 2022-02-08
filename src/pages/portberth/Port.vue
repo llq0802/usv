@@ -1,11 +1,17 @@
 <template>
   <div class="port-content">
-    <table-search
-      class="port-search"
-      :placeholder="'请选择港口'"
-      :autoClear="true"
-      @selectPort="selectPort"
-    />
+    <div class="port-search">
+      <table-search
+        class="port-search-main"
+        :placeholder="'请选择港口'"
+        :autoClear="true"
+        @selectPort="selectPort"
+      />
+      <el-button type="primary" class="port-search-btn" @click="handleAddPortClick"
+        >添加港口</el-button
+      >
+    </div>
+
     <!-- 封装的表格 -->
     <port-table
       :tableIndex="false"
