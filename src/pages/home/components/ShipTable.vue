@@ -26,8 +26,9 @@
 <script>
 import ShipSearch from 'components/common/keyword-search/KeywordSearch';
 import ShowShipTable from 'components/common/table/Mytable';
-import { apiGetShip } from 'api/usv';
+import { apiGetShipByQuery, apiGetShipById } from 'api/shipinfo';
 import { BASE_CONSTANTS } from '@/config';
+import { setStorage, getStorage } from '@/utils/localStorage';
 
 import { apiGetPortByQuery } from 'api/port';
 export default {
@@ -77,7 +78,38 @@ export default {
     // 查看船只
     viewShip(ship) {
       console.log(ship)
+    },
+
+    // 页面重载时恢复数据
+    async regainShip() {
+      let list = JSON.parse(getStorage('showShipsList'));
+      if (!list.length) {
+        // 默认显示五条在线船只
+        const res = await apiGetShipByQuery({ Page: 1, Size: 9999 });
+        if (!res.errorCode) return;
+        for (let ship of res.data.result) {
+          if (list.length === 5) return;
+          if (!ship.runtimeInfo.state) {
+            list.push(ship);
+          }
+        }
+      }
+      else {
+        // 更新船只状态
+        for(let ship of list) {
+          const res = await apiGetShipById(ship.id);
+          if (res.errorCode) return ship = null;
+          ship = res.data;
+        }
+      }
+      this.showList = list;
     }
+  },
+  updated() {
+    setStorage('showShipsList', JSON.stringify(this.showList));
+  },
+  created() {
+    this.regainShip();
   }
 }
 </script>

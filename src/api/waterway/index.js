@@ -21,3 +21,11 @@ export const apiGetWayByQuery = (params) => {
     params
   });
 };
+
+// 根据航标ident查询交叉航道
+export const apiGetWaysByIdent = ident => {
+  return request({
+    url: `/waterway/get?ident=${ident}`,
+    method: 'get'
+  })
+};
