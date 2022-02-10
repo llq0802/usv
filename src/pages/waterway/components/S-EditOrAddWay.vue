@@ -38,68 +38,74 @@
       >
     </div>
     <!-- 规划路径 -->
-    <div class="waterway-box" v-if="currentWay && currentWay.fixes">
-      <!-- 规划起点光标 -->
-      <div @click="handleCursorInsert(-1)" class="first-nava" v-if="currentWay.fixes.length"></div>
-      <span id="cursor-2" v-if="cursorInsertIndex === -1 && currentWay.fixes.length"></span>
-      <div v-for="(nava, index) in currentWay.fixes" :key="nava.id" class="nava-box">
-        <!-- 方向标 -->
-        <span class="arrows" @click="handleCursorInsert(index)" v-if="isShowArrows(nava, index)">
-          →
-        </span>
-        <!-- 两点不能连接的时候用分割 -->
-        <span class="arrows" @click="handleCursorInsert(index)" v-else style="color: red">
-          ≠≠
-        </span>
-        <!-- 信息 -->
-        <div class="nava-item shadow">
-          <span @click="handleCurrentClick(nava, index)">{{ nava.navaid.ident }}</span>
-          <!-- 删除框 -->
-          <el-popover trigger="hover" placement="top" v-show="currentWay.fixes.length !== 1">
-            <el-button
-              size="mini"
-              type="danger"
-              @click="handleBeforeDelete(nava, index, 'prev')"
-              v-show="index !== 0"
-              >删除前面</el-button
+    <div style="min-height: 6vh">
+      <div v-if="currentWay && currentWay.fixes" class="waterway-box">
+        <!-- 规划起点光标 -->
+        <div
+          @click="handleCursorInsert(-1)"
+          class="first-nava"
+          v-if="currentWay.fixes.length"
+        ></div>
+        <span id="cursor-2" v-if="cursorInsertIndex === -1 && currentWay.fixes.length"></span>
+        <div v-for="(nava, index) in currentWay.fixes" :key="nava.id" class="nava-box">
+          <!-- 方向标 -->
+          <span class="arrows" @click="handleCursorInsert(index)" v-if="isShowArrows(nava, index)">
+            →
+          </span>
+          <!-- 两点不能连接的时候用分割 -->
+          <span class="arrows" @click="handleCursorInsert(index)" v-else style="color: red">
+            ≠≠
+          </span>
+          <!-- 信息 -->
+          <div class="nava-item shadow">
+            <span @click="handleCurrentClick(nava, index)">{{ nava.navaid.ident }}</span>
+            <!-- 删除框 -->
+            <el-popover trigger="hover" placement="top" v-show="currentWay.fixes.length !== 1">
+              <el-button
+                size="mini"
+                type="danger"
+                @click="handleBeforeDelete(nava, index, 'prev')"
+                v-show="index !== 0"
+                >删除前面</el-button
+              >
+              <el-button
+                size="mini"
+                type="danger"
+                @click="handleAfterDelete(nava, index, 'next')"
+                v-show="index !== currentWay.fixes.length - 1"
+                >删除后面</el-button
+              >
+              <!-- 删除当前 -->
+              <div class="delete-nava" slot="reference" @click="handleCurrentDelete(nava, index)">
+                <i class="el-icon-close"></i>
+              </div>
+            </el-popover>
+            <!-- 长度1时,解决不能显示el-popover问题 -->
+            <div
+              class="delete-nava"
+              v-if="currentWay.fixes.length === 1"
+              @click="handleCurrentDelete(nava, index)"
             >
-            <el-button
-              size="mini"
-              type="danger"
-              @click="handleAfterDelete(nava, index, 'next')"
-              v-show="index !== currentWay.fixes.length - 1"
-              >删除后面</el-button
-            >
-            <!-- 删除当前 -->
-            <div class="delete-nava" slot="reference" @click="handleCurrentDelete(nava, index)">
               <i class="el-icon-close"></i>
             </div>
-          </el-popover>
-          <!-- 长度1时,解决不能显示el-popover问题 -->
-          <div
-            class="delete-nava"
-            v-if="currentWay.fixes.length === 1"
-            @click="handleCurrentDelete(nava, index)"
-          >
-            <i class="el-icon-close"></i>
           </div>
+          <!-- 光标 -->
+          <span id="cursor-1" v-show="cursorInsertIndex === index"></span>
         </div>
-        <!-- 光标 -->
-        <span id="cursor-1" v-show="cursorInsertIndex === index"></span>
+        <!-- 规划终点光标 -->
+        <span
+          class="arrows"
+          @click="handleCursorInsert(currentWay.fixes.length - 1)"
+          v-if="currentWay.fixes.length"
+        >
+          →
+        </span>
+        <div
+          class="first-nava"
+          @click="handleCursorInsert(currentWay.fixes.length - 1)"
+          v-if="currentWay.fixes.length"
+        ></div>
       </div>
-      <!-- 规划终点光标 -->
-      <span
-        class="arrows"
-        @click="handleCursorInsert(currentWay.fixes.length - 1)"
-        v-if="currentWay.fixes.length"
-      >
-        →
-      </span>
-      <div
-        class="first-nava"
-        @click="handleCursorInsert(currentWay.fixes.length - 1)"
-        v-if="currentWay.fixes.length"
-      ></div>
     </div>
 
     <!-- 保存按钮 -->
