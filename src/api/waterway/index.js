@@ -109,3 +109,12 @@ export const apiGetWayIntersections = (params) => {
     params
   });
 };
+
+// 为指定的航标查找最短路径
+export const apiGetWayBestShort = (params) => {
+  return request({
+    url: '/navigation/navigatefromnavaid',
+    method: 'get',
+    params
+  });
+};

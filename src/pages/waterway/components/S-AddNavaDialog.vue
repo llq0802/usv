@@ -4,13 +4,7 @@
     <div class="nava-box shadow text-style" @click.stop="handleCurrentClick">
       {{ value.ident || '航标' }}
     </div>
-    <Dialog
-      :isShow="true"
-      :item="value"
-      @handleBoxClose="handleBoxClose"
-      @handleDelete="handleDelete"
-      @handleEdit="handleEdit"
-    >
+    <Dialog :isShow="true" :item="value" @handleBoxClose="handleBoxClose" @handleEdit="handleEdit">
       <template #item-box>
         <div class="item-box-title">{{ value.ident }} 航标</div>
         <div class="item-box">
@@ -85,12 +79,6 @@ export default {
      */
     handleEdit() {
       this.$emit('handleAddSave', this.type, this.value);
-    },
-    /**
-     * 删除
-     */
-    handleDelete() {
-      this.$emit('handleDelete', this.value.id, this.delFunc);
     }
   }
 };

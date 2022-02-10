@@ -96,7 +96,7 @@ export default {
      * 删除
      */
     handleDelete() {
-      this.$emit('handleDelete', this.value.id, this.delFunc);
+      this.$emit('handleDelete', this.value.id, this.type, this.delFunc);
     }
   }
 };

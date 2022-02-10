@@ -49,7 +49,7 @@ export const updateToken = async (timer = 1800, config) => {
 export const checkTokenTime = (tokenTime, cTime = 0) => {
   // 现在的时间 单位秒
   const nowTime = Number.parseInt(Date.now() / 1000);
-  console.log('token时间还剩:', (tokenTime - nowTime) / 60 + '分钟');
+  // console.log('token时间还剩:', (tokenTime - nowTime) / 60 + '分钟');
   // 如果<=0证明过期了
   return tokenTime - nowTime <= cTime ? true : false;
 };

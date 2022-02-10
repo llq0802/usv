@@ -164,7 +164,8 @@ export default {
             'getMapBounds',
             boundPath,
             this.mapInstance.getZoom(),
-            this.mapInstance.getCenter()
+            this.mapInstance.getCenter(),
+            this.mapInstance
           );
         });
       }

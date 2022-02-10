@@ -10,12 +10,11 @@ export default {
       const confirmRlust = await confirmMsg(this);
       if (confirmRlust === 'confirm') {
         const { errorCode } = await requestFun(id);
-        if (+errorCode === 0) {
-          const list = `${api.slice(6).toLowerCase()}List`;
-          let index = this[list].findIndex((item) => item.id === id);
-          this[list].splice(index, 1);
-          this.$message.success('删除成功');
-        }
+        if (+errorCode !== 0) return;
+        const list = `${api.slice(6).toLowerCase()}List`;
+        let index = this[list].findIndex((item) => item.id === id);
+        this[list].splice(index, 1);
+        this.$message.success('删除成功');
       }
     }
   }

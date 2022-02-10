@@ -46,7 +46,6 @@ export default {
           this.$set(item, 'locationObj', turnLngLatObj(item.location));
           item.locationArr = turnLngLat(item.location);
         }
-        console.log(this.currentNava);
         // console.log(this.navaList);
       }
     }
