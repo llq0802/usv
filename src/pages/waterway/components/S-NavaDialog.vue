@@ -7,6 +7,7 @@
     <Dialog
       :isShow="isShow"
       :item="value"
+      :isDisable="isDisable"
       @handleBoxClose="handleBoxClose"
       @handleDelete="handleDelete"
       @handleEdit="handleEdit"
@@ -16,7 +17,13 @@
         <div class="item-box">
           <div class="item-left">半径</div>
           <div>
-            <el-input type="number" v-model="value.radius" placeholder="请输入半径" size="mini" />
+            <el-input
+              type="number"
+              v-model="value.radius"
+              placeholder="请输入半径"
+              size="mini"
+              :disabled="isDisable"
+            />
           </div>
         </div>
         <div class="item-box">
@@ -27,6 +34,7 @@
               v-model="value.zoomLevel"
               placeholder="请输入层级"
               size="mini"
+              :disabled="isDisable"
             />
           </div>
         </div>
@@ -62,7 +70,11 @@ export default {
       type: String,
       default: 'nava'
     },
-    // 删除港口的请求接口函数名,在api文件下文件中
+    isDisable: {
+      type: Boolean,
+      default: false
+    },
+    // 删除请求接口函数名,在api文件下文件中
     delFunc: {
       type: String,
       default: 'apiDelNava'

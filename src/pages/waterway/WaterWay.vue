@@ -8,6 +8,7 @@
     <way-dialog
       v-if="currentWay.length"
       class="way-dialog"
+      ref="waydialog"
       :wayList="currentWay"
       @handleEdit="handleEdit"
       @handleBoxClose="handleBoxClose"
@@ -70,7 +71,7 @@
             v-for="(item, index) in navaList"
             :key="index"
             :position="[item.locationObj.longitude, item.locationObj.latitude]"
-            :draggable="currentNava && currentNava.id === item.id"
+            :draggable="currentNava && currentNava.id === item.id && !isShowWayDialog"
             :events="navaEvents"
             :extData="item"
             :offset="[-5, -5]"
@@ -79,6 +80,7 @@
             <nava-dialog
               :value="item"
               :currentNava="currentNava"
+              :isDisable="isShowWayDialog"
               @handleCurrentClick="handleCurrentClick"
               @handleBoxClose="handleBoxClose"
               @handleEdit="handleEdit"
@@ -161,15 +163,15 @@ export default {
   data() {
     return {
       isShowWayDialog: false, // 是否为显示航道操作栏弹窗
-      isClickMap: false,
-      isRequest: true,
+      isClickMap: false, //是否可以点击地图
+      isRequest: true, //是否可以请求数据
       isShowWayIdent: false,
       currentNava: null,
-      currentWay: [],
+      currentWay: [], //当前地图选中的航道
       currentWayIdent: '',
-      currentWayDialog: null,
-      mapInstance: null,
-      lineInstance: Object.freeze([]), //实例
+      currentWayDialog: { fixes: [] }, //航道操作栏的当前航道
+      mapInstance: null, //地图实例
+      lineInstance: Object.freeze([]), //动态添加航道线段实例
       publicQuery: {
         //公共的请求参数
         'Condition.Rect.TopLeft': '',
@@ -181,6 +183,7 @@ export default {
         Page: 1,
         Size: 1e5
       },
+      // 新增航标数据
       navaAddData: {
         isClick: false,
         ident: '',
@@ -191,10 +194,10 @@ export default {
       },
       // 新增航道数据
       wayAddData: {
-        isClick: false, // 是否点击了新增航道按钮
+        isClick: false, // 是否点击了新增航道按钮 点击了为新增,没点击为修改
         wayDistance: 0,
         // verify: false,
-        ident: '', //航道标识
+        ident: '',
         plan: 1 //0自动规划, 1手动规划
       }
     };
@@ -320,7 +323,6 @@ export default {
      * 点击当前航标
      */
     handleCurrentClick(type, value) {
-      console.log(value);
       let lng = value.locationObj.longitude,
         lat = value.locationObj.latitude;
       this.currentNava = value;
@@ -334,22 +336,186 @@ export default {
         if (flag && this.currentWay.every((item) => item.id !== way.id)) {
           this.currentWay.push(way);
         }
-        console.log(this.currentWay);
+        // console.log(this.currentWay);
       }
+      // 当航道操作栏打开时点击航标
+      if (this.isShowWayDialog) {
+        this.waterwayAddNava(value, this.currentWay);
+      }
+    },
+    waterwayAddNava(currentNava, currentWayList) {
+      const map = this.$refs.amap;
+      const editaddway = this.$refs.editaddway;
+      const wayAddData = this.wayAddData;
+      const navaList = this.currentWayDialog.fixes;
+      // 判断点击的航标是否在本航道中
+      const isFlag = navaList.some((item) => item.navaidId == currentNava.id);
+      //修改模式手动规划点击时 true,1 默认最后一个航标插入
+      if (!wayAddData.isClick && wayAddData.plan === 1) {
+        // console.log('修改模式下,手动规划');
+        // 当前点击的点是不是在航道操作栏修改的点中
+        if (isFlag) {
+          this.$message.warning('不能点击本航道中的航标插入');
+          // const currentNava =navaList[editaddway.cursorInsertIndex].navaid;
+          // this.showNavigationLine(currentNava);
+          return;
+        }
+        // 当在第一个航标前插入 直接在数组前面添加channelAddData.isClickFirstNava
+        if (editaddway.cursorInsertIndex === -1) {
+          navaList.unshift({ navaid: currentNava, navaidId: currentNava.id });
+          // 显示点击航标半径和可导航范围
+          // const currentNava =navaList[0].navaid;
+          // this.showNavigationLine(currentNava);
+        } else {
+          // 插入该点的后面
+          navaList.splice(editaddway.cursorInsertIndex + 1, 0, {
+            navaid: currentNava,
+            navaidId: currentNava.id
+          });
+          // 默认光标位置channelAddData.cursorInsertIndex++;
+          editaddway.cursorInsertIndex = navaList.length - 1;
+          // 显示航标半径,异步获取数据（实时添加航标返回内可导航的航标）
+          // this.buttonClickData.clickNavaidInfo = navaList[navaList.length - 1].navaid;
+          // const currentNava = navaList[navaList.length - 1].navaid;
+          // this.showNavigationLine(currentNava);
+        }
+        //实时显示航道长度航道的起点和终点
+        this.showLineAndDistance();
+      }
+      // 修改模式,自动规划 或者 新增模式,自动规划
+      else if (
+        (wayAddData.isClick && wayAddData.plan === 0) ||
+        (!wayAddData.isClick && !wayAddData.plan === 0)
+      ) {
+        // console.log('修改模式下,自动规划 或者 新增模式下,自动规划');
+        // 判断点击的航标是否在本航道中
+        // 当有长度时只能在本航道点击
+        if (navaList.length) {
+          if (!isFlag) {
+            this.$message.warning('请选择本航道中的航标自动规划');
+            return;
+          }
+          //将点击的航标赋值给自动规划中的起点和终点
+          if (!editaddway.autoPlanData.isStart) {
+            if (currentNava.id === editaddway.autoPlanData.endNava.id) {
+              this.$message.warning('不能选择同一航标进行自动规划');
+              return;
+            }
+            // 查找起点的下标
+            let startIndex = navaList.findIndex((item) => item.navaidId === currentNava.id);
+            if (editaddway.autoPlanData.endNava.id) {
+              let index = navaList.findIndex(
+                (item) => item.navaidId === editaddway.autoPlanData.endNava.id
+              );
+              if (index <= startIndex) {
+                this.$message.warning('终点航标不能在起点航标之前!');
+                return;
+              }
+            }
+            editaddway.autoPlanData.startNava = deepClone(currentNava);
+            editaddway.autoPlanData.isStart = !editaddway.autoPlanData.isStart;
+            // map.ChannelRadiusCircle = currentNava;
+          } else if (editaddway.autoPlanData.isStart && !editaddway.autoPlanData.isEnd) {
+            if (currentNava.id === editaddway.autoPlanData.startNava.id) {
+              this.$message.warning('不能选择同一航标进行自动规划');
+              return;
+            }
+            // 查找终点的下标
+            let endIndex = navaList.findIndex((item) => item.navaidId === currentNava.id);
+            if (editaddway.autoPlanData.startNava.id) {
+              let index = navaList.findIndex(
+                (item) => item.navaidId === editaddway.autoPlanData.startNava.id
+              );
+              if (index >= endIndex) {
+                this.$message.warning('终点航标不能在起点航标之前!!');
+                return;
+              }
+            }
+            editaddway.autoPlanData.endNava = deepClone(currentNava);
+            editaddway.autoPlanData.isEnd = !editaddway.autoPlanData.isEnd;
+            // map.ChannelRadiusCircle = currentNava;
+          }
+        } else {
+          //将点击的航标赋值给自动规划中的起点和终点
+          if (!editaddway.autoPlanData.isStart) {
+            if (currentNava.id === editaddway.autoPlanData.endNava.id) {
+              this.$message.warning('不能选择同一航标进行自动规划');
+              return;
+            }
+            editaddway.autoPlanData.startNava = deepClone(currentNava);
+            editaddway.autoPlanData.isStart = !editaddway.autoPlanData.isStart;
+            // map.ChannelRadiusCircle = currentNava;
+          } else if (editaddway.autoPlanData.isStart && !editaddway.autoPlanData.isEnd) {
+            if (currentNava.id === editaddway.autoPlanData.startNava.id) {
+              this.$message.warning('不能选择同一航标进行自动规划');
+              return;
+            }
+            editaddway.autoPlanData.endNava = deepClone(currentNava);
+            editaddway.autoPlanData.isEnd = !editaddway.autoPlanData.isEnd;
+            // map.ChannelRadiusCircle = currentNava;
+          }
+        }
+        //实时显示航道长度航道的起点和终点
+        this.showLineAndDistance();
+      }
+
+      //新增模式 手动规划  false,1
+      else if (wayAddData.isClick && wayAddData.plan === 1) {
+        console.log('新增模式下,手动规划');
+        if (!navaList.length) {
+          // 手动规划新增
+          this.$set(navaList, navaList.length, {
+            navaidId: currentNava.id,
+            navaid: currentNava
+          });
+          //默认光标位置
+          editaddway.cursorInsertIndex = 0;
+          // 显示航标半径,异步获取数据（实时添加航标返回内可导航的航标）
+          // this.showNavigationLine(currentNava);
+          // this.buttonClickData.clickNavaidInfo = currentNava;
+        } else {
+          if (isFlag) {
+            this.$message.warning('不能选择本航道中的航标插入');
+            // const currentNava = navaList[navaList.length - 1].navaid;
+            // this.showNavigationLine(currentNava);
+            return;
+          }
+          // 手动规划新增
+          this.$set(navaList, navaList.length, {
+            navaidId: currentNava.id,
+            navaid: currentNava
+          });
+          //默认光标位置
+          editaddway.cursorInsertIndex = navaList.length - 1;
+          // 显示航标半径,异步获取数据（实时添加航标返回内可导航的航标）
+          // this.buttonClickData.clickNavaidInfo = currentNava;
+          // this.showNavigationLine(currentNava);
+        }
+        //实时显示航道长度航道的起点和终点
+        this.showLineAndDistance();
+      }
+      //新增模式,自动规划
+      // else if (!wayAddData.isClick && !wayAddData.plan) {}
+      // console.log('插入位置' + editaddway.cursorInsertIndex);
     },
     /**
      * 关闭航道,航标的信息框
      */
     handleBoxClose(type) {
       if (type === 'nava') {
+        if (this.isShowWayDialog) {
+          this.currentNava = null;
+          return;
+        }
         this.isShowWayDialog = false;
         this.currentNava = null;
         this.currentWay = [];
         this.isRequest = true;
       } else if (type === 'way') {
         this.isShowWayDialog = false;
-
-        this.currentWayDialog = null;
+        this.lineInstance = this.addPolyLine(this.mapInstance, [], this.lineInstance);
+        console.log(this.lineInstance);
+        this.currentWayDialog = { fixes: [] };
         this.currentNava = null;
         this.currentWay = [];
         this.isRequest = true;
@@ -360,9 +526,13 @@ export default {
      */
     handleWayCancel() {
       this.isShowWayDialog = false;
-      this.currentWayDialog = null;
+      this.currentWayDialog = { fixes: [] };
+
       this.currentWay = [];
       this.currentNava = null;
+      if (this.lineInstance.length) {
+        this.lineInstance = this.addPolyLine(this.mapInstance, [], this.lineInstance);
+      }
     },
 
     /**
@@ -376,7 +546,9 @@ export default {
       this.publicQuery['Condition.Rect.BottomRight'] = turnLngLat(boundPath[0]);
       this.publicQuery['Condition.ZoomLevel'] = zoomLevel;
       if (!this.isRequest) return;
+
       await Promise.all([this.getWaterwayList(), this.getNavaList()]);
+
       if (this.currentNava && !this.navaList.find((item) => item.id === this.currentNava.id)) {
         this.currentNava = null;
       }
@@ -406,7 +578,7 @@ export default {
     handleAddWay() {
       this.isShowWayDialog = true;
       this.wayAddData.isClick = true;
-      this.wayAddData.plan = 0;
+      this.wayAddData.plan = 1; //手动规划
     },
     /**
      * 添加航标请求
@@ -462,9 +634,8 @@ export default {
         : navaList.splice(startIndex, index, ...setFixArray); // 替换之前的航标(开始索引,项数)
       //默认插入的航标位置
       this.cursorInsertIndex = navaList.length - 1;
-      let pathArr = this.isSplitWaterway();
-      this.lineInstance = this.addPolyLine(this.mapInstance, pathArr, this.lineInstance);
-      this.currentWayDialog.totalDistance = this.getDistanceOfLine(pathArr);
+
+      this.showLineAndDistance();
     }
   }
 };

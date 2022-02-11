@@ -9,7 +9,7 @@ export default {
       return AMap.GeometryUtil.distance(startPoint, endPoint);
     },
     /**
-     * 封装删除新增航道航标时检查是否能拆分线段函数
+     * 封装航道操作,操作航标时使当前航道拆分成多段航道线段函数
      */
     isSplitWaterway() {
       const navaList = this.currentWayDialog.fixes;
@@ -59,8 +59,14 @@ export default {
         return 0;
       }
     },
+
+    showLineAndDistance() {
+      let pathArr = this.isSplitWaterway();
+      this.lineInstance = this.addPolyLine(this.mapInstance, pathArr, this.lineInstance);
+      this.currentWayDialog.totalDistance = this.getDistanceOfLine(pathArr);
+    },
     /**
-     * 动态在地图上添加线段
+     * 动态在地图上添加航道线段
      */
     addPolyLine(amap, pathArrs, polylineInstance) {
       // 循环清空之前的地图显示的Polyline
@@ -69,21 +75,23 @@ export default {
       }
       // 清空折线实例
       polylineInstance = [];
-      for (let item of pathArrs) {
-        const polyline = new AMap.Polyline({
-          path: item, // 设置线覆盖物路径
-          strokeColor: '#000000', // 线颜色
-          strokeWeight: 8, // 线宽
-          strokeOpacity: 1,
-          zIndex: 900,
-          showDir: true, //方向标识
-          dirColor: '#fff', //方向标识颜色
-          lineJoin: 'round'
-        });
-        polylineInstance.push(polyline);
+      if (pathArrs.length) {
+        for (let item of pathArrs) {
+          const polyline = new AMap.Polyline({
+            path: item, // 设置线覆盖物路径
+            strokeColor: '#000000', // 线颜色
+            strokeWeight: 8, // 线宽
+            strokeOpacity: 1,
+            zIndex: 900,
+            showDir: true, //方向标识
+            dirColor: '#fff', //方向标识颜色
+            lineJoin: 'round'
+          });
+          polylineInstance.push(polyline);
+        }
+        // 在地图中循环添加Polyline实例线段
+        for (const item of polylineInstance) amap.add(item);
       }
-      // 在地图中循环添加Polyline实例线段
-      for (const item of polylineInstance) amap.add(item);
       // 返回出线段实例(数组)
       return polylineInstance;
     }

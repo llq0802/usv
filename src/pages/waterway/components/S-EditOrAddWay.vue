@@ -30,7 +30,7 @@
         </div>
         <span>
           <el-button type="primary" size="mini" @click="handleAutoPlanOk">确定规划</el-button>
-          <el-button size="mini" @click="handleCancelAuto">取消自动</el-button>
+          <el-button size="mini" @click="handleCancelAuto">关闭自动</el-button>
         </span>
       </div>
       <el-button type="primary" size="mini" class="open-auto-btn" v-else @click="handleOpenAutoPlan"
@@ -49,11 +49,20 @@
         <span id="cursor-2" v-if="cursorInsertIndex === -1 && currentWay.fixes.length"></span>
         <div v-for="(nava, index) in currentWay.fixes" :key="nava.id" class="nava-box">
           <!-- 方向标 -->
-          <span class="arrows" @click="handleCursorInsert(index)" v-if="isShowArrows(nava, index)">
+          <span
+            class="arrows"
+            @click="handleCursorInsert(index, 'arrows')"
+            v-if="isShowArrows(nava, index)"
+          >
             →
           </span>
           <!-- 两点不能连接的时候用分割 -->
-          <span class="arrows" @click="handleCursorInsert(index)" v-else style="color: red">
+          <span
+            class="arrows"
+            @click="handleCursorInsert(index, 'arrows')"
+            v-else
+            style="color: red"
+          >
             ≠≠
           </span>
           <!-- 信息 -->
@@ -95,7 +104,7 @@
         <!-- 规划终点光标 -->
         <span
           class="arrows"
-          @click="handleCursorInsert(currentWay.fixes.length - 1)"
+          @click="handleCursorInsert(currentWay.fixes.length - 1, 'arrows')"
           v-if="currentWay.fixes.length"
         >
           →
@@ -171,6 +180,9 @@ export default {
         );
       }
     },
+    /**
+     * 自动规划保存,网络请求
+     */
     handleAutoPlanOk() {
       const autoPlanData = this.autoPlanData;
       let startDataId = autoPlanData.startNava.id,
@@ -188,34 +200,60 @@ export default {
         this.$emit('autoPlanRequest', startDataId, endDataId);
       }
     },
-
+    /**
+     * 点击自动规划按钮
+     */
     handleOpenAutoPlan() {
+      const parent = this.$parent;
+      parent.wayAddData.plan = 0;
       this.$message.info('规划时请先选择起点，并按航道的方向进行规划');
-      this.isAutoPlan = true;
     },
+    /**
+     * 点击取消自动规划按钮
+     */
     handleCancelAuto() {
-      this.isAutoPlan = false;
+      const parent = this.$parent;
+      parent.wayAddData.plan = 1;
     },
-
+    /**
+     * 点击取消按钮
+     */
     handleBoxClose() {
       this.$emit('handleWayCancel', this.currentWay);
     },
+    /**
+     * 点击保存按钮
+     */
     handleEdit() {
       this.$emit('handleWaySave', this.currentWay);
     },
+    /**
+     * 点击当前航标
+     */
     handleCurrentClick(nava, index) {
       this.$emit('handleNavaClick', nava, index);
     },
-    handleCursorInsert(index) {
-      console.log(index);
-      this.cursorInsertIndex = index;
+    /**
+     * 航标之间插入光标的位置
+     */
+    handleCursorInsert(index, arrows) {
+      this.cursorInsertIndex = arrows ? index - 1 : index;
     },
+    /**
+     * 删除航道操作栏中当前的航标
+     */
     handleCurrentDelete(nava, index) {
       this.$emit('handleDelCurrentWayDialog', nava, index, this.type);
     },
+    /**
+     * 删除航道操作栏中后面所有航标
+     */
     handleAfterDelete(nava, index, type) {
       this.$emit('handleDelWayPrevOrNext', index, type, nava);
     },
+    /**
+     * 删除航道操作栏中前面所有航标
+     */
     handleBeforeDelete(nava, index, type) {
       this.$emit('handleDelWayPrevOrNext', index, type, nava);
     },
@@ -303,8 +341,9 @@ export default {
         margin-right: 10px;
         position: relative;
         border-radius: 3px;
-        color: rgb(6, 19, 54);
-        background: rgba(250, 200, 20, 0.9);
+        color: #fff;
+        // background: rgba(250, 200, 20, 0.9);
+        background: #409eff;
         font-size: 15px;
         cursor: pointer;
       }
@@ -314,6 +353,7 @@ export default {
         right: -2px;
         font-size: 17px;
         z-index: 2;
+        color: #000;
         cursor: pointer;
       }
       // 光标动画

@@ -30,6 +30,7 @@ export default {
       navaEvents: Object.freeze({
         // 航标拖动事件
         dragging: async (e) => {
+          if (this.isShowWayDialog) return;
           this.isRequest = false;
           const isAddNava = e.target.getExtData();
           if (!isAddNava.id) {

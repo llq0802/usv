@@ -11,11 +11,15 @@ export default {
      */
     handleDelCurrentWayDialog(nava, index) {
       let navaList = this.currentWayDialog.fixes;
+      const currentWay = this.$refs.waydialog.currentWay;
+      const editaddway = this.$refs.editaddway;
       navaList.splice(index, 1);
-      this.$refs.editaddway.cursorInsertIndex = navaList.length - 1; // 默认插入航标的位置
-      let pathArr = this.isSplitWaterway();
-      this.lineInstance = this.addPolyLine(this.mapInstance, pathArr, this.lineInstance);
-      this.currentWayDialog.totalDistance = this.getDistanceOfLine(pathArr);
+      editaddway.cursorInsertIndex = navaList.length - 1; // 默认插入航标的位置
+      if (navaList.length > 0) {
+        currentWay.departure.navaid.ident = navaList[0].navaid.ident;
+        currentWay.destination.navaid.ident = navaList[navaList.length - 1].navaid.ident;
+      }
+      this.showLineAndDistance();
     },
     /**
      * 删除航道中的航标(前面或者后面所有)
@@ -24,9 +28,8 @@ export default {
       let navaList = this.currentWayDialog.fixes;
       type === 'next' ? navaList.splice(index) : navaList.splice(0, index + 1);
       this.$refs.editaddway.cursorInsertIndex = navaList.length - 1; // 默认插入航标的位置
-      let pathArr = this.isSplitWaterway();
-      this.lineInstance = this.addPolyLine(this.mapInstance, pathArr, this.lineInstance);
-      this.currentWayDialog.totalDistance = this.getDistanceOfLine(pathArr);
+
+      this.showLineAndDistance();
     },
     /**
      * 删除航标,航道网络请求

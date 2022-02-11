@@ -17,7 +17,8 @@ export default {
         this.currentWay = [val];
         await this.$nextTick();
         this.$refs.editaddway.cursorInsertIndex = this.currentWayDialog.fixes.length - 1;
-        this.wayAddData.plan = 0;
+        this.wayAddData.plan = 1; // 手动规划
+        this.showLineAndDistance();
       }
     },
     /**

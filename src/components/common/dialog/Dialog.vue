@@ -13,7 +13,12 @@
       <!-- 插槽内容 -->
       <slot name="item-box"></slot>
       <!-- 按钮 -->
-      <PortBtn :item="item" @handleDelete="handleDelete" @handleEdit="handleEdit" />
+      <PortBtn
+        :item="item"
+        @handleDelete="handleDelete"
+        @handleEdit="handleEdit"
+        v-show="!isDisable"
+      />
     </div>
   </div>
 </template>
@@ -38,6 +43,10 @@ export default {
       default: false
     },
     isShow: {
+      type: Boolean,
+      default: false
+    },
+    isDisable: {
       type: Boolean,
       default: false
     }

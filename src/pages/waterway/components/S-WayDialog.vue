@@ -1,6 +1,6 @@
 <template>
   <div class="wayinfo-content shadow">
-    <i class="el-icon-close" @click="handleBoxClose"></i>
+    <i class="el-icon-close" @click="handleBoxClose" v-show="!isDisable"></i>
     <div>
       <div class="item-box-title">{{ currentWay.ident }} 航道</div>
       <!-- <div class="item-box">
@@ -26,6 +26,7 @@
           size="mini"
           type="primary"
           :plain="i !== index"
+          :disabled="isDisable"
           @click="handleBtnClick(item, i)"
         >
           {{ item.ident }}
@@ -34,7 +35,12 @@
     </div>
     <!-- 按钮 -->
     <div>
-      <el-button type="primary" size="mini" icon="el-icon-edit" @click="handleEdit"
+      <el-button
+        type="primary"
+        size="mini"
+        icon="el-icon-edit"
+        @click="handleEdit"
+        :disabled="isDisable"
         >编辑航道</el-button
       >
       <el-button type="danger" size="mini" icon="el-icon-delete" @click="handleDelete"
@@ -70,18 +76,30 @@ export default {
   computed: {
     currentWay() {
       return this.wayList[this.index];
+    },
+    isDisable() {
+      return this.$parent.isShowWayDialog;
     }
   },
   methods: {
     handleBtnClick(item, index) {
       this.index = index;
     },
+    /**
+     * 编辑航道
+     */
     handleEdit() {
       this.$emit('handleEdit', this.type, this.currentWay);
     },
+    /**
+     * 删除航道
+     */
     handleDelete() {
       this.$emit('handleDelete', this.currentWay.id, this.type, this.delFunc);
     },
+    /**
+     * 关闭弹窗
+     */
     handleBoxClose() {
       this.$emit('handleBoxClose', this.type);
     }
