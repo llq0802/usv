@@ -63,6 +63,11 @@ export const routes = [
         meta: { title: '航线管理', icon: 'el-icon-lx-home' }
       },
       {
+        path: '/runstate',
+        component: () => import(/* webpackChunkName: "runstate" */ 'pages/shipRunningState/ShipRunningState'),
+        meta: { title: '运行详情', icon: 'el-icon-lx-home' }
+      },
+      {
         path: '/404',
         component: () => import(/* webpackChunkName: "404" */ '../pages/404/404.vue')
       }
