@@ -26,7 +26,11 @@ export const apiPostDeleteRoute = id => {
   })
 };
 
-// 更新航线
+/**
+ * 更新航线
+ * @param {id, name, departure, destination, segments} data 
+ * @returns 
+ */
 export const apiPostUpdateRoute = data => {
   return request({
     url: `/route/update`,
@@ -34,7 +38,18 @@ export const apiPostUpdateRoute = data => {
     data
   })
 };
-
+/**
+ * 新增航线
+ * @param {departure, destination, segments} data 
+ * @returns 
+ */
+export const apiAddRoute = data => {
+  return request({
+    url: `/route/add`,
+    method: 'post',
+    data
+  })
+};
 // 以字符串的形式返回指定航线的航段信息
 export const apiGetRouteString = id => {
   return request({

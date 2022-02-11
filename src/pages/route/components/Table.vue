@@ -8,7 +8,7 @@
       </keyword-search><br>
       <el-input v-model="keyword" placeholder="请输入航线名称" clearable></el-input>
       <el-button type="primary" icon="el-icon-search" @click="getRouteList">搜索</el-button>
-      <el-button type="success">新建航线</el-button>
+      <el-button type="success" @click="addRoute">新建航线</el-button>
     </div>
     <div class="table">
       <route-table
@@ -141,12 +141,24 @@ export default {
       this.paginationOptions.page = page;
       this.getRouteList();
     },
+    // 添加航线
+    addRoute() {
+      this.$emit('getRow', {
+        name: '',
+        departure: null,
+        destination: null,
+        segments: []
+      });
+    }
   },
   created() {
     this.getRouteList();
   },
-  mounted() {
-    
+  watch: {
+    'routeList.length'() {
+      if (!this.routeList.length) return;
+      this.$emit('getRow', this.routeList[0]);
+    }
   }
 }
 </script>
