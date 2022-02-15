@@ -64,16 +64,14 @@
         <div class="yaw-instructions-div"></div>
       </div>
       <div class="usvStyleDashboard-roll">
-        <echatsCalibration :setmannedDeg="setmannedRollDeg" v-if="setmannedRollDeg"></echatsCalibration>
-        <!-- <echatsCalibration :setmannedDeg="20"></echatsCalibration> -->
-
+        <calibration :setmannedDeg="setmannedRollDeg" v-if="setmannedRollDeg"></calibration>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import echatsCalibration from '@/components/plan/echatsCalibration';
+import Calibration from './Calibration.vue';
 export default {
   name: 'usvStyleDashboard',
   props: {
@@ -83,7 +81,7 @@ export default {
     }
   },
   components: {
-    echatsCalibration
+    Calibration
   },
   data() {
     return {

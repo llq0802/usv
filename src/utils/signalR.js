@@ -9,11 +9,11 @@ import { getStorage } from '@/utils/localStorage';
 const tokenTime = getStorage('tokenTime');
 const token = getStorage('token');
 
-var callbackHandle = 0;
+let callbackHandle = 0;
 // 需要执行的函数集
 let connectCallbacks = new Map();
 // 连接成功表示
-var isconnected = false;
+let isconnected = false;
 
 // 通过指定服务器和token 配置连接
 let signal;
@@ -22,11 +22,7 @@ signal = new signalR.HubConnectionBuilder() //服务器地址
   .build();
 // 表示获取数据可以开始，但是没有传入需要获取的类型和id
 export async function start(reconnect) {
-  if (
-    token &&
-    token != '' &&
-    !checkTokenTime(tokenTime, 0)
-  ) {
+  if (token && !checkTokenTime(tokenTime, 0)) {
     try {
       // 建立连接
       await signal.start();
@@ -78,7 +74,7 @@ signal.onclose(() => {
   }, 5000);
 });
 
-var stream;
+let stream;
 let dataCallbacks = new Map();
 function startStreaming(streamingOptions) {
   stream = signal.stream('stream', streamingOptions);
@@ -122,7 +118,7 @@ export function subscribeAll(arr) {
       })
     )
     .then(codingId => {
-      for (var i = 0; i < codingId.length; i++) {
+      for (let i = 0; i < codingId.length; i++) {
         dataCallbacks.set(codingId[i], {
           eventName: arr[i].eventName,
           resourceId: arr[i].shipId,
@@ -168,12 +164,6 @@ export function unsubscribe(subscribeId) {
   }
 }
 
-export function install() {
-  // install方法的第一个参数是 Vue 构造器，第二个参数是一个可选的选项对象。
-  start(false);
-  Vue.prototype.signalr = signal;
-}
-
 // 注册连接和重连成功后执行的回调函数，如果调用此函数时连接已建立，回调将会被立即执行一次。
 // 返回值为用于删除重连回调的句柄。
 export function connected(cb) {
@@ -189,14 +179,4 @@ export function connected(cb) {
 // 删除已注册的重连回调。
 export function unconnected(handle) {
   connectCallbacks.delete(handle);
-}
-
-// 作用未知
-export function getSubscriptions() {
-  return signal.invoke('getSubscriptions');
-}
-
-// 在用户退出登录时调用logout确保退出登录时断开底层WebSocket
-export function logout() {
-  signal.stop();
 }

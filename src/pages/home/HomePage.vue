@@ -43,7 +43,7 @@
       </template>
     </Map>
     <!-- 底部按钮 -->
-    <div class="track-btn-part">
+    <div class="track-btn-part" v-if="shipDataList.length">
       <el-button v-if="!isOpenTrack" type="warning" @click="openTrack">开启轨迹</el-button>
       <template v-else>
         <el-button type="success" @click="clearTrack">清除轨迹</el-button>

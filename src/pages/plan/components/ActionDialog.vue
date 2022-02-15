@@ -127,6 +127,7 @@ export default {
         const res = await apiPostExecutePlan(this.actionForm);
         if (!res.errorCode) this.$message.success(`计划执行成功`);
         this.actionPlanLoading = false;
+        this.$router.push({path: '/runstate', usvid: this.actionForm.usvId});
       })
     },
     cancel() {

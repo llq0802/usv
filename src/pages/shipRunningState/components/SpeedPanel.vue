@@ -11,7 +11,7 @@
 export default {
   name: 'usvSpeedPanel',
   props: {
-    // 船只瞬时速度
+    // 船只状态
     setmanned: {
       type: Object
       // default: '10'
@@ -20,6 +20,7 @@ export default {
 
   data() {
     return {
+      $echarts: window.echarts,
       usvSpeedPanel: null,
       usvDashboardMyChart: null
     };
