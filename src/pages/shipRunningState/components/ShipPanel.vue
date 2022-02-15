@@ -107,7 +107,6 @@ export default {
   data() {
     return {
       currentRow: null,
-      BASE_CONSTANTS: BASE_CONSTANTS,
       isShow: true,
     };
   },
@@ -115,9 +114,9 @@ export default {
     // 折叠功能
     toggleShow() {
       if(this.isShow) {
-        this.$refs.unmanedShipInfo.style.top = '-500px';
+        this.$refs.unmanedShipInfo.style.top = '-550px';
         let timer = setTimeout(()=> {
-          this.$refs.toggleBtn.style.top = '500px';
+          this.$refs.toggleBtn.style.top = '550px';
           this.isShow = !this.isShow;
           clearTimeout(timer)
         }, 500)
@@ -127,10 +126,6 @@ export default {
         this.isShow = !this.isShow;
         
       }
-    },
-    // 无人船小船信息显示
-    setCurrent() {
-      this.$emit('clearTable');
     }
   },
   created() {}

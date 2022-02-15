@@ -73,6 +73,7 @@ export default {
   components: {},
   data() {
     return {
+      $echarts: window.echarts,
       // 仪表起始度
       series: {
         radius: null,
@@ -83,10 +84,6 @@ export default {
         splitNumber: null,
         center: null
       },
-      // arr: [-27, 27, -3, -6, -2, 1, 150, 270, 189, 356],
-      // setmannedDeg: null,
-      // 图像选装变化，命名不能一样
-      rotateDeg: rotate()
     };
   },
   methods: {
@@ -213,7 +210,7 @@ export default {
       handler() {
         if (this.setmannedDeg) {
           // this.usvDashboardMyChart.setOption(this.upsateOption(), true);
-          this.rotateDeg(this.$refs.Calibration_style, parseFloat(this.setmannedDeg * -1), 500);
+          rotate(this.$refs.Calibration_style, parseFloat(this.setmannedDeg * -1), 500);
         }
       },
       deep: true

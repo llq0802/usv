@@ -12,6 +12,13 @@ export const apiGetPlan = (params = { Page: 1, Size: 10, 'Contion.Keyword': '' }
     params
   })
 };
+// 根据id查询计划
+export const apiGetPlanById = id => {
+  return request({
+    url: `/plan/get?id=${id}`,
+    method: 'get'
+  })
+};
 /**
  * 添加计划
  * @param {name, organizationId} data 
@@ -22,7 +29,6 @@ export const apiPostAddPlan = data => {
     method: 'post',
     data
   })
-
 };
 // 修改计划名称和机构
 export const apiPostPlanInfo = data => {
@@ -45,6 +51,20 @@ export const apiPostExecutePlan = data => {
     url: `/plan/execute`,
     method: 'post',
     data
+  })
+};
+// 取消计划
+export const apiCancelPlanById = id => {
+  return request({
+    url: `/plan/cancel?usvId=${id}`,
+    method: 'get'
+  })
+};
+// 根据船只id获取执行任务的信息
+export const apiGetExecuteInfoByUsvId = id => {
+  return request({
+    url: `/plan/getexecutioncontext?usvId=${id}`,
+    method: 'get'
   })
 };
 // 更新计划
