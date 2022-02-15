@@ -82,7 +82,7 @@ export default {
   },
   computed: {
     isShow() {
-      return this.currentNava && this.currentNava.id === this.value.id;
+      return this.currentNava && this.currentNava.id === this.value.id && !this.isDisable;
     }
   },
   methods: {

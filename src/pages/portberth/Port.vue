@@ -3,7 +3,7 @@
     <div class="port-search">
       <table-search
         class="port-search-main"
-        :placeholder="'请选择港口'"
+        :placeholder="'输入关键字搜索港口'"
         :autoClear="true"
         @selectPort="selectPort"
       />

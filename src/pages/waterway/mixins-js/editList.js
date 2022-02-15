@@ -1,7 +1,7 @@
 import * as apiNava from 'api/nava';
 import * as apiWay from 'api/waterway';
 import { turnLngLat, turnLngLatObj, str2Path } from '@/utils/handleLngLat';
-import { BASE_CONSTANTS } from '@/config';
+import { deepClone } from '@/utils';
 
 export default {
   methods: {
@@ -12,13 +12,26 @@ export default {
       if (type === 'nava') {
         this.editNava(val);
       } else if (type === 'way') {
+        const amap = this.$refs.amap;
         this.isShowWayDialog = true;
         this.currentWayDialog = val;
         this.currentWay = [val];
+        this.isShowHighlightWay = false;
         await this.$nextTick();
-        this.$refs.editaddway.cursorInsertIndex = this.currentWayDialog.fixes.length - 1;
+        if (!this.currentNava) {
+          this.$refs.editaddway.cursorInsertIndex = this.currentWayDialog.fixes.length - 1;
+          this.currentNava =
+            this.currentWayDialog.fixes[this.currentWayDialog.fixes.length - 1].navaid;
+        } else {
+          const index = this.currentWayDialog.fixes.findIndex(
+            (item) => item.navaid.id === this.currentNava.id
+          );
+          this.$refs.editaddway.cursorInsertIndex = index;
+        }
         this.wayAddData.plan = 1; // 手动规划
+        this.wayAddData.isClick = false;
         this.showLineAndDistance();
+        await amap.setMapFitView(val.fixesArray);
       }
     },
     /**

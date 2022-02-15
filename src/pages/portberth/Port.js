@@ -201,11 +201,17 @@ export default {
      * 防抖: 缩放,拖拽地图时请求数据
      */
     getMapBounds: debounce(async function (boundPath, zoomLevel, center) {
-      let clitentArea = Math.round(AMap.GeometryUtil.ringArea(boundPath));
-      this.publicQuery['Condition.Rect.TopLeft'] = turnLngLat(boundPath[3]);
-      this.publicQuery['Condition.Rect.TopRight'] = turnLngLat(boundPath[2]);
-      this.publicQuery['Condition.Rect.BottomLeft'] = turnLngLat(boundPath[1]);
-      this.publicQuery['Condition.Rect.BottomRight'] = turnLngLat(boundPath[0]);
+      let boundList = [
+        [boundPath.BottomRight[0], boundPath.BottomRight[1]],
+        [boundPath.BottomLeft[0], boundPath.BottomLeft[1]],
+        [boundPath.TopLeft[0], boundPath.TopLeft[1]],
+        [boundPath.TopRight[0], boundPath.TopRight[1]]
+      ];
+      let clitentArea = Math.round(AMap.GeometryUtil.ringArea(boundList));
+      this.publicQuery['Condition.Rect.TopLeft'] = turnLngLat(boundPath.TopLeft);
+      this.publicQuery['Condition.Rect.TopRight'] = turnLngLat(boundPath.TopRight);
+      this.publicQuery['Condition.Rect.BottomLeft'] = turnLngLat(boundPath.BottomLeft);
+      this.publicQuery['Condition.Rect.BottomRight'] = turnLngLat(boundPath.BottomRight);
       this.publicQuery['Condition.ZoomLevel'] = zoomLevel;
       if (this.isRequest) {
         this.getPortList(this.publicQuery);

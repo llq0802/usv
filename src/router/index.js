@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import { getStorage } from '@/utils/localStorage';
 import { checkTokenTime } from '@/utils/token';
-import { Message } from 'element-ui';
+// import { Message } from 'element-ui';
 
 Vue.use(Router);
 export const routes = [
@@ -64,7 +64,8 @@ export const routes = [
       },
       {
         path: '/runstate',
-        component: () => import(/* webpackChunkName: "runstate" */ 'pages/shipRunningState/ShipRunningState'),
+        component: () =>
+          import(/* webpackChunkName: "runstate" */ 'pages/shipRunningState/ShipRunningState'),
         meta: { title: '运行详情', icon: 'el-icon-lx-home' }
       },
       {
@@ -111,11 +112,12 @@ router.beforeEach((to, from, next) => {
     return next();
   } else {
     if (!token || isPast) {
-      Message({
-        message: '用户身份信息失效，请重新登录',
-        type: 'error',
-        duration: 4000
-      });
+      // if (document.getElementsByClassName('el-message').length) return next('./login');
+      // Message({
+      //   message: '用户身份信息失效，请重新登录',
+      //   type: 'error',
+      //   duration: 4000
+      // });
       return next('./login');
     } else {
       return next();

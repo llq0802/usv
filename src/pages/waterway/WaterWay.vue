@@ -1,14 +1,21 @@
 <template>
   <div class="way-content">
     <div class="add-nava">
+      <keyword-search
+        class="search-main-box"
+        :placeholder="'关键字搜索航道或航标'"
+        :autoClear="true"
+        :isShowWaterway="true"
+        @selectNavaAndWay="selectNavaAndWay"
+      />
       <el-button type="primary" @click="handleAddNava">添加航标</el-button>
       <el-button type="primary" @click="handleAddWay">添加航道</el-button>
     </div>
 
     <way-dialog
-      v-if="currentWay.length"
       class="way-dialog"
       ref="waydialog"
+      v-if="currentWay.length"
       :wayList="currentWay"
       @handleEdit="handleEdit"
       @handleBoxClose="handleBoxClose"
@@ -50,15 +57,15 @@
         <!-- 鼠标经过航道显示dient -->
         <div ref="wayIdent" v-show="isShowWayIdent" class="wayIdent">{{ currentWayIdent }}</div>
         <!-- 当前选中的航道 -->
-        <template v-for="(item, index) in currentWay">
+        <template v-if="isShowHighlightWay">
           <el-amap-polyline
-            v-show="currentWay.length"
+            v-for="(item, index) in currentWay"
             :extData="item"
             :key="index + 'b'"
             :path="item.fixesArray"
             :strokeStyle="item.connectivity === 2 ? 'solid' : 'dashed'"
             :strokeColor="item.color"
-            :strokeWeight="9"
+            :strokeWeight="8"
             :events="currentWayEvents"
             :zIndex="60"
             lineJoin="round"
@@ -72,10 +79,10 @@
             :key="index"
             :position="[item.locationObj.longitude, item.locationObj.latitude]"
             :draggable="currentNava && currentNava.id === item.id && !isShowWayDialog"
+            :zIndex="currentNava && currentNava.id === item.id ? 900 : 100"
             :events="navaEvents"
             :extData="item"
             :offset="[-5, -5]"
-            :zIndex="9"
           >
             <nava-dialog
               :value="item"
@@ -87,6 +94,7 @@
               @handleDelete="handleDelete"
             />
           </el-amap-marker>
+
           <template v-for="(nava, index) in navaList">
             <el-amap-circle
               v-if="currentNava && currentNava.id === nava.id"
@@ -104,6 +112,22 @@
             </el-amap-circle>
           </template>
         </template>
+        <!--  修改航道中的航标(高亮) -->
+        <template v-if="currentWayDialog && currentWayDialog.fixes.length">
+          <el-amap-marker
+            v-for="(item, index) in currentWayDialog.fixes"
+            :key="index + 'i'"
+            :zIndex="999"
+            :offset="[-5, -5]"
+            :position="[item.navaid.locationObj.longitude, item.navaid.locationObj.latitude]"
+          >
+            <div class="nava-box light-nava" @click="handleClickHighlightNava(item, index)">
+              <!-- 航标ident信息 -->
+              {{ item.navaid.ident }}
+            </div>
+          </el-amap-marker>
+        </template>
+
         <!-- 新增航标 -->
         <template v-if="navaAddData && navaAddData.latitude">
           <el-amap-marker
@@ -136,6 +160,7 @@
 
 <script>
 import Amap from 'components/amap/Amap';
+import KeywordSearch from 'components/common/keyword-search/KeywordSearch';
 import WayDialog from './components/S-WayDialog';
 import NavaDialog from './components/S-NavaDialog';
 import AddNavaDialog from './components/S-AddNavaDialog';
@@ -149,6 +174,7 @@ import delList from './mixins-js/delList';
 import editList from './mixins-js/editList';
 import amapEvents from './mixins-js/amapEvents';
 import utils from './mixins-js/utils';
+import { BASE_CONSTANTS } from '@/config';
 
 export default {
   name: 'WaterWay',
@@ -158,13 +184,15 @@ export default {
     NavaDialog,
     WayDialog,
     AddNavaDialog,
-    EditOrAddWay
+    EditOrAddWay,
+    KeywordSearch
   },
   data() {
     return {
       isShowWayDialog: false, // 是否为显示航道操作栏弹窗
       isClickMap: false, //是否可以点击地图
       isRequest: true, //是否可以请求数据
+      isShowHighlightWay: false,
       isShowWayIdent: false,
       currentNava: null,
       currentWay: [], //当前地图选中的航道
@@ -172,6 +200,7 @@ export default {
       currentWayDialog: { fixes: [] }, //航道操作栏的当前航道
       mapInstance: null, //地图实例
       lineInstance: Object.freeze([]), //动态添加航道线段实例
+      toNavaInstance: Object.freeze([]), //获取所有可以直接到达指定航标的线段实例
       publicQuery: {
         //公共的请求参数
         'Condition.Rect.TopLeft': '',
@@ -194,6 +223,7 @@ export default {
       },
       // 新增航道数据
       wayAddData: {
+        isShowTips: false,
         isClick: false, // 是否点击了新增航道按钮 点击了为新增,没点击为修改
         wayDistance: 0,
         // verify: false,
@@ -203,6 +233,37 @@ export default {
     };
   },
   methods: {
+    async selectNavaAndWay(value) {
+      const amap = this.$refs.amap;
+      if (value.type === 1) {
+        this.$set(value, 'locationObj', turnLngLatObj(value.location));
+        value.locationArr = turnLngLat(value.location);
+        await amap.setMapFitView(value.locationArr, false);
+        this.currentNava = value;
+      } else if (value.type === 2) {
+        if (this.isShowWayDialog) {
+          this.$message.warning('请先关闭当前航道操作栏');
+          return;
+        }
+        value.fixesArray = str2Path(value.bounds);
+        await amap.setMapFitView(value.fixesArray);
+        const { data, errorCode } = await wayApi.apiGetWaysByIdent(value.ident);
+        if (+errorCode !== 0) return;
+        let en = data.ident.charAt(0).toUpperCase(); // 根据标识开头字母设置不同的颜色
+        this.$set(data, 'color', BASE_CONSTANTS.colorArray(en));
+        this.$set(data, 'strokeWeight', 4);
+        data.fixes.sort((a, b) => a.order - b.order); //  航标点排序
+        data.fixesArray = []; // 为每一项添加二维航道路线数组
+        for (let x of data.fixes) {
+          const fixesArrays = data.fixesArray; // 处理航标坐标组成航道线
+          x.navaid.locationObj = turnLngLatObj(x.navaid.location); // 经纬度转换
+          fixesArrays.push([x.navaid.locationObj.longitude, x.navaid.locationObj.latitude]); // 轨迹数组创建
+        }
+        console.log(data);
+        this.currentWay = [data];
+        this.isShowHighlightWay = true;
+      }
+    },
     // 通过新增航道获取航道id
     async getAddWayIdent(ident = this.wayAddData.ident) {
       const { data, errorCode } = await wayApi.apiAddWay({ ident });
@@ -213,8 +274,22 @@ export default {
      */
     async handleWaySave(val) {
       const navaList = val.fixes;
+      const editaddway = this.$refs.editaddway;
       if (navaList.length >= 2) {
-        let waterwayId = val.id;
+        let waterwayId;
+        if (this.wayAddData.isClick) {
+          const reg = /^[A-Z]\d{1,3}$/;
+          // 新增航道的情况
+          if (!reg.test(this.wayAddData.ident)) {
+            this.$message.warning('航道名称首字母大写并跟随1-3个数字');
+            return;
+          }
+          waterwayId = await this.getAddWayIdent();
+          if (!waterwayId) return;
+        } else {
+          // 修改航道的情况
+          waterwayId = val.id;
+        }
         let arr = navaList.map((item, i) => {
           item.order = Number.parseInt(i) + 1;
           return {
@@ -224,18 +299,31 @@ export default {
         });
         const fixes = deepClone(arr);
         let data = { waterwayId, fixes };
-        const { errorCode } = await wayApi.apiEditWay(data);
-        if (+errorCode === 0) {
-          this.$message.success('修改成功');
-          data = null;
-          this.getNavaList();
-          this.getWaterwayList();
+        try {
+          editaddway.loading = true;
+          const { errorCode } = await wayApi.apiEditWay(data);
+          editaddway.loading = false;
+          if (+errorCode === 0) {
+            this.$message.success('修改成功');
+            data = null;
+            this.handleWayCancel();
+            this.getNavaList();
+            this.getWaterwayList();
+          }
+        } catch (error) {
+          editaddway.loading = false;
         }
       } else {
         this.$message.warning('一条航道必须拥有两个及两个以上的航标');
       }
     },
-
+    /**
+     * 点击航道操作框里的高亮中的航标
+     */
+    handleClickHighlightNava(value, index) {
+      console.log(value, index);
+      this.currentNava = value;
+    },
     /**
      * 点击航道操作框里的航标
      */
@@ -296,12 +384,18 @@ export default {
           }
           autoPlanData.isEnd = !autoPlanData.isEnd;
         }
+      } else {
+        console.log('手动');
+        this.currentNava = navaid;
       }
     },
     /**
      * 关闭新增的Dialog
      */
     handleAddBoxClose() {
+      if (this.toNavaInstance.length) {
+        this.toNavaInstance = this.addPolyLine(this.mapInstance, [], this.toNavaInstance);
+      }
       this.resetNavaAddData();
     },
     /**
@@ -323,6 +417,7 @@ export default {
      * 点击当前航标
      */
     handleCurrentClick(type, value) {
+      this.resetNavaAddData();
       let lng = value.locationObj.longitude,
         lat = value.locationObj.latitude;
       this.currentNava = value;
@@ -335,14 +430,20 @@ export default {
         });
         if (flag && this.currentWay.every((item) => item.id !== way.id)) {
           this.currentWay.push(way);
+          this.isShowHighlightWay = true;
         }
-        // console.log(this.currentWay);
+        console.log(this.currentWay);
       }
-      // 当航道操作栏打开时点击航标
+      // 当航道操作栏打开时点击航标后续操作
       if (this.isShowWayDialog) {
         this.waterwayAddNava(value, this.currentWay);
       }
+      // 显示当前航标能到达的所有航标
+      this.showLineClickNava(value);
     },
+    /**
+     * 点击航标插入到航道中
+     */
     waterwayAddNava(currentNava, currentWayList) {
       const map = this.$refs.amap;
       const editaddway = this.$refs.editaddway;
@@ -507,32 +608,36 @@ export default {
           this.currentNava = null;
           return;
         }
-        this.isShowWayDialog = false;
         this.currentNava = null;
-        this.currentWay = [];
-        this.isRequest = true;
       } else if (type === 'way') {
-        this.isShowWayDialog = false;
-        this.lineInstance = this.addPolyLine(this.mapInstance, [], this.lineInstance);
-        console.log(this.lineInstance);
         this.currentWayDialog = { fixes: [] };
         this.currentNava = null;
-        this.currentWay = [];
-        this.isRequest = true;
       }
+      this.resetPublicData();
     },
     /**
      * 关闭航道操作栏
      */
     handleWayCancel() {
-      this.isShowWayDialog = false;
       this.currentWayDialog = { fixes: [] };
-
-      this.currentWay = [];
       this.currentNava = null;
+      this.resetPublicData();
+    },
+
+    /**
+     * 重置一些公共数据
+     */
+    resetPublicData() {
+      this.resetNavaAddData();
       if (this.lineInstance.length) {
         this.lineInstance = this.addPolyLine(this.mapInstance, [], this.lineInstance);
       }
+      if (this.toNavaInstance.length) {
+        this.toNavaInstance = this.addPolyLine(this.mapInstance, [], this.toNavaInstance);
+      }
+      this.isShowWayDialog = false;
+      this.wayAddData.isShowTips = false;
+      this.currentWay = [];
     },
 
     /**
@@ -540,17 +645,23 @@ export default {
      */
     getMapBounds: debounce(async function (boundPath, zoomLevel, mapCenter, mapInstance) {
       this.mapInstance = mapInstance;
-      this.publicQuery['Condition.Rect.TopLeft'] = turnLngLat(boundPath[3]);
-      this.publicQuery['Condition.Rect.TopRight'] = turnLngLat(boundPath[2]);
-      this.publicQuery['Condition.Rect.BottomLeft'] = turnLngLat(boundPath[1]);
-      this.publicQuery['Condition.Rect.BottomRight'] = turnLngLat(boundPath[0]);
+      this.publicQuery['Condition.Rect.TopLeft'] = turnLngLat(boundPath.TopLeft);
+      this.publicQuery['Condition.Rect.TopRight'] = turnLngLat(boundPath.TopRight);
+      this.publicQuery['Condition.Rect.BottomLeft'] = turnLngLat(boundPath.BottomLeft);
+      this.publicQuery['Condition.Rect.BottomRight'] = turnLngLat(boundPath.BottomRight);
       this.publicQuery['Condition.ZoomLevel'] = zoomLevel;
       if (!this.isRequest) return;
+      await Promise.all([this.getNavaList(), this.getWaterwayList()]);
+      // if (this.currentNava && !this.navaList.find((item) => item.id === this.currentNava.id)) {
+      //   this.currentNava = null;
+      // }
+      if (this.toNavaInstance.length && this.currentNava) {
+        // 显示当前航标能到达的所有航标
+        this.showLineClickNava(this.currentNava);
+      }
 
-      await Promise.all([this.getWaterwayList(), this.getNavaList()]);
-
-      if (this.currentNava && !this.navaList.find((item) => item.id === this.currentNava.id)) {
-        this.currentNava = null;
+      if (this.navaAddData.latitude) {
+        this.showLineClickNava(this.navaAddData);
       }
     }, 500),
 
@@ -558,26 +669,32 @@ export default {
      * 点击地图获取坐标
      */
     getMapLngLat(p) {
+      if (!this.isClickMap) return;
       let lng = p.lng,
         lat = p.lat;
       this.navaAddData.latitude = lat;
       this.navaAddData.longitude = lng;
+      this.showLineClickNava(this.navaAddData);
     },
     /**
      * 点击航标添加
      */
     handleAddNava() {
+      this.isRequest = false;
+      this.handleWayCancel();
       this.navaAddData.isClick = true;
       this.isClickMap = true;
-      this.isRequest = false;
       this.$message.info('开启了航标新增，请点击地图');
     },
     /**
      * 点击航道添加
      */
     handleAddWay() {
+      this.resetNavaAddData();
+      this.handleWayCancel();
       this.isShowWayDialog = true;
       this.wayAddData.isClick = true;
+
       this.wayAddData.plan = 1; //手动规划
     },
     /**
@@ -606,6 +723,7 @@ export default {
     },
     // 自动航道规划网络请求展示到手动规划中修改
     async autoPlanRequest(StartNavaidId, EndNavaidId) {
+      const editaddway = this.$refs.editaddway;
       let navaList = this.currentWayDialog.fixes;
       let startIndex = navaList.findIndex((item) => item.navaidId === StartNavaidId);
       let endIndex = navaList.findIndex((item) => item.navaidId === EndNavaidId);
@@ -613,29 +731,35 @@ export default {
         this.$message.warning('终点航标不能在起点航标之前');
         return;
       }
-      const { data, errorCode } = await wayApi.apiGetWayBestShort({ StartNavaidId, EndNavaidId });
-      if (+errorCode !== 0) return;
-      // 设置航道中的航标数组
-      let setFixArray = [];
-      // 添加航标 处理数据
-      for (let item of data) {
-        item.navaid.locationObj = turnLngLatObj(item.navaid.location);
-        // 设置手动规划、修改路线
-        setFixArray.push({
-          navaidId: item.id,
-          navaid: item.navaid
-        });
+      try {
+        editaddway.loading = true;
+        const { data, errorCode } = await wayApi.apiGetWayBestShort({ StartNavaidId, EndNavaidId });
+        editaddway.loading = false;
+        if (+errorCode !== 0) return;
+        // 设置航道中的航标数组
+        let setFixArray = [];
+        // 添加航标 处理数据
+        for (let item of data) {
+          item.navaid.locationObj = turnLngLatObj(item.navaid.location);
+          // 设置手动规划、修改路线
+          setFixArray.push({
+            navaidId: item.id,
+            navaid: item.navaid
+          });
+        }
+        //变成修改模式
+        // 替换的项数
+        let index = Math.abs(endIndex - startIndex) + 1;
+        !navaList.length
+          ? navaList.push(...setFixArray) // 之前没航标
+          : navaList.splice(startIndex, index, ...setFixArray); // 替换之前的航标(开始索引,项数)
+        //默认插入的航标位置
+        editaddway.cursorInsertIndex = navaList.length - 1;
+        this.showLineAndDistance();
+        editaddway.handleCancelAuto();
+      } catch (error) {
+        editaddway.loading = false;
       }
-      //变成修改模式
-      // 替换的项数
-      let index = Math.abs(endIndex - startIndex) + 1;
-      !navaList.length
-        ? (navaList = setFixArray) // 之前没航标就直接赋值
-        : navaList.splice(startIndex, index, ...setFixArray); // 替换之前的航标(开始索引,项数)
-      //默认插入的航标位置
-      this.cursorInsertIndex = navaList.length - 1;
-
-      this.showLineAndDistance();
     }
   }
 };
@@ -655,7 +779,12 @@ export default {
   .add-nava {
     position: absolute;
     left: 0;
+    top: -1px;
     z-index: 99;
+    .search-main-box {
+      display: inline-block;
+      margin-right: 10px;
+    }
   }
   .edit-or-add-way {
     position: absolute;
@@ -667,6 +796,30 @@ export default {
     transform: translate(-50%, -150%);
     font-weight: bold;
     text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;
+  }
+  .nava-box {
+    position: absolute;
+    top: 26px;
+    left: -11px;
+    padding: 3px;
+    text-align: center;
+    border-radius: 3px;
+    &::after {
+      content: '';
+      width: 0;
+      height: 0;
+      border-bottom: 8px solid #ffa35c;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      position: absolute;
+      top: -8px;
+      left: 15px;
+    }
+  }
+
+  .light-nava {
+    background: #ffa35c !important;
+    z-index: 999 !important;
   }
 }
 </style>

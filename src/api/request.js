@@ -50,10 +50,16 @@ service.interceptors.response.use(
       }
       // 响应请求为200,但是有错误提示时,统一提示给用户
       if (response.data.errorCode !== 0 && response.data.message) {
+        // if (msgCallBacks.length > 0) return response.data;
+        if (document.getElementsByClassName('el-message').length) return response.data;
+        // msgCallBacks.push(Message);
         Message({
           message: response.data.message,
           type: 'error'
         });
+        // setTimeout(() => {
+        //   msgCallBacks.pop();
+        // });
         return response.data;
       }
     } else {
@@ -64,14 +70,18 @@ service.interceptors.response.use(
     NProgress.done();
     //身份过期
     if (err.response.status && err.response.status === 401) {
-      Message({
-        message: err.response.data.message || '用户身份信息过期，请重新登录！',
-        type: 'error',
-        duration: 3500
-      });
+      if (!document.getElementsByClassName('el-message').length) {
+        Message({
+          message: err.response.data.message || '用户身份信息过期，请重新登录！',
+          type: 'error',
+          duration: 3500
+        });
+      }
       router.replace('/login');
       delStorage();
     } else {
+      console.log('响应错误', err.response);
+      if (document.getElementsByClassName('el-message').length) return Promise.reject();
       // 接收错误返回的信息,并提示用户
       if (err.response.data.message) {
         Message({
@@ -87,7 +97,6 @@ service.interceptors.response.use(
         });
       }
     }
-    console.log('响应错误', err.response);
     return Promise.reject();
   }
 );

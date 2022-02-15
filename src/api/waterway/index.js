@@ -117,12 +117,25 @@ export const apiGetWayBestShort = (params) => {
     method: 'get',
     params
   });
-}
+};
+
+// 获取查找航道航标数据
+// params: {
+//   'Condition.Keyword': query,
+//   'Condition.Type': [1, 2].toString(),
+//   Page: 1,
+//   Size: 1e7,
+// },
+export const apiGetNavaAndWayByQuery = (params) => {
+  return request({
+    url: '/navigation/search',
+    params
+  });
+};
 
 // 根据航标ident查询交叉航道
-export const apiGetWaysByIdent = ident => {
+export const apiGetWaysByIdent = (ident) => {
   return request({
-    url: `/waterway/get?ident=${ident}`,
-    method: 'get'
-  })
+    url: `/waterway/get?ident=${ident}`
+  });
 };
