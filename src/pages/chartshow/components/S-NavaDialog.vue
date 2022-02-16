@@ -4,14 +4,7 @@
     <div class="nava-box shadow text-style" @click.stop="handleCurrentClick">
       {{ value.ident }}
     </div>
-    <Dialog
-      :isShow="isShow"
-      :item="value"
-      :isDisable="isDisable"
-      @handleBoxClose="handleBoxClose"
-      @handleDelete="handleDelete"
-      @handleEdit="handleEdit"
-    >
+    <Dialog :isShow="isShow" :item="value" :isDisable="true" @handleBoxClose="handleBoxClose">
       <template #item-box>
         <div class="item-box-title">{{ value.ident }} 航标</div>
         <div class="item-box">
@@ -22,7 +15,7 @@
               v-model="value.radius"
               placeholder="请输入半径"
               size="mini"
-              :disabled="isDisable"
+              disabled
             />
           </div>
         </div>
@@ -34,7 +27,7 @@
               v-model="value.zoomLevel"
               placeholder="请输入层级"
               size="mini"
-              :disabled="isDisable"
+              disabled
             />
           </div>
         </div>
@@ -69,20 +62,11 @@ export default {
     type: {
       type: String,
       default: 'nava'
-    },
-    isDisable: {
-      type: Boolean,
-      default: true
-    },
-    // 删除请求接口函数名,在api文件下文件中
-    delFunc: {
-      type: String,
-      default: 'apiDelNava'
     }
   },
   computed: {
     isShow() {
-      return this.currentNava && this.currentNava.id === this.value.id && !this.isDisable;
+      return this.currentNava && this.currentNava.id === this.value.id;
     }
   },
   methods: {
@@ -97,18 +81,6 @@ export default {
      */
     handleBoxClose() {
       this.$emit('handleBoxClose', this.type);
-    },
-    /**
-     * 更新
-     */
-    handleEdit() {
-      this.$emit('handleEdit', this.type, this.value);
-    },
-    /**
-     * 删除
-     */
-    handleDelete() {
-      this.$emit('handleDelete', this.value.id, this.type, this.delFunc);
     }
   }
 };
@@ -117,7 +89,10 @@ export default {
 <style scoped lang="less">
 @nava-background-color: rgba(80, 114, 209, 0.8);
 @nava-maker-color: rgba(90, 115, 141, 1);
-
+.port-box {
+  left: 1px !important;
+  top: 60px !important;
+}
 /**航标点样式 */
 .nava-maker {
   width: 6px;

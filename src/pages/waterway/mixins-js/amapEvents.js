@@ -27,6 +27,11 @@ export default {
           this.currentWay.push(waterway);
           this.resetNavaAddData();
           this.isShowHighlightWay = true;
+          this.$nextTick(() => {
+            [...this.$refs.waterwayLine].map((item) => {
+              item.$$getInstance().setOptions({ showDir: true });
+            });
+          });
         }
       }),
       navaEvents: Object.freeze({

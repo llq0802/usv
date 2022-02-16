@@ -24,9 +24,10 @@ export default {
         currentWayComponent.currentWay.departure.navaid.ident = navaList[0].navaid.ident;
         currentWayComponent.currentWay.destination.navaid.ident =
           navaList[navaList.length - 1].navaid.ident;
-        console.log(navaList);
       }
+      this.currentNava = navaList[navaList.length - 1].navaid;
       this.showLineAndDistance();
+
       if (this.toNavaInstance.length) {
         this.toNavaInstance = this.addPolyLine(this.mapInstance, [], this.toNavaInstance);
       }
@@ -46,6 +47,7 @@ export default {
           navaList[navaList.length - 1].navaid.ident;
         console.log(navaList);
       }
+      this.currentNava = navaList[navaList.length - 1].navaid;
       this.showLineAndDistance();
       if (this.toNavaInstance.length) {
         this.toNavaInstance = this.addPolyLine(this.mapInstance, [], this.toNavaInstance);

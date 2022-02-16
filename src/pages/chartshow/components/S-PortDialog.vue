@@ -4,25 +4,19 @@
       <i class="iconfont el-icon-gangkou"></i>
       {{ port.name }}
     </div>
-    <Dialog
-      :isShow="isShow"
-      :item="port"
-      @handleBoxClose="handleBoxClose"
-      @handleDelete="handleDelete"
-      @handleEdit="handleEdit"
-    >
+    <Dialog :isShow="isShow" :item="port" :isDisable="true" @handleBoxClose="handleBoxClose">
       <template #item-box>
         <!-- 港口信息框-->
         <div class="item-box-title">{{ port.name }} 港口</div>
         <div class="item-box">
           <div class="item-left">名称</div>
           <div>
-            <el-input type="text" v-model="port.name" size="mini" />
+            <el-input type="text" v-model="port.name" size="mini" disabled />
           </div>
         </div>
         <div class="item-box">
           <div class="item-left">层级</div>
-          <el-input type="text" v-model="port.zoomLevel" size="mini" />
+          <el-input type="text" v-model="port.zoomLevel" size="mini" disabled />
         </div>
         <div class="item-box">
           <div class="item-left">面积</div>
@@ -50,27 +44,20 @@ export default {
   props: {
     currentPort: {
       type: Object,
-      isRequired: true,
       default: () => {}
     },
     port: {
       type: Object,
-      isRequired: true,
       default: () => {}
     },
     type: {
       type: String,
       default: 'port'
-    },
-    // 删除港口的请求接口函数名,在api文件下port文件中
-    delFunc: {
-      type: String,
-      default: 'apiDelPort'
     }
   },
   computed: {
     isShow() {
-      return this.currentPort.isPortEdit && this.currentPort.id === this.port.id;
+      return this.currentPort && this.currentPort.id === this.port.id;
     }
   },
   methods: {
@@ -85,18 +72,6 @@ export default {
      */
     handleBoxClose() {
       this.$emit('handleBoxClose', this.type);
-    },
-    /**
-     * 更新
-     */
-    handleEdit() {
-      this.$emit('handleEdit', this.type, this.port);
-    },
-    /**
-     * 删除
-     */
-    handleDelete() {
-      this.$emit('handleDelete', this.port.id, this.delFunc);
     }
   }
 };
