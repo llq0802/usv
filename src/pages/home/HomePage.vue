@@ -73,13 +73,14 @@ export default {
   },
   data() {
     return {
-      shipDataList: [{
-        id: 1,
-        calibratedLocation: [106.551842, 29.592214],
-        shipName: '无人船',
-        state: '在线',
-        velocity: 30.34964576
-      }],
+      shipDataList: [],
+      // {
+      //   id: 1,
+      //   calibratedLocation: [106.551842, 29.592214],
+      //   shipName: '无人船',
+      //   state: '在线',
+      //   velocity: 30.34964576
+      // }
       // 所有船只的移动轨迹
       allShipTrack: [],
       // 定时器
