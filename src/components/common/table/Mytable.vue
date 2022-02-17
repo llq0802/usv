@@ -85,7 +85,12 @@
               </el-button>
               <el-dropdown-menu slot="dropdown">
                 <template v-for="(val, i) in item.items">
-                  <template v-if="val.state !== 0">
+                  <template v-if="scope.row.runtimeInfo && scope.row.runtimeInfo.state !== 0">
+                    <el-dropdown-item :command="val.command" :key="i">
+                      {{ val.label }}
+                    </el-dropdown-item>
+                  </template>
+                  <template v-else-if="val.state !== 0">
                     <el-dropdown-item :command="val.command" :key="i">
                       {{ val.label }}
                     </el-dropdown-item>
@@ -117,7 +122,6 @@
             >
               {{ item.label }}
             </el-button>
-            
           </template>
         </template>
       </el-table-column>

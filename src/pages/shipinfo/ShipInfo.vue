@@ -34,6 +34,9 @@
     <state-info :isShow.sync="isShowState" :currentRow="currentRow" />
     <!-- 无人船弹修改配置组件 -->
     <edit-config :isShow.sync="isShowConfig" :currentRow="currentRow" />
+
+    <action-dialog :isShow.sync="isShowAction" ref="actionDialog" />
+
     <!-- 视频组件 -->
     <on-video :isShow.sync="isShowVideo" :accessToken="videoData.token" :url="videoData.url" />
   </div>
@@ -43,6 +46,7 @@
 import TableSearch from 'components/common/table-search/TableSearch.vue';
 import BaseTable from 'components/common/table/Mytable.vue';
 import EditConfig from './components/S-EditConfig.vue';
+import ActionDialog from './components/S-ActionDialog.vue';
 import StateInfo from './components/S-StateInfo.vue';
 import EditAdd from './components/S-AddOrEdit.vue';
 import OnVideo from './components/S-LineVideo.vue';
@@ -61,7 +65,8 @@ export default {
     EditAdd,
     StateInfo,
     EditConfig,
-    OnVideo
+    OnVideo,
+    ActionDialog
   },
   data() {
     return {
@@ -73,6 +78,7 @@ export default {
       isShowState: false,
       isShowConfig: false,
       isShowVideo: false,
+      isShowAction: false,
       loading: false,
       currentRow: {}, // 当前表格行的信息
       organInfoList: [],
@@ -183,6 +189,7 @@ export default {
      */
     async getShipList() {
       this.loading = true;
+      const items = this.tableOption.options[0].items;
       const { data, errorCode } = await shipApi.apiGetShipByQuery(this.shipParams);
       if (+errorCode === 0) {
         this.loading = false;
@@ -191,12 +198,13 @@ export default {
         for (let item of this.shipList) {
           // 当无人船的状态为0(离线) 不渲染下拉菜单中的一些项
           if (+item.runtimeInfo.state === 0) {
-            const items = this.tableOption.options[0].items;
             items.find((val) => val.command === 'reset').state = 0;
             items.find((val) => val.command === 'onlineVideo').state = 0;
             items.find((val) => val.command === 'setReturnPoint').state = 0;
             items.find((val) => val.command === 'config').state = 0;
+            items.find((val) => val.command === 'actionPlan').state = 0;
             items.find((val) => val.command === 'viewStatusInfo').state = 0;
+            items.find((val) => val.command === 'viewRunStatus').state = 0;
           }
         }
       }
@@ -268,6 +276,8 @@ export default {
         }, 3e4);
       } else if (val === 'actionPlan') {
         console.log('actionPlan');
+        this.$refs.actionDialog.actiomFrom.usvId = this.currentRow.id;
+        this.isShowAction = true;
       }
     },
     /**
