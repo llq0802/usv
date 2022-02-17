@@ -66,7 +66,7 @@ export const routes = [
         path: '/runstate',
         component: () =>
           import(/* webpackChunkName: "runstate" */ 'pages/shipRunningState/ShipRunningState'),
-        meta: { title: '运行详情', icon: 'el-icon-lx-home' }
+        meta: { title: '运行详情', icon: 'el-icon-lx-home', hidden: true }
       },
       {
         path: '/404',
