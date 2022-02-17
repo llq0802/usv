@@ -116,7 +116,7 @@ export default {
             dropdown: true,
             items: [
               {
-                command: 'info',
+                command: 'editInfo',
                 label: '修改信息'
               },
               {
@@ -128,11 +128,11 @@ export default {
                 label: '恢复出厂设置'
               },
               {
-                command: 'returnHome',
+                command: 'setReturnPoint',
                 label: '设置返航点'
               },
               {
-                command: 'action',
+                command: 'actionPlan',
                 label: '执行计划'
               },
               {
@@ -194,7 +194,7 @@ export default {
             const items = this.tableOption.options[0].items;
             items.find((val) => val.command === 'reset').state = 0;
             items.find((val) => val.command === 'onlineVideo').state = 0;
-            items.find((val) => val.command === 'returnHome').state = 0;
+            items.find((val) => val.command === 'setReturnPoint').state = 0;
             items.find((val) => val.command === 'config').state = 0;
             items.find((val) => val.command === 'viewStatusInfo').state = 0;
           }
@@ -246,12 +246,12 @@ export default {
      * 点击下拉菜单项
      */
     dropdownChange(val) {
-      if (val === 'info') {
+      if (val === 'editInfo') {
         this.title = 'edit';
         this.isShowEditAdd = true;
       } else if (val === 'reset') {
         this.handleFactoryResetShip();
-      } else if (val === 'returnHome') {
+      } else if (val === 'setReturnPoint') {
         this.handleSetReturnHome();
       } else if (val === 'viewStatusInfo') {
         this.isShowState = true;
@@ -266,8 +266,8 @@ export default {
           if (checkTokenTime(this.videoData.cTime, 3600)) getOnlineVideoToken();
           console.log('checkTokenInterval');
         }, 3e4);
-      } else if (val === 'action') {
-        console.log('action');
+      } else if (val === 'actionPlan') {
+        console.log('actionPlan');
       }
     },
     /**
