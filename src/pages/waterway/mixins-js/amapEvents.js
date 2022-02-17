@@ -25,6 +25,13 @@ export default {
           // 获得父组件航道信息框是否打开
           this.currentWay = [];
           this.currentWay.push(waterway);
+          this.resetNavaAddData();
+          this.isShowHighlightWay = true;
+          this.$nextTick(() => {
+            [...this.$refs.waterwayLine].map((item) => {
+              item.$$getInstance().setOptions({ showDir: true });
+            });
+          });
         }
       }),
       navaEvents: Object.freeze({

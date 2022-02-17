@@ -146,10 +146,11 @@ export const apiGetNavaByFromlocation = (params) => {
     method: 'get',
     params
   });
+};
 // 根据航道ident查询该航道上所有航标
-export const apiGetNavidsByIdent = ident => {
+export const apiGetNavidsByIdent = (ident) => {
   return request({
     url: `/navaid/waterways?ident=${ident}`,
-    method: 'get',
-  })
+    method: 'get'
+  });
 };

@@ -4,9 +4,41 @@ export default {
      * 计算两点的距离
      */
     getDistance(start, end) {
-      let startPoint = [start.locationObj.longitude, start.locationObj.latitude],
-        endPoint = [end.locationObj.longitude, end.locationObj.latitude];
+      let startPoint, endPoint;
+      if (end.locationObj) {
+        (startPoint = [start.locationObj.longitude, start.locationObj.latitude]),
+          (endPoint = [end.locationObj.longitude, end.locationObj.latitude]);
+      } else {
+        (startPoint = [start.locationObj.longitude, start.locationObj.latitude]),
+          (endPoint = [end.longitude, end.latitude]);
+      }
       return AMap.GeometryUtil.distance(startPoint, endPoint);
+    },
+
+    /**
+     * 点击航标根据获取附近可导航航标
+     */
+    getNavaToByRadius(navaid) {
+      const toNavaList = [];
+      const navaList = [];
+      this.navaList.forEach((item) => {
+        const flag = navaid.radius >= this.getDistance(item, navaid);
+        if (flag && navaid.id !== item.id) {
+          navaList.push(item);
+          if (navaid.locationObj) {
+            toNavaList.push([
+              [navaid.locationObj.longitude, navaid.locationObj.latitude],
+              [item.locationObj.longitude, item.locationObj.latitude]
+            ]);
+          } else {
+            toNavaList.push([
+              [navaid.longitude, navaid.latitude],
+              [item.locationObj.longitude, item.locationObj.latitude]
+            ]);
+          }
+        }
+      });
+      return { toNavaList, navaList };
     },
     /**
      * 封装航道操作,操作航标时使当前航道拆分成多段航道线段函数
@@ -59,7 +91,21 @@ export default {
         return 0;
       }
     },
+    /**
+     * 实时渲染点击航标根据获取附近可导航航标组成的航道
+     */
+    showLineClickNava(value) {
+      let { toNavaList } = this.getNavaToByRadius(value);
+      this.toNavaInstance = this.addPolyLine(this.mapInstance, toNavaList, this.toNavaInstance, {
+        strokeColor: '#006400',
+        strokeWeight: 4,
+        zIndex: 1000
+      });
+    },
 
+    /**
+     * 实时渲染修改航道操作栏中的航标后组成的航道
+     */
     showLineAndDistance() {
       let pathArr = this.isSplitWaterway();
       this.lineInstance = this.addPolyLine(this.mapInstance, pathArr, this.lineInstance);
@@ -68,7 +114,8 @@ export default {
     /**
      * 动态在地图上添加航道线段
      */
-    addPolyLine(amap, pathArrs, polylineInstance) {
+    addPolyLine(amap, pathArrs, polylineInstance, options = {}) {
+      options = { strokeColor: '000000', strokeWeight: 8, zIndex: 900, ...options };
       // 循环清空之前的地图显示的Polyline
       if (polylineInstance.length) {
         for (const removePolyline of polylineInstance) amap.remove(removePolyline);
@@ -79,10 +126,10 @@ export default {
         for (let item of pathArrs) {
           const polyline = new AMap.Polyline({
             path: item, // 设置线覆盖物路径
-            strokeColor: '#000000', // 线颜色
-            strokeWeight: 8, // 线宽
+            strokeColor: options.strokeColor, // 线颜色
+            strokeWeight: options.strokeWeight, // 线宽
+            zIndex: options.zIndex, // 线宽
             strokeOpacity: 1,
-            zIndex: 900,
             showDir: true, //方向标识
             dirColor: '#fff', //方向标识颜色
             lineJoin: 'round'

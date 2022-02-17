@@ -1,5 +1,23 @@
 <template>
   <div class="shadow content">
+    <!-- 新增航道标识 -->
+    <div class="content-top" v-if="$parent.wayAddData.isClick">
+      <el-input
+        v-model="$parent.wayAddData.ident"
+        ref="addInput"
+        placeholder="输入新增航道名称"
+        size="mini"
+        style="width: 200px"
+        @blur="verifyAddWayIdent($parent.wayAddData.ident)"
+      />
+      <div
+        class="input-verify"
+        v-show="$parent.wayAddData.isClick && $parent.wayAddData.isShowTips"
+      >
+        首字母大写并跟随1-3个数字
+      </div>
+    </div>
+
     <div class="auto-plan-content">
       <!-- 自动规划起始点 -->
       <div class="auto-plan-box" v-if="isAutoPlan">
@@ -29,7 +47,9 @@
           ></i>
         </div>
         <span>
-          <el-button type="primary" size="mini" @click="handleAutoPlanOk">确定规划</el-button>
+          <el-button type="primary" size="mini" @click="handleAutoPlanOk" :loading="loading"
+            >确定规划</el-button
+          >
           <el-button size="mini" @click="handleCancelAuto">关闭自动</el-button>
         </span>
       </div>
@@ -37,6 +57,7 @@
         >开启自动规划</el-button
       >
     </div>
+
     <!-- 规划路径 -->
     <div style="min-height: 6vh">
       <div v-if="currentWay && currentWay.fixes" class="waterway-box">
@@ -67,7 +88,16 @@
           </span>
           <!-- 信息 -->
           <div class="nava-item shadow">
-            <span @click="handleCurrentClick(nava, index)">{{ nava.navaid.ident }}</span>
+            <span
+              @click="handleCurrentClick(nava, index)"
+              class="nava-item-ident"
+              :class="{
+                'light-nava':
+                  ($parent.currentNava && $parent.currentNava.id === nava.navaidId) ||
+                  autoPlanData.selectWaterwayId.includes(nava.navaidId)
+              }"
+              >{{ nava.navaid.ident }}</span
+            >
             <!-- 删除框 -->
             <el-popover trigger="hover" placement="top" v-show="currentWay.fixes.length !== 1">
               <el-button
@@ -104,7 +134,7 @@
         <!-- 规划终点光标 -->
         <span
           class="arrows"
-          @click="handleCursorInsert(currentWay.fixes.length - 1, 'arrows')"
+          @click="handleCursorInsert(currentWay.fixes.length - 1)"
           v-if="currentWay.fixes.length"
         >
           →
@@ -120,7 +150,7 @@
     <!-- 保存按钮 -->
     <div class="btn-box">
       <el-button size="mini" @click="handleBoxClose">取消</el-button>
-      <el-button type="primary" size="mini" @click="handleEdit">保存</el-button>
+      <el-button type="primary" size="mini" @click="handleEdit" :loading="loading">保存</el-button>
     </div>
   </div>
 </template>
@@ -134,6 +164,7 @@ export default {
   data() {
     return {
       cursorInsertIndex: 0, // 默认航标插入的位置
+      loading: false,
       autoPlanData: {
         isStart: false,
         // 起点航标数据
@@ -161,6 +192,18 @@ export default {
     }
   },
   methods: {
+    // 验证新增航道的名称
+    verifyAddWayIdent(val) {
+      const addInput = this.$refs.addInput.$refs.input;
+      const reg = /^[A-Z]\d{1,3}$/;
+      if (!reg.test(val)) {
+        addInput.style.borderColor = 'red';
+        this.$parent.wayAddData.isShowTips = true;
+        return;
+      }
+      addInput.style.borderColor = '';
+      this.$parent.wayAddData.isShowTips = false;
+    },
     /**
      * 清空自动规划中 起点 终点
      */
@@ -206,6 +249,9 @@ export default {
     handleOpenAutoPlan() {
       const parent = this.$parent;
       parent.wayAddData.plan = 0;
+      parent.currentNava = null;
+      this.cursorInsertIndex = this.currentWay.fixes.length - 1;
+
       this.$message.info('规划时请先选择起点，并按航道的方向进行规划');
     },
     /**
@@ -214,6 +260,19 @@ export default {
     handleCancelAuto() {
       const parent = this.$parent;
       parent.wayAddData.plan = 1;
+      this.autoPlanData = {
+        isStart: false,
+        // 起点航标数据
+        startNava: {},
+        isEnd: false,
+        // 终点航标数据
+        endNava: {},
+        // 自动规划中已选中的航标ID
+        selectWaterwayId: []
+      };
+      if (!parent.wayAddData.isClick) {
+        parent.currentNava = this.currentWay.fixes[this.currentWay.fixes.length - 1].navaid;
+      }
     },
     /**
      * 点击取消按钮
@@ -237,7 +296,19 @@ export default {
      * 航标之间插入光标的位置
      */
     handleCursorInsert(index, arrows) {
+      const parent = this.$parent;
       this.cursorInsertIndex = arrows ? index - 1 : index;
+      if (!this.isAutoPlan) {
+        if (index === 0 || index === -1) {
+          parent.currentNava = this.currentWay.fixes[0].navaid;
+          return;
+        }
+        if (index === this.currentWay.fixes.length - 1) {
+          parent.currentNava = this.currentWay.fixes[index].navaid;
+          return;
+        }
+        parent.currentNava = this.currentWay.fixes[index - 1].navaid;
+      }
     },
     /**
      * 删除航道操作栏中当前的航标
@@ -277,6 +348,7 @@ export default {
 
 <style lang="less" scoped>
 .content {
+  box-sizing: border-box;
   position: absolute;
   bottom: -10px;
   left: 0px;
@@ -284,6 +356,14 @@ export default {
   z-index: 99;
   background: rgba(250, 250, 250, 0.9);
   padding: 20px;
+  .content-top {
+    position: absolute;
+    z-index: 88;
+    .input-verify {
+      color: red;
+      font-size: 12px;
+    }
+  }
   .auto-plan-content {
     position: relative;
     text-align: right;
@@ -336,16 +416,17 @@ export default {
       display: flex;
       .nava-item {
         display: flex;
-        padding: 2px;
         align-items: center;
-        margin-right: 10px;
         position: relative;
-        border-radius: 3px;
-        color: #fff;
-        // background: rgba(250, 200, 20, 0.9);
-        background: #409eff;
         font-size: 15px;
+        margin-right: 10px;
         cursor: pointer;
+        color: #fff;
+        .nava-item-ident {
+          padding: 2px;
+          border-radius: 3px;
+          background: #409eff;
+        }
       }
       .delete-nava {
         position: absolute;
@@ -370,6 +451,12 @@ export default {
   }
   .btn-box {
     text-align: center;
+  }
+  .light-nava {
+    background: #ffa35c !important;
+    z-index: 999 !important;
+    color: #000;
+    border: 1px solid #000;
   }
 }
 // 光标

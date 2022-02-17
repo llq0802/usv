@@ -154,12 +154,12 @@ export default {
           const mapBounds = this.mapInstance.getBounds();
           let southWest = mapBounds.southwest,
             northEast = mapBounds.northeast;
-          const boundPath = [
-            [northEast.lng, southWest.lat],
-            [southWest.lng, southWest.lat],
-            [southWest.lng, northEast.lat],
-            [northEast.lng, northEast.lat]
-          ];
+          const boundPath = {
+            TopLeft: [southWest.lng, northEast.lat],
+            TopRight: [northEast.lng, northEast.lat],
+            BottomLeft: [southWest.lng, southWest.lat],
+            BottomRight: [northEast.lng, southWest.lat]
+          };
           this.$emit(
             'getMapBounds',
             boundPath,

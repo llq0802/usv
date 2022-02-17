@@ -34,6 +34,65 @@
         </el-select>
       </el-form-item>
     </el-form>
+
+    <!-- 航道页面选择框 -->
+    <el-form :model="portForm" v-else-if="isShowWaterway">
+      <el-form-item prop="id">
+        <el-select
+          clearable
+          filterable
+          v-loadmore="getNextPageNavaAndWayList"
+          v-model="wayForm.id"
+          :placeholder="placeholder"
+          :loading="remoteLoading"
+          :filter-method="(keyword) => filterNavaAndWayList(keyword)"
+          @visible-change="getNavaAndWayList"
+          @change="selectNavaAndWay"
+        >
+          <el-option
+            v-for="item in navaAndWayList"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id"
+          >
+            <span style="float: left">{{ item.ident }}</span>
+            <span style="float: right; color: #8492a6">{{
+              +item.type === 1 ? '航标' : '航道'
+            }}</span>
+          </el-option>
+        </el-select>
+      </el-form-item>
+    </el-form>
+
+    <!-- 航图页面选择框 -->
+    <el-form :model="chartForm" v-else-if="isShowChart">
+      <el-form-item prop="id">
+        <el-select
+          clearable
+          filterable
+          v-loadmore="getNextPageNavaAndWayList"
+          v-model="chartForm.id"
+          :placeholder="placeholder"
+          :loading="remoteLoading"
+          :filter-method="(keyword) => filterNavaAndWayList(keyword)"
+          @visible-change="getNavaAndWayList"
+          @change="selectNavaAndWay"
+        >
+          <el-option
+            v-for="item in navaAndWayList"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id"
+          >
+            <span style="float: left">{{ +item.type === 4 ? item.port.name : item.ident }}</span>
+            <span style="float: right; color: #8492a6">{{
+              +item.type === 1 ? '航标' : +item.type === 2 ? '航道' : '港口'
+            }}</span>
+          </el-option>
+        </el-select>
+      </el-form-item>
+    </el-form>
+
     <!-- 港口选择框 -->
     <el-form :model="portForm" v-else>
       <el-form-item prop="usvId">
@@ -61,6 +120,8 @@
 <script>
 import { apiGetShip } from 'api/usv';
 import { apiGetPortByQuery } from 'api/port';
+import { apiGetNavaAndWayByQuery } from 'api/waterway';
+
 import { BASE_CONSTANTS, PAGE_SIZE } from '@/config';
 export default {
   props: {
@@ -68,9 +129,21 @@ export default {
       type: Boolean,
       default: false
     },
+    isShowWaterway: {
+      type: Boolean,
+      default: false
+    },
+    isShowChart: {
+      type: Boolean,
+      default: false
+    },
     states: {
       type: Array,
       default: () => [0, 1, 2, 3, 4, 5]
+    },
+    paramsArray: {
+      type: Array,
+      default: () => [1, 2]
     },
     placeholder: {
       type: String,
@@ -89,13 +162,20 @@ export default {
       portForm: {
         portId: null
       },
+      wayForm: {
+        id: null
+      },
+      chartForm: {
+        id: null
+      },
       remoteLoading: '',
       // 搜索条件
       page: PAGE_SIZE.page,
       keyword: '',
       shipList: [],
       total: 0,
-      portList: []
+      portList: [],
+      navaAndWayList: []
     };
   },
   methods: {
@@ -177,6 +257,7 @@ export default {
     async filterPortList(keyword) {
       this.keyword = keyword;
       this.remoteLoading = true;
+      this.page = 1;
       const res = await apiGetPortByQuery({
         Page: this.page,
         Size: PAGE_SIZE.size,
@@ -201,6 +282,7 @@ export default {
         this.portList.push(item);
       }
     },
+
     // 选中船只
     selectShip(id) {
       let ship = this.shipList.find((v) => v.id === id);
@@ -215,6 +297,67 @@ export default {
       this.$emit('selectPort', port);
       if (this.autoClear) {
         this.portForm.portId = null;
+      }
+    },
+
+    // 获取航道航标港口数据
+    async getNavaAndWayList(flag) {
+      if (!flag) {
+        this.navaAndWayList = [];
+        this.page = PAGE_SIZE.page;
+        this.total = 0;
+        return;
+      }
+      this.remoteLoading = true;
+      const { data, errorCode } = await apiGetNavaAndWayByQuery({
+        Page: this.page,
+        Size: PAGE_SIZE.size,
+        'Condition.Type': this.paramsArray.toString()
+      });
+      this.remoteLoading = false;
+      if (+errorCode !== 0) return;
+      this.total = data.total;
+      this.navaAndWayList = data.result;
+      console.log(this.navaAndWayList);
+    },
+    // 关键字航道航标港口数据
+    async filterNavaAndWayList(keyword) {
+      this.keyword = keyword;
+      this.remoteLoading = true;
+      this.page = 1;
+      const res = await apiGetNavaAndWayByQuery({
+        Page: this.page,
+        Size: PAGE_SIZE.size,
+        'Condition.Keyword': keyword,
+        'Condition.Type': this.paramsArray.toString()
+      });
+      this.remoteLoading = false;
+      if (+res.errorCode !== 0) return;
+      this.navaAndWayList = res.data.result;
+      this.total = res.data.total;
+    },
+    // 获取下一页航道航标数据
+    async getNextPageNavaAndWayList() {
+      if (this.navaAndWayList.length === this.total) return;
+      this.page++;
+      const res = await apiGetNavaAndWayByQuery({
+        Page: this.page,
+        Size: PAGE_SIZE.size,
+        'Condition.Keyword': this.keyword,
+        'Condition.Type': [1, 2].toString()
+      });
+      if (res.errorCode !== 0) return;
+      for (let item of res.data.result) {
+        this.navaAndWayList.push(item);
+        console.log('获取下一页数据', this.navaAndWayList.length);
+      }
+    },
+    selectNavaAndWay(id) {
+      let value = this.navaAndWayList.find((v) => v.id === id);
+      this.$emit('selectNavaAndWay', value);
+      if (this.autoClear) {
+        this.wayForm.id = null;
+        this.chartForm.id = null;
       }
     }
   }
