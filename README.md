@@ -291,9 +291,9 @@ import 'element-ui/lib/theme-default/index.css'; // 默认主题
 
 第三步：打开 src/components/common/Sidebar.vue 文件，找到 el-menu 标签，把 background-color/text-color/active-text-color 属性去掉即可。
 
-## 三、后端说明
+## 三、接口文档
 
-[后端 Swagger 地址](http://192.168.110.234:8766/openapi/index.html)
+[后端接口 Swagger 地址](http://192.168.110.234:8766/openapi/index.html)
 
 ## 四、相关规范
 
@@ -331,4 +331,4 @@ import 'element-ui/lib/theme-default/index.css'; // 默认主题
 6. vue 文件名必须大写字母开头，文件代码控制在 500 行内，必要时应抽取部分代码在对应页面下的 mixins 文件中 并以模块或者功能分类
 7. 事件处理方法命名由 "handle" + "相关元素" + "事件名" 组成。 如处理导航栏子元素点击事件的方法 `handleNavItemClick`
 8. 网请求函数命名由 api + '其他' ，命名要根据请求内容合理命名。
-9. 代码风格按照 Vue2 的风格指南执行
+9. 代码风格按照 Vue2 官方文档的风格指南执行
