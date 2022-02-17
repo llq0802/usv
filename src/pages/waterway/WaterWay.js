@@ -8,12 +8,12 @@ import * as navaApi from 'api/nava';
 import * as wayApi from 'api/waterway';
 import { turnLngLat, turnLngLatObj, str2Path } from '@/utils/handleLngLat';
 import { debounce, deepClone } from '@/utils';
-import addList from './mixins-js/addList';
-import getList from './mixins-js/getList';
-import delList from './mixins-js/delList';
-import editList from './mixins-js/editList';
-import amapEvents from './mixins-js/amapEvents';
-import utils from './mixins-js/utils';
+import addList from './mixins/addList';
+import getList from './mixins/getList';
+import delList from './mixins/delList';
+import editList from './mixins/editList';
+import amapEvents from './mixins/amapEvents';
+import utils from './mixins/utils';
 import { BASE_CONSTANTS } from '@/config';
 
 export default {

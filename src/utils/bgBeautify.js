@@ -5,40 +5,36 @@
 // 绘制canvas特效
 export function focusPoint() {
   function n(n, e, t) {
-    return n.getAttribute(e) || t
+    return n.getAttribute(e) || t;
   }
 
   function e(n) {
-    return document.getElementsByTagName(n)
+    return document.getElementsByTagName(n);
   }
 
   function t() {
     var t = e('script'),
       o = t.length,
-      i = t[o - 1]
+      i = t[o - 1];
     return {
       l: o,
-      z: n(i, 'zIndex', -1),
+      z: n(i, 'zIndex', 1),
       o: n(i, 'opacity', 1),
       c: n(i, 'color', '0,149,255'),
       n: n(i, 'count', 299)
-    }
+    };
   }
 
   function o() {
-    ;(a = m.width =
-      window.innerWidth ||
-      document.documentElement.clientWidth ||
-      document.body.clientWidth),
+    (a = m.width =
+      window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth),
       (c = m.height =
-        window.innerHeight ||
-        document.documentElement.clientHeight ||
-        document.body.clientHeight)
+        window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight);
   }
 
   function i() {
-    r.clearRect(0, 0, a, c)
-    var n, e, t, o, m, l
+    r.clearRect(0, 0, a, c);
+    var n, e, t, o, m, l;
     s.forEach(function (i, x) {
       for (
         i.x += i.xa,
@@ -57,18 +53,16 @@ export function focusPoint() {
             (m = i.y - n.y),
             (l = o * o + m * m),
             l < n.max &&
-              (n === y &&
-                l >= n.max / 2 &&
-                ((i.x -= 0.03 * o), (i.y -= 0.03 * m)),
+              (n === y && l >= n.max / 2 && ((i.x -= 0.03 * o), (i.y -= 0.03 * m)),
               (t = (n.max - l) / n.max),
               r.beginPath(),
               (r.lineWidth = t),
               (r.strokeStyle = 'rgba(' + d.c + ',' + (t + 0.2) + ')'),
               r.moveTo(i.x, i.y),
               r.lineTo(n.x, n.y),
-              r.stroke()))
+              r.stroke()));
     }),
-      x(i)
+      x(i);
   }
 
   var a,
@@ -78,44 +72,43 @@ export function focusPoint() {
     d = t(),
     l = 'c_n' + d.l,
     r = m.getContext('2d'),
-    x = window.requestAnimationFrame
-  ;(window.w = Math.random),
+    x = window.requestAnimationFrame;
+  (window.w = Math.random),
     (window.y = {
       x: null,
       y: null,
       max: 2e4
-    })
-  ;(m.id = l),
-    (m.style.cssText =
-      'position:fixed;top:0;left:0;z-index:' + d.z + ';opacity:' + d.o),
+    });
+  (m.id = l),
+    (m.style.cssText = 'position:fixed;top:0;left:0;z-index:' + d.z + ';opacity:' + d.o),
     e('body')[0].appendChild(m),
     o(),
     (window.onmousemove = function (n) {
-      ;(n = n || window.event), (y.x = n.clientX), (y.y = n.clientY)
+      (n = n || window.event), (y.x = n.clientX), (y.y = n.clientY);
     }),
     (window.onmouseout = function () {
-      ;(y.x = null), (y.y = null)
-    })
+      (y.x = null), (y.y = null);
+    });
   for (var s = [], f = 0; d.n > f; f++) {
     var h = w() * a,
       g = w() * c,
       v = 2 * w() - 1,
-      p = 2 * w() - 1
+      p = 2 * w() - 1;
     s.push({
       x: h,
       y: g,
       xa: v,
       ya: p,
       max: 6e3
-    })
+    });
   }
-  ;(u = s.concat([y])),
+  (u = s.concat([y])),
     setTimeout(function () {
-      i()
-    }, 100)
+      i();
+    }, 100);
 }
 
 // 清除canvas容器
 export function clearCavas() {
-  document.body.removeChild(document.querySelector('canvas'))
+  document.body.removeChild(document.querySelector('canvas'));
 }

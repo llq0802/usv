@@ -17,7 +17,7 @@ export const apiGetUserByQuery = (params) => {
 // 通过ID查询指定用户并返回用户信息
 export const apiGetUserById = (id) => {
   return request({
-    url: `/user/get/?id=${id}`,
+    url: `/user/get?id=${id}`,
     method: 'get'
   });
 };
@@ -25,7 +25,7 @@ export const apiGetUserById = (id) => {
 //根据ID删除指定用户
 export const apiDelUser = (id) => {
   return request({
-    url: `/user/delete/?id=${id}`,
+    url: `/user/delete?id=${id}`,
     method: 'post'
   });
 };

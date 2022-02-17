@@ -14,80 +14,265 @@ npm run build
 ### 目录结构
 
 ```
--src
+src
+│  App.vue
+│  main.js 项目入口
 │
-│  App.vue 根组件
-│  main.js 根入口js
-│
-│
-├─api 网络请求api
-│  │  request.js 封装的axios请求
+├─api
+│  │  request.js 封装的axios
 │  │
-│  └─login
+│  ├─camera
+│  │      index.js
+│  │
+│  ├─geography
+│  │      index.js
+│  │
+│  ├─login
+│  │      index.js
+│  │
+│  ├─nava
+│  │      index.js
+│  │
+│  ├─organization
+│  │      index.js
+│  │
+│  ├─plan
+│  │      index.js
+│  │
+│  ├─port
+│  │      index.js
+│  │
+│  ├─route
+│  │      index.js
+│  │
+│  ├─shipinfo
+│  │      index.js
+│  │
+│  ├─user
+│  │      index.js
+│  │
+│  ├─usv
+│  │      index.js
+│  │
+│  └─waterway
 │          index.js
 │
-├─assets
-│  ├─css 样式文件
-│  │  │  base.css 公共样式文件
-│  │  │  color-dark.css 暗黑主题样式
-│  │  │  icon.css 图标样式
+├─assets 资源文件
+│  ├─css 样式
+│  │  │  map-style.less
+│  │  │  reset.less
 │  │  │
-│  │  └─theme-green 浅绿色主题样式
-│  │      │  color-green.css
-│  │      │  index.css
+│  │  ├─theme-dark
+│  │  │      color-dark.less
+│  │  │
+│  │  └─theme-green
+│  │      │  color-green.less
+│  │      │  index.less
 │  │      │
-│  │      └─fonts 字体图标
+│  │      └─fonts
 │  │              element-icons.ttf
 │  │              element-icons.woff
 │  │
-│  └─img 图片文件
-│          img.jpg
-│          login-bg.jpg
-│          logo.png
+│  └─img 图片
+│      ├─avatar
+│      │      avatar.jpg
+│      │
+│      ├─login
+│      │      login-bg.jpg
+│      │
+│      └─map
+│              marker.png
+│              precise-marker.png
+│              ship.png
 │
 ├─components
-│  ├─amap 地图组件
+│  ├─amap 公共地图组件
 │  │      Amap.vue
 │  │
-│  └─common 页面公共组件
-│          Header.vue
-│          Home.vue
-│          Sidebar.vue
-│          Tags.vue
+│  └─common
+│      ├─dialog 弹窗组件
+│      │      Dialog.vue
+│      │
+│      ├─keyword-search 搜索组件
+│      │      KeywordSearch.vue
+│      │
+│      ├─layout 布局组件
+│      │      Breadcrumb.vue
+│      │      Header.vue
+│      │      Index.vue
+│      │      Sidebar.vue
+│      │      Tags.vue
+│      │
+│      ├─line-video 视频组件
+│      │      OnLineVideo.vue
+│      │
+│      ├─port-btn
+│      │      PortBtn.vue
+│      │
+│      ├─table 公共表格组件
+│      │      Mytable.vue
+│      │
+│      └─table-search 搜索 按钮组件
+│              TableSearch.vue
 │
-├─config 配置文件
+├─config 全局常量配置
 │      index.js
 │
-├─lang 国际化语言
-│      i18n.js
-│
 ├─pages 路由页面
-│  ├─403
-│  │      403.vue
-│  │
 │  ├─404
 │  │      404.vue
 │  │
+│  ├─chartshow
+│  │  │  ChartShow.vue
+│  │  │
+│  │  └─components
+│  │          S-NavaDialog.vue
+│  │          S-PortDialog.vue
+│  │          S-WayDialog.vue
+│  │
 │  ├─home
-│  │      Dashboard.vue
+│  │  │  HomePage.vue
+│  │  │
+│  │  └─components
+│  │          ShipTable.vue
 │  │
 │  ├─login
 │  │      Login.vue
 │  │
-│  └─Permission
-│          Permission.vue│
+│  ├─organization
+│  │  │  Organ.vue
+│  │  │
+│  │  └─components
+│  │          S-AddOrEdit.vue
+│  │
+│  ├─permissions
+│  │      Permission.vue
+│  │
+│  ├─plan
+│  │  │  Plan.vue
+│  │  │
+│  │  ├─components
+│  │  │      ActionDialog.vue
+│  │  │      AddDialog.vue
+│  │  │      DrawPointDialog.vue
+│  │  │      EditDialog.vue
+│  │  │      TrackingDialog.vue
+│  │  │
+│  │  └─mixins
+│  │          aboutMap.js
+│  │
+│  ├─portberth
+│  │  │  Port.js
+│  │  │  Port.less
+│  │  │  Port.vue
+│  │  │
+│  │  ├─components
+│  │  │      S-AddBerthDialog.vue
+│  │  │      S-AddPointDialog.vue
+│  │  │      S-AddPortDialog.vue
+│  │  │      S-AddProcedureDialog.vue
+│  │  │      S-AddTransitionDialog.vue
+│  │  │      S-BerthDialog.vue
+│  │  │      S-NavaMarker.vue
+│  │  │      S-PointDialog.vue
+│  │  │      S-PortDialog.vue
+│  │  │      S-PortTable.vue
+│  │  │      S-ProcedureDialog.vue
+│  │  │      S-ProcedureMarker.vue
+│  │  │      S-TransitionDialog.vue
+│  │  │      S-TransitionMarker.vue
+│  │  │
+│  │  └─mixins 混入
+│  │          addList.js
+│  │          amapEvents.js
+│  │          delList.js
+│  │          editList.js
+│  │          getList.js
+│  │          tableEvents.js
+│  │          utils.js
+│  │
+│  ├─route
+│  │  │  Route.vue
+│  │  │
+│  │  ├─components
+│  │  │      RouteDetail.vue
+│  │  │      Table.vue
+│  │  │
+│  │  └─mixins
+│  │          aboutMap.js
+│  │          detail.js
+│  │
+│  ├─shipinfo
+│  │  │  ShipInfo.vue
+│  │  │
+│  │  └─components
+│  │          S-AddOrEdit.vue
+│  │          S-EditConfig.vue
+│  │          S-LineVideo.vue
+│  │          S-StateInfo.vue
+│  │
+│  ├─shipRunningState
+│  │  │  ShipRunningState.vue
+│  │  │
+│  │  ├─components
+│  │  │      Calibration.vue
+│  │  │      ShipPanel.vue
+│  │  │      SpeedPanel.vue
+│  │  │      StyleDashboard.vue
+│  │  │
+│  │  └─mixins
+│  │          plan.js
+│  │          watch.js
+│  │
+│  ├─user
+│  │  │  User.vue
+│  │  │
+│  │  └─components
+│  │          S-AddOrEdit.vue
+│  │
+│  └─waterway
+│      │  WaterWay.js
+│      │  WaterWay.less
+│      │  WaterWay.vue
+│      │
+│      ├─components
+│      │      S-AddNavaDialog.vue
+│      │      S-EditOrAddWay.vue
+│      │      S-NavaDialog.vue
+│      │      S-WayDialog.vue
+│      │
+│      └─mixins
+│              addList.js
+│              amapEvents.js
+│              delList.js
+│              editList.js
+│              getList.js
+│              utils.js
 │
-├─router 路由配置
+├─plugins 插件
+│      amap.js
+│      directives.js
+│      elementui.js
+│      signalR.js
+│
+├─router 路由
 │      index.js
 │
-└─utils 工具函数
+└─utils 工具方法
+        bgBeautify.js 登录背景
         bus.js
-        directives.js
+        handleLngLat.js 地图中经纬度数据格式相互转换
         index.js
+        localStorage.js 封装本地存储
+        rotate.js 旋转
+        signalR.js 实时通讯
+        token.js
+
+
 
 ```
 
-## 二、如何切换主题色呢？
+## 二、如何切换主题色？
 
 第一步：打开 src/plugins 文件找到 elementui.js，换成浅绿色主题。
 
@@ -106,21 +291,9 @@ import 'element-ui/lib/theme-default/index.css'; // 默认主题
 
 第三步：打开 src/components/common/Sidebar.vue 文件，找到 el-menu 标签，把 background-color/text-color/active-text-color 属性去掉即可。
 
-## 三、说明
+## 三、后端说明
 
-1.  航段的类型未指定 'Unspecified' type = 0
-    坐标导航航段 'DirectToLocation' type = 1
-    航标导航航段 'DirectToNavaid' type = 2
-    航道导航航段 'ViaWaterway' type = 3
-    标准离港程序航段 'Sid' type = 4
-    标准进港程序航段 'Star' type = 5
-    进港泊位过渡段 'InboundBerthTransition' type = 6
-    离港泊位过渡段 'OutboundBerthTransition' type = 7
-    进港航道过渡段 'InboundEnrouteTransition' type = 8
-    离港航道过渡段 'OutboundEnrouteTransition' type = 9
-
-2.  当前航线:'#227be0', 进港航段:'#976F02', 离港航段:'#00C227';
-    航道高亮:'#26A4BA', 航段高亮:'#011932';
+[后端 Swagger 地址](http://192.168.110.234:8766/openapi/index.html)
 
 ## 四、相关规范
 
@@ -135,7 +308,6 @@ import 'element-ui/lib/theme-default/index.css'; // 默认主题
 ### JS
 
 1. 语句结束后必须加 `;` 分号结尾
-
 2. 变量和方法名采用小驼峰形式，常量名采用全大写加下划线形式，类名采用大驼峰形式
 
    ```javascript
@@ -154,13 +326,9 @@ import 'element-ui/lib/theme-default/index.css'; // 默认主题
    ```
 
 3. 所有文件名用小写，过长时写加 "-" 分割的形式，如 "cultural-boutique "、 "tourism-boutique，不允许大写文件名"
-
 4. 公共组件，放在 src/components 文件 common 中
-
 5. 私有组件，存放在对应页面下的 "components" 文件夹中，并且组件文件夹以 "S-" 开头命名，如私有 login "S-Login-说明功能 "
-
-6. vue 文件名必须大写字母开头，文件代码控制在 500 行内，必要时应抽取部分代码在对应页面下的 mixins-js 文件中 并以模块或者功能分类
-
+6. vue 文件名必须大写字母开头，文件代码控制在 500 行内，必要时应抽取部分代码在对应页面下的 mixins 文件中 并以模块或者功能分类
 7. 事件处理方法命名由 "handle" + "相关元素" + "事件名" 组成。 如处理导航栏子元素点击事件的方法 `handleNavItemClick`
-
 8. 网请求函数命名由 api + '其他' ，命名要根据请求内容合理命名。
+9. 代码风格按照 Vue2 的风格指南执行

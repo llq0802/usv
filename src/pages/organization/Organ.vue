@@ -5,7 +5,7 @@
         :buttonName="'添加组织'"
         @buttonSearch="handleButtonSearch"
         @handleDrag="handleButtonDrag"
-        @clear="handleButtonSearch"
+        @clear="getOrganList"
       />
       <el-divider />
       <!-- 封装的表格 -->
@@ -90,8 +90,12 @@ export default {
     /**
      * 搜索组织
      */
-    handleButtonSearch() {
-      this.getOrganList();
+    handleButtonSearch(keywords) {
+      if (!keywords) {
+        this.getOrganList();
+        return;
+      }
+      this.tableData = this.tableData.filter((item) => item.name.includes(keywords));
     },
     /**
      * 添加组织

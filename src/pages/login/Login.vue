@@ -5,7 +5,7 @@
       <el-form :model="param" :rules="rules" ref="login" label-width="0px" class="ms-content">
         <el-form-item prop="userName">
           <el-input v-model="param.userName" placeholder="请输入用户名">
-            <el-button slot="prepend" icon="el-icon-lx-people"></el-button>
+            <el-button slot="prepend" icon="iconfont icon-yonghu"></el-button>
           </el-input>
         </el-form-item>
         <el-form-item prop="password">
@@ -16,7 +16,7 @@
             v-model="param.password"
             @keyup.enter.native="submitForm()"
           >
-            <el-button slot="prepend" icon="el-icon-lx-lock"></el-button>
+            <el-button slot="prepend" icon="iconfont icon-mima"></el-button>
           </el-input>
         </el-form-item>
         <div class="login-btn">
@@ -33,6 +33,7 @@ import jwt_decode from 'jwt-decode';
 import { HEADER_TITLE, MESSAGE } from '@/config';
 import { apiSigninLogin } from 'api/login';
 import { setStorage } from '@/utils/localStorage';
+import { focusPoint, clearCavas } from '@/utils/bgBeautify';
 
 export default {
   data() {
@@ -48,6 +49,12 @@ export default {
       },
       loginLoading: false
     };
+  },
+  mounted() {
+    focusPoint();
+  },
+  beforeDestroy() {
+    clearCavas();
   },
   methods: {
     submitForm() {
@@ -76,7 +83,6 @@ export default {
                 setStorage('organizationId', arrayToken[5]);
                 this.loginLoading = false;
                 this.$message.success(MESSAGE.loginSuccess);
-                // console.log(JSON.parse(localStorage.getItem('usv')));
                 this.$router.push('/');
               }
             }
@@ -95,14 +101,16 @@ export default {
   position: relative;
   width: 100%;
   height: 100%;
-  background-image: url(../../assets/img/login/login-bg.jpg);
-  background-size: 100%;
+  background-image: url(../../assets/img/login/login.jpg);
+  background-size: 100% 100%;
 }
 .ms-title {
   width: 100%;
   line-height: 50px;
   text-align: center;
   font-size: 20px;
+  font-weight: bold;
+  letter-spacing: 2px;
   color: #fff;
   border-bottom: 1px solid #ddd;
 }
@@ -115,6 +123,7 @@ export default {
   border-radius: 5px;
   background: rgba(255, 255, 255, 0.3);
   overflow: hidden;
+  z-index: 9;
 }
 .ms-content {
   padding: 30px 30px;

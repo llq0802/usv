@@ -160,7 +160,6 @@ export default {
     };
   },
   created() {
-    // console.log(shipApi);
     this.getShipList();
     this.getOrganList();
   },
@@ -327,8 +326,6 @@ export default {
     async toRunStatus() {
       const confirmRlust = await confirmMsg(this, '此操作将跳转到无人船运行状态界面');
       if (confirmRlust == 'confirm') {
-        console.log(this.currentRow.id);
-        return;
         this.$router.push({
           path: 'runstate',
           query: { usvId: this.currentRow.id }

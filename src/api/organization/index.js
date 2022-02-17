@@ -10,7 +10,7 @@ export const apiGetOrganAll = () => {
 // 通过id查
 export const apiGetOrganById = (id) => {
   return request({
-    url: `/organization/get/?id=${id}`,
+    url: `/organization/get?id=${id}`,
     method: 'get'
   });
 };

@@ -19,13 +19,13 @@ import AddTransitionDialog from './components/S-AddTransitionDialog.vue';
 import { turnLngLat, str2Path } from '@/utils/handleLngLat';
 import { debounce, deepClone } from '@/utils';
 //提取的本页公共js文件
-import amapEvents from './mixins-js/amapEvents';
-import tableEvents from './mixins-js/tableEvents';
-import getLsit from './mixins-js/getList';
-import editList from './mixins-js/editList';
-import addList from './mixins-js/addList';
-import delList from './mixins-js/delList';
-import utils from './mixins-js/utils';
+import amapEvents from './mixins/amapEvents';
+import tableEvents from './mixins/tableEvents';
+import getLsit from './mixins/getList';
+import editList from './mixins/editList';
+import addList from './mixins/addList';
+import delList from './mixins/delList';
+import utils from './mixins/utils';
 export default {
   name: 'port',
   mixins: [amapEvents, getLsit, editList, addList, delList, tableEvents, utils], //混入的js

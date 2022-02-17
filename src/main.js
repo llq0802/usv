@@ -3,7 +3,6 @@ import App from './App.vue';
 import router from './router';
 import './plugins/elementui';
 import 'nprogress/nprogress.css';
-import './assets/css/icon.less';
 import './plugins/directives';
 import 'babel-polyfill';
 import './plugins/amap';

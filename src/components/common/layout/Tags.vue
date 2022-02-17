@@ -68,7 +68,8 @@ export default {
       });
       if (!isExist) {
         // if (route.meta.title === '404') return;
-        if (this.tagsList.length >= 8) {
+        if (this.tagsList.length >= 10) {
+          //最多10个标签
           this.tagsList.shift();
         }
         this.tagsList.push({

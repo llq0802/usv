@@ -3,7 +3,7 @@ import Router from 'vue-router';
 import { getStorage } from '@/utils/localStorage';
 import { checkTokenTime } from '@/utils/token';
 // import { Message } from 'element-ui';
-
+const ICON = 'iconfont';
 Vue.use(Router);
 export const routes = [
   {
@@ -15,58 +15,57 @@ export const routes = [
       {
         path: '/',
         component: () => import(/* webpackChunkName: "homepage" */ '../pages/home/HomePage.vue'),
-        meta: { title: '运行状态', icon: 'el-icon-lx-home' }
+        meta: { title: '运行状态', icon: `${ICON} icon-weizhi` }
       },
-
+      {
+        path: '/plan',
+        component: () => import(/* webpackChunkName: "plan" */ 'pages/plan/Plan'),
+        meta: { title: '计划管理', icon: `${ICON} icon-jihua` }
+      },
+      {
+        path: '/route',
+        component: () => import(/* webpackChunkName: "route" */ 'pages/route/Route'),
+        meta: { title: '航线管理', icon: `${ICON} icon-line` }
+      },
       {
         path: '/waterway',
         component: () =>
           import(/* webpackChunkName: "waterway" */ '../pages/waterway/WaterWay.vue'),
-        meta: { title: '航道航标管理', icon: 'el-icon-lx-home' }
-      },
-      {
-        path: '/portberth',
-        component: () => import(/* webpackChunkName: "portberth" */ '../pages/portberth/Port.vue'),
-        meta: { title: '港口泊位管理', icon: 'el-icon-lx-home' }
+        meta: { title: '航道航标管理', icon: `${ICON} icon-hangbiao` }
       },
       {
         path: '/chartshow',
         component: () =>
           import(/* webpackChunkName: "portberth" */ '../pages/chartshow/ChartShow.vue'),
-        meta: { title: '航图展示管理', icon: 'el-icon-lx-home' }
+        meta: { title: '航图展示管理', icon: `${ICON} icon-chart` }
       },
       {
-        path: '/user',
-        component: () => import(/* webpackChunkName: "user" */ '../pages/user/User.vue'),
-        meta: { title: '用户信息管理', icon: 'el-icon-lx-home' }
-      },
-      {
-        path: '/organ',
-        component: () =>
-          import(/* webpackChunkName: "organization" */ '../pages/organization/Organ.vue'),
-        meta: { title: '组织机构管理', icon: 'el-icon-lx-home' }
+        path: '/portberth',
+        component: () => import(/* webpackChunkName: "portberth" */ '../pages/portberth/Port.vue'),
+        meta: { title: '港口泊位管理', icon: `${ICON} icon-gangkou` }
       },
       {
         path: '/shipinfo',
         component: () =>
           import(/* webpackChunkName: "shipinfo" */ '../pages/shipinfo/ShipInfo.vue'),
-        meta: { title: '船舶信息管理', icon: 'el-icon-lx-home' }
+        meta: { title: '船舶信息管理', icon: `${ICON} icon-lunchuan` }
       },
       {
-        path: '/plan',
-        component: () => import(/* webpackChunkName: "plan" */ 'pages/plan/Plan'),
-        meta: { title: '计划管理', icon: 'el-icon-lx-home' }
+        path: '/user',
+        component: () => import(/* webpackChunkName: "user" */ '../pages/user/User.vue'),
+        meta: { title: '用户信息管理', icon: `${ICON} icon-yonghu` }
       },
       {
-        path: '/route',
-        component: () => import(/* webpackChunkName: "route" */ 'pages/route/Route'),
-        meta: { title: '航线管理', icon: 'el-icon-lx-home' }
+        path: '/organ',
+        component: () =>
+          import(/* webpackChunkName: "organization" */ '../pages/organization/Organ.vue'),
+        meta: { title: '组织机构管理', icon: `${ICON} icon-gongsi` }
       },
       {
         path: '/runstate',
         component: () =>
           import(/* webpackChunkName: "runstate" */ 'pages/shipRunningState/ShipRunningState'),
-        meta: { title: '运行详情', icon: 'el-icon-lx-home', hidden: true }
+        meta: { title: '运行详情', hidden: true }
       },
       {
         path: '/404',
