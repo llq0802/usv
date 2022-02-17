@@ -21,40 +21,40 @@ src
 ├─api
 │  │  request.js 封装的axios
 │  │
-│  ├─camera
+│  ├─camera 视频
 │  │      index.js
 │  │
 │  ├─geography
 │  │      index.js
 │  │
-│  ├─login
+│  ├─login 登录
 │  │      index.js
 │  │
-│  ├─nava
+│  ├─nava 航标
 │  │      index.js
 │  │
-│  ├─organization
+│  ├─organization 组织
 │  │      index.js
 │  │
-│  ├─plan
+│  ├─plan 计划
 │  │      index.js
 │  │
-│  ├─port
+│  ├─port 港口
 │  │      index.js
 │  │
-│  ├─route
+│  ├─route 航线
 │  │      index.js
 │  │
-│  ├─shipinfo
+│  ├─shipinfo  船舶
 │  │      index.js
 │  │
-│  ├─user
+│  ├─user 用户
 │  │      index.js
 │  │
 │  ├─usv
 │  │      index.js
 │  │
-│  └─waterway
+│  └─waterway 航道
 │          index.js
 │
 ├─assets 资源文件
@@ -78,7 +78,7 @@ src
 │      │      avatar.jpg
 │      │
 │      ├─login
-│      │      login-bg.jpg
+│      │      login.jpg
 │      │
 │      └─map
 │              marker.png
@@ -122,7 +122,7 @@ src
 │  ├─404
 │  │      404.vue
 │  │
-│  ├─chartshow
+│  ├─chartshow 航图管理
 │  │  │  ChartShow.vue
 │  │  │
 │  │  └─components
@@ -130,25 +130,25 @@ src
 │  │          S-PortDialog.vue
 │  │          S-WayDialog.vue
 │  │
-│  ├─home
+│  ├─home 运行状态
 │  │  │  HomePage.vue
 │  │  │
 │  │  └─components
 │  │          ShipTable.vue
 │  │
-│  ├─login
+│  ├─login 登录
 │  │      Login.vue
 │  │
-│  ├─organization
+│  ├─organization 组织管理
 │  │  │  Organ.vue
 │  │  │
 │  │  └─components
 │  │          S-AddOrEdit.vue
 │  │
-│  ├─permissions
+│  ├─permissions 权限
 │  │      Permission.vue
 │  │
-│  ├─plan
+│  ├─plan 计划管理
 │  │  │  Plan.vue
 │  │  │
 │  │  ├─components
@@ -161,7 +161,7 @@ src
 │  │  └─mixins
 │  │          aboutMap.js
 │  │
-│  ├─portberth
+│  ├─portberth 港口泊位管理
 │  │  │  Port.js
 │  │  │  Port.less
 │  │  │  Port.vue
@@ -191,7 +191,7 @@ src
 │  │          tableEvents.js
 │  │          utils.js
 │  │
-│  ├─route
+│  ├─route 航线管理
 │  │  │  Route.vue
 │  │  │
 │  │  ├─components
@@ -202,7 +202,7 @@ src
 │  │          aboutMap.js
 │  │          detail.js
 │  │
-│  ├─shipinfo
+│  ├─shipinfo 船舶信息管理
 │  │  │  ShipInfo.vue
 │  │  │
 │  │  └─components
@@ -211,7 +211,7 @@ src
 │  │          S-LineVideo.vue
 │  │          S-StateInfo.vue
 │  │
-│  ├─shipRunningState
+│  ├─shipRunningState 运行详情
 │  │  │  ShipRunningState.vue
 │  │  │
 │  │  ├─components
@@ -230,7 +230,7 @@ src
 │  │  └─components
 │  │          S-AddOrEdit.vue
 │  │
-│  └─waterway
+│  └─waterway 航道航标管理
 │      │  WaterWay.js
 │      │  WaterWay.less
 │      │  WaterWay.vue
@@ -250,23 +250,23 @@ src
 │              utils.js
 │
 ├─plugins 插件
-│      amap.js
-│      directives.js
-│      elementui.js
-│      signalR.js
+│      amap.js 地图
+│      directives.js 全局自定义指令
+│      elementui.js ui
+│
 │
 ├─router 路由
 │      index.js
 │
 └─utils 工具方法
         bgBeautify.js 登录背景
-        bus.js
+        bus.js 事件中心
         handleLngLat.js 地图中经纬度数据格式相互转换
-        index.js
+        index.js 防抖 节流 深克隆 等
         localStorage.js 封装本地存储
         rotate.js 旋转
         signalR.js 实时通讯
-        token.js
+        token.js 解析token和过期时间
 
 
 
