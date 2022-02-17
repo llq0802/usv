@@ -1,6 +1,15 @@
 <template>
   <div class="show-content">
-    <Amap ref="amap" :isEdit="isClickMap" @getLngLat="getMapLngLat" @getMapBounds="getMapBounds">
+    <keyword-search
+      class="search-container"
+      :placeholder="'搜索航道航标港口'"
+      :autoClear="true"
+      :isShowChart="true"
+      :paramsArray="[1, 2, 4]"
+      @selectNavaAndWay="selectNavaAndWay"
+    />
+
+    <Amap ref="amap" @getMapBounds="getMapBounds">
       <template #show>
         <!-- 航道 -->
         <template v-if="waterwayList.length">
@@ -111,6 +120,7 @@
 
 <script>
 import Amap from 'components/amap/Amap';
+import KeywordSearch from 'components/common/keyword-search/KeywordSearch.vue';
 import { turnLngLat, turnLngLatObj, str2Path } from '@/utils/handleLngLat';
 import * as apiNava from 'api/nava';
 import * as apiWay from 'api/waterway';
@@ -126,11 +136,11 @@ export default {
     Amap,
     NavaDialog,
     WayDialog,
-    PortDialog
+    PortDialog,
+    KeywordSearch
   },
   data() {
     return {
-      isClickMap: false, //是否可以点击地图
       isShowWayIdent: false,
       isShowPortPolygon: false,
       currentWayIdent: '',
@@ -187,8 +197,62 @@ export default {
     };
   },
   methods: {
+    /**
+     * 防抖: 缩放,拖拽地图时请求数据
+     */
+    getMapBounds: debounce(async function (boundPath, zoomLevel, mapCenter, mapInstance) {
+      this.zoomLevel = zoomLevel;
+      this.isShowPortPolygon = zoomLevel >= 15;
+      this.publicQuery['Condition.Rect.TopLeft'] = turnLngLat(boundPath.TopLeft);
+      this.publicQuery['Condition.Rect.TopRight'] = turnLngLat(boundPath.TopRight);
+      this.publicQuery['Condition.Rect.BottomLeft'] = turnLngLat(boundPath.BottomLeft);
+      this.publicQuery['Condition.Rect.BottomRight'] = turnLngLat(boundPath.BottomRight);
+      this.publicQuery['Condition.ZoomLevel'] = zoomLevel;
+      await Promise.all([this.getNavaList(), this.getWaterwayList()], this.getPortList());
+    }, 500),
+    /**
+     * 搜索后点击选中的航道或航标,港口
+     */
+    async selectNavaAndWay(value) {
+      this.handleBoxClose();
+      const amap = this.$refs.amap;
+      if (value.type === 1) {
+        //航标的情况
+        this.$set(value, 'locationObj', turnLngLatObj(value.location));
+        value.locationArr = turnLngLat(value.location);
+        await amap.setMapFitView(value.locationArr, false);
+        this.currentNava = value;
+      } else if (value.type === 2) {
+        //航道的情况
+        value.fixesArray = str2Path(value.bounds);
+        await amap.setMapFitView(value.fixesArray);
+        const { data, errorCode } = await apiWay.apiGetWaysByIdent(value.ident);
+        if (+errorCode !== 0) return;
+        let en = data.ident.charAt(0).toUpperCase(); // 根据标识开头字母设置不同的颜色
+        this.$set(data, 'color', BASE_CONSTANTS.colorArray(en));
+        this.$set(data, 'strokeWeight', 4);
+        data.fixes.sort((a, b) => a.order - b.order); //  航标点排序
+        data.fixesArray = []; // 为每一项添加二维航道路线数组
+        for (let x of data.fixes) {
+          const fixesArrays = data.fixesArray; // 处理航标坐标组成航道线
+          x.navaid.locationObj = turnLngLatObj(x.navaid.location); // 经纬度转换
+          fixesArrays.push([x.navaid.locationObj.longitude, x.navaid.locationObj.latitude]); // 轨迹数组创建
+        }
+        this.currentWay = data;
+      } else if (value.type === 4) {
+        const port = value.port;
+        this.$set(port, 'locationObj', turnLngLatObj(port.location)); //响应式
+        port.locationArr = turnLngLat(port.location);
+        port.boundList = str2Path(port.bounds);
+        this.$set(port, 'area', +port.area.toFixed(2));
+        this.currentPort = port;
+        await amap.setMapFitView(port.boundList);
+      }
+    },
+    /**
+     * 点击航道或航标
+     */
     handleCurrentClick(type, value) {
-      console.log(value);
       this.handleBoxClose();
       if (type === 'port') {
         if (this.zoomLevel < 15) this.$refs.amap.setMapFitView(value.boundList);
@@ -198,14 +262,14 @@ export default {
         this.currentNava = value;
       }
     },
-
+    /**
+     * 关闭dialog
+     */
     handleBoxClose(type) {
-      console.log('关闭当前航标', type);
       this.currentNava = null;
       this.currentWay = null;
       this.currentPort = null;
     },
-
     /**
      * 获取港口信息
      */
@@ -221,7 +285,6 @@ export default {
           item.boundList = str2Path(item.bounds);
           this.$set(item, 'area', +item.area.toFixed(2));
         }
-        console.log(this.portList);
       }
     },
     /**
@@ -243,7 +306,6 @@ export default {
             fixesArrays.push([x.navaid.locationObj.longitude, x.navaid.locationObj.latitude]); // 轨迹数组创建
           }
         }
-        // console.log(this.waterwayList);
       }
     },
     /**
@@ -258,24 +320,8 @@ export default {
           this.$set(item, 'locationObj', turnLngLatObj(item.location));
           item.locationArr = turnLngLat(item.location);
         }
-        // console.log(this.navaList);
       }
-    },
-    getMapLngLat() {},
-
-    /**
-     * 防抖: 缩放,拖拽地图时请求数据
-     */
-    getMapBounds: debounce(async function (boundPath, zoomLevel, mapCenter, mapInstance) {
-      this.zoomLevel = zoomLevel;
-      this.isShowPortPolygon = zoomLevel >= 15;
-      this.publicQuery['Condition.Rect.TopLeft'] = turnLngLat(boundPath.TopLeft);
-      this.publicQuery['Condition.Rect.TopRight'] = turnLngLat(boundPath.TopRight);
-      this.publicQuery['Condition.Rect.BottomLeft'] = turnLngLat(boundPath.BottomLeft);
-      this.publicQuery['Condition.Rect.BottomRight'] = turnLngLat(boundPath.BottomRight);
-      this.publicQuery['Condition.ZoomLevel'] = zoomLevel;
-      await Promise.all([this.getNavaList(), this.getWaterwayList()], this.getPortList());
-    }, 500)
+    }
   }
 };
 </script>
@@ -284,6 +330,11 @@ export default {
 .show-content {
   height: 100%;
   position: relative;
+  .search-container {
+    position: absolute;
+    z-index: 99;
+    top: -1px;
+  }
   .wayIdent {
     position: absolute;
     font-size: 20px;

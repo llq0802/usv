@@ -119,10 +119,10 @@ export const apiGetWayBestShort = (params) => {
   });
 };
 
-// 获取查找航道航标数据
+// 获取查找航道航标港口数据
 // params: {
 //   'Condition.Keyword': query,
-//   'Condition.Type': [1, 2].toString(),
+//   'Condition.Type': [1, 2,4,8].toString(),
 //   Page: 1,
 //   Size: 1e7,
 // },

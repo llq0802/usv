@@ -64,6 +64,35 @@
       </el-form-item>
     </el-form>
 
+    <!-- 航图页面选择框 -->
+    <el-form :model="chartForm" v-else-if="isShowChart">
+      <el-form-item prop="id">
+        <el-select
+          clearable
+          filterable
+          v-loadmore="getNextPageNavaAndWayList"
+          v-model="chartForm.id"
+          :placeholder="placeholder"
+          :loading="remoteLoading"
+          :filter-method="(keyword) => filterNavaAndWayList(keyword)"
+          @visible-change="getNavaAndWayList"
+          @change="selectNavaAndWay"
+        >
+          <el-option
+            v-for="item in navaAndWayList"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id"
+          >
+            <span style="float: left">{{ +item.type === 4 ? item.port.name : item.ident }}</span>
+            <span style="float: right; color: #8492a6">{{
+              +item.type === 1 ? '航标' : +item.type === 2 ? '航道' : '港口'
+            }}</span>
+          </el-option>
+        </el-select>
+      </el-form-item>
+    </el-form>
+
     <!-- 港口选择框 -->
     <el-form :model="portForm" v-else>
       <el-form-item prop="usvId">
@@ -104,9 +133,17 @@ export default {
       type: Boolean,
       default: false
     },
+    isShowChart: {
+      type: Boolean,
+      default: false
+    },
     states: {
       type: Array,
       default: () => [0, 1, 2, 3, 4, 5]
+    },
+    paramsArray: {
+      type: Array,
+      default: () => [1, 2]
     },
     placeholder: {
       type: String,
@@ -126,6 +163,9 @@ export default {
         portId: null
       },
       wayForm: {
+        id: null
+      },
+      chartForm: {
         id: null
       },
       remoteLoading: '',
@@ -260,7 +300,7 @@ export default {
       }
     },
 
-    // 获取航道航标数据
+    // 获取航道航标港口数据
     async getNavaAndWayList(flag) {
       if (!flag) {
         this.navaAndWayList = [];
@@ -272,7 +312,7 @@ export default {
       const { data, errorCode } = await apiGetNavaAndWayByQuery({
         Page: this.page,
         Size: PAGE_SIZE.size,
-        'Condition.Type': [1, 2].toString()
+        'Condition.Type': this.paramsArray.toString()
       });
       this.remoteLoading = false;
       if (+errorCode !== 0) return;
@@ -280,7 +320,7 @@ export default {
       this.navaAndWayList = data.result;
       console.log(this.navaAndWayList);
     },
-    // 关键字航道航标数据
+    // 关键字航道航标港口数据
     async filterNavaAndWayList(keyword) {
       this.keyword = keyword;
       this.remoteLoading = true;
@@ -289,7 +329,7 @@ export default {
         Page: this.page,
         Size: PAGE_SIZE.size,
         'Condition.Keyword': keyword,
-        'Condition.Type': [1, 2].toString()
+        'Condition.Type': this.paramsArray.toString()
       });
       this.remoteLoading = false;
       if (+res.errorCode !== 0) return;
@@ -317,6 +357,7 @@ export default {
       this.$emit('selectNavaAndWay', value);
       if (this.autoClear) {
         this.wayForm.id = null;
+        this.chartForm.id = null;
       }
     }
   }

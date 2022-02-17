@@ -107,6 +107,12 @@ export default {
       const autoPlanData = editaddway.autoPlanData;
       const navaLsit = this.currentWayDialog.fixes;
       editaddway.cursorInsertIndex = index;
+      if (this.zoomLevel < 15) {
+        this.$refs.amap.setMapFitView(
+          [navaid.locationObj.longitude, navaid.locationObj.latitude],
+          false
+        );
+      }
       //自动规划
       if (this.wayAddData.plan === 0) {
         //查找当前点击航标是否在本航道之中
@@ -401,6 +407,7 @@ export default {
      */
     getMapBounds: debounce(async function (boundPath, zoomLevel, mapCenter, mapInstance) {
       this.mapInstance = mapInstance;
+      this.zoomLevel = zoomLevel;
       this.publicQuery['Condition.Rect.TopLeft'] = turnLngLat(boundPath.TopLeft);
       this.publicQuery['Condition.Rect.TopRight'] = turnLngLat(boundPath.TopRight);
       this.publicQuery['Condition.Rect.BottomLeft'] = turnLngLat(boundPath.BottomLeft);
