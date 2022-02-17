@@ -166,6 +166,7 @@ export default {
         // 传入事件名,和所需要的arr参数
         signalr.subscribeAll(eventsList).then(data => {
           this.isSubsribed = true;
+          console.log(data)
           // 保存编码,是取消事件流的唯一标识
           if (data) {
             this.subscribeId = data;

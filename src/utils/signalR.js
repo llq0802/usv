@@ -172,11 +172,15 @@ export function connected(cb) {
   if (isconnected) {
     cb(false);
   }
-
   return callbackHandle;
 }
 
 // 删除已注册的重连回调。
 export function unconnected(handle) {
   connectCallbacks.delete(handle);
+}
+
+// 在用户退出登录时调用logout确保退出登录时断开底层WebSocket
+export function stop() {
+  signal.stop();
 }
