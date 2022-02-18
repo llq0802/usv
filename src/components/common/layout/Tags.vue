@@ -123,7 +123,7 @@ export default {
 
 .tags-li {
   float: left;
-  margin: 4px 5px 2px 5px;
+  margin: 4px 10px 2px 5px;
   border-radius: 3px;
   font-size: 12px;
   overflow: hidden;
