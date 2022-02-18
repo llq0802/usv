@@ -68,8 +68,9 @@ service.interceptors.response.use(
   },
   (err) => {
     NProgress.done();
+    if (!err.response) return Promise.reject();
     //身份过期
-    if (err.response && err.response.status && err.response.status === 401) {
+    if (err.response.status && err.response.status === 401) {
       if (!document.getElementsByClassName('el-message').length) {
         Message({
           message: err.response.data.message || '用户身份信息过期，请重新登录！',
@@ -83,7 +84,7 @@ service.interceptors.response.use(
       console.log('响应错误', err.response);
       if (document.getElementsByClassName('el-message').length) return Promise.reject();
       // 接收错误返回的信息,并提示用户
-      if (err.response.data.message) {
+      if (err.response && err.response.data.message) {
         Message({
           message: err.response.data.message,
           type: 'error'

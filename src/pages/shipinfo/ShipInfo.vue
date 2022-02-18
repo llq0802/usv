@@ -6,7 +6,7 @@
         :buttonName="'添加无人船'"
         @buttonSearch="handleButtonSearch"
         @handleDrag="handleButtonDrag"
-        @clear="handleButtonSearch"
+        @clear="handleClearSearch"
       >
       </table-search>
       <el-divider />
@@ -34,9 +34,14 @@
     <state-info :isShow.sync="isShowState" :currentRow="currentRow" />
     <!-- 无人船弹修改配置组件 -->
     <edit-config :isShow.sync="isShowConfig" :currentRow="currentRow" />
-
+    <!-- 执行计划 -->
     <action-dialog :isShow.sync="isShowAction" ref="actionDialog" />
-
+    <!-- 设置返航点位 -->
+    <return-point
+      :isShow.sync="isShowReturnPoint"
+      :returnPointList="returnPointList"
+      ref="returnPoint"
+    />
     <!-- 视频组件 -->
     <on-video :isShow.sync="isShowVideo" :accessToken="videoData.token" :url="videoData.url" />
   </div>
@@ -47,6 +52,7 @@ import TableSearch from 'components/common/table-search/TableSearch.vue';
 import BaseTable from 'components/common/table/Mytable.vue';
 import EditConfig from './components/S-EditConfig.vue';
 import ActionDialog from './components/S-ActionDialog.vue';
+import ReturnPoint from './components/S-ReturnPoint.vue';
 import StateInfo from './components/S-StateInfo.vue';
 import EditAdd from './components/S-AddOrEdit.vue';
 import OnVideo from './components/S-LineVideo.vue';
@@ -56,6 +62,7 @@ import * as liveApi from 'api/camera';
 import { PAGE_SIZE, BASE_CONSTANTS } from '@/config';
 import { checkTokenTime } from '@/utils/token';
 import { confirmMsg } from '@/utils';
+import { turnLngLat, turnLngLatObj, str2Path } from '@/utils/handleLngLat';
 
 export default {
   name: 'shipinfo',
@@ -66,7 +73,8 @@ export default {
     StateInfo,
     EditConfig,
     OnVideo,
-    ActionDialog
+    ActionDialog,
+    ReturnPoint
   },
   data() {
     return {
@@ -79,10 +87,12 @@ export default {
       isShowConfig: false,
       isShowVideo: false,
       isShowAction: false,
+      isShowReturnPoint: false,
       loading: false,
       currentRow: {}, // 当前表格行的信息
       organInfoList: [],
       shipList: [],
+      returnPointList: [],
       // 视频组件信息
       videoData: {
         url: null,
@@ -123,7 +133,7 @@ export default {
             items: [
               {
                 command: 'editInfo',
-                label: '修改信息'
+                label: '修改船舶信息'
               },
               {
                 command: 'config',
@@ -135,11 +145,11 @@ export default {
               },
               {
                 command: 'setReturnPoint',
-                label: '设置返航点'
+                label: '设置返航点位'
               },
               {
                 command: 'actionPlan',
-                label: '执行计划'
+                label: '执行返航计划'
               },
               {
                 command: 'viewStatusInfo',
@@ -147,11 +157,11 @@ export default {
               },
               {
                 command: 'viewRunStatus',
-                label: '运行状态信息'
+                label: '运行状态界面'
               },
               {
                 command: 'onlineVideo',
-                label: '实时视频'
+                label: '实时视频查看'
               }
             ]
           },
@@ -240,7 +250,13 @@ export default {
      */
     handleButtonSearch(val) {
       this.shipParams['Condition.Keyword'] = val;
-      console.log(this.shipParams);
+      this.getShipList();
+    },
+    /**
+     *清除搜索无人船
+     */
+    handleClearSearch() {
+      this.shipParams['Condition.Keyword'] = '';
       this.getShipList();
     },
     /**
@@ -323,16 +339,21 @@ export default {
      * 设置返航点
      */
     async handleSetReturnHome() {
-      const currentShip = this.currentRow;
-      const { data, errorCode } = await shipApi.apiGetReturnPointShip(currentShip.id);
+      this.isShowReturnPoint = true;
+      const id = this.currentRow.id;
+      const { data, errorCode } = await shipApi.apiGetReturnPointShip(id);
       if (+errorCode === 0) {
-        console.log(data);
+        // this.returnPointList.push({
+        //   location: data
+        // });
       }
       // 开启事件流
       // this.wsReturnHome = signalr.connected(this.showShipStatusInfo);
     },
 
-    // 跳转显示查看无人船状态
+    /**
+     * 跳转显示查看无人船状态
+     */
     async toRunStatus() {
       const confirmRlust = await confirmMsg(this, '此操作将跳转到无人船运行状态界面');
       if (confirmRlust == 'confirm') {

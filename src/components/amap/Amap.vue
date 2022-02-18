@@ -23,6 +23,8 @@
       <slot name="port_berth"></slot>
       <!--航图展示管理-->
       <slot name="show"></slot>
+      <!-- 返航点 -->
+      <slot name="return-point"></slot>
     </el-amap>
 
     <!-- 卫星按钮 -->

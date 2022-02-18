@@ -45,7 +45,7 @@ export const apiAddShip = (data) => {
 //删除
 export const apiDelShip = (id) => {
   return request({
-    url: `/usv/delete/?id=${id}`,
+    url: `/usv/delete?id=${id}`,
     method: 'post'
   });
 };
@@ -77,7 +77,7 @@ export const apiEditShip = (data) => {
 // }
 export const apiSetConfigShip = (id, data) => {
   return request({
-    url: `/usv/setconfig/?id=${id}`,
+    url: `/usv/setconfig?id=${id}`,
     method: 'post',
     data
   });
@@ -85,7 +85,7 @@ export const apiSetConfigShip = (id, data) => {
 //从无人船读取配置信息。
 export const apiGetConfigShip = (id) => {
   return request({
-    url: `/usv/getconfig/?id=${id}`,
+    url: `/usv/getconfig?id=${id}`,
     method: 'get'
   });
 };
@@ -93,21 +93,21 @@ export const apiGetConfigShip = (id) => {
 //将无人船恢复出厂设置。
 export const apiFactoryResetShip = (id) => {
   return request({
-    url: `/usv/factoryreset/?id=${id}`,
+    url: `/usv/factoryreset?id=${id}`,
     method: 'post'
   });
 };
 //暂停指定无人船正在执行的任务。
 export const apiPauseShip = (id) => {
   return request({
-    url: `/usv/pause/?id=${id}`,
+    url: `/usv/pause?id=${id}`,
     method: 'post'
   });
 };
 //恢复指定无人船已暂停的任务。
 export const apiResumeShip = (id) => {
   return request({
-    url: `/usv/resume/?id=${id}`,
+    url: `/usv/resume?id=${id}`,
     method: 'post'
   });
 };
@@ -115,14 +115,14 @@ export const apiResumeShip = (id) => {
 //停止指定无人船正在执行的任务立即返航
 export const apiReturnShip = (id) => {
   return request({
-    url: `/usv/return/?id=${id}`,
+    url: `/usv/return?id=${id}`,
     method: 'post'
   });
 };
 //立即停止航行并清空航点。
 export const apiStopShip = (id) => {
   return request({
-    url: `/usv/stop/?id=${id}`,
+    url: `/usv/stop?id=${id}`,
     method: 'post'
   });
 };
@@ -130,7 +130,7 @@ export const apiStopShip = (id) => {
 //将指定的无人船软复位。
 export const apiResetShip = (id) => {
   return request({
-    url: `/usv/reset/?id=${id}`,
+    url: `/usv/reset?id=${id}`,
     method: 'post'
   });
 };
@@ -138,8 +138,9 @@ export const apiResetShip = (id) => {
 //获取无人船当前设置的返航点的坐标
 export const apiGetReturnPointShip = (id) => {
   return request({
-    url: `/usv/getreturnpoint/?id=${id}`,
-    method: 'get'
+    url: `/usv/getreturnpoint`,
+    method: 'get',
+    params: { id }
   });
 };
 //设置无人船当前设置的返航点的坐标
@@ -149,7 +150,7 @@ export const apiGetReturnPointShip = (id) => {
 // }
 export const apiSetReturnPointShip = (params) => {
   return request({
-    url: `/usv/getreturnpoint`,
+    url: `/usv/setreturnpoint`,
     method: 'post',
     params
   });

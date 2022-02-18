@@ -20,7 +20,9 @@
               <div>船名：{{ ship.shipName }}</div>
               <div>状态：{{ ship.state }}</div>
               <!-- 状态离线不显示速度 -->
-              <div class="speed" v-if="ship.state != '离线'">航行速度：{{ ship.velocity.toFixed(2) }}m/s</div>
+              <div class="speed" v-if="ship.state != '离线'">
+                航行速度：{{ ship.velocity.toFixed(2) }}m/s
+              </div>
             </div>
             <div class="ship-marker-png" @click="goDetail(ship.id)" :data-id="ship.id">
               <img src="@/assets/img/map/ship.png" alt />
@@ -54,7 +56,6 @@
 </template>
 
 <script>
-
 import Map from 'components/amap/Amap';
 import ShipTable from './components/ShipTable';
 
@@ -69,7 +70,8 @@ import { apiSimpleTrack } from 'api/geography';
 export default {
   props: {},
   components: {
-    Map, ShipTable
+    Map,
+    ShipTable
   },
   data() {
     return {
@@ -90,8 +92,8 @@ export default {
       // 是否开始轨迹
       isOpenTrack: false,
       // 轨迹颜色
-      getColorByIndex: BASE_CONSTANTS.strokeColorList,
-    }
+      getColorByIndex: BASE_CONSTANTS.strokeColorList
+    };
   },
   methods: {
     // 简化函数
@@ -136,7 +138,7 @@ export default {
     shipMoveAnimation() {
       for (let M of this.$refs.shipMarker) {
         const shipMarker = M.$$getInstance();
-        let shipData = this.shipDataList.find(item => item.id === shipMarker.getExtData().id);
+        let shipData = this.shipDataList.find((item) => item.id === shipMarker.getExtData().id);
         if (!shipData) return;
         let [location, speed] = [shipData.calibratedLocation, shipData.velocity];
         let toDistance = {};
@@ -178,7 +180,7 @@ export default {
     },
     // 跳转详情
     goDetail(usvId) {
-      this.$router.push({path:'runstate', query:{usvId}});
+      this.$router.push({ path: 'runstate', query: { usvId } });
     }
   },
   watch: {
@@ -202,17 +204,23 @@ export default {
             // console.log(this.allShipTrack);
           }
           // 显示船只减少
-          if (oldValue.length === this.shipDataList.length + 1 && newValue.length === this.shipDataList.length) {
+          if (
+            oldValue.length === this.shipDataList.length + 1 &&
+            newValue.length === this.shipDataList.length
+          ) {
             for (let i = this.allShipTrack.length - 1; i >= 0; i--) {
-              if (!this.shipDataList.some(val => val.id == this.allShipTrack[i].id)) {
+              if (!this.shipDataList.some((val) => val.id == this.allShipTrack[i].id)) {
                 this.allShipTrack.splice(i, 1);
               }
             }
           }
           // 显示船只增加
-          if (oldValue.length === this.shipDataList.length - 1 && newValue.length === this.shipDataList.length) {
+          if (
+            oldValue.length === this.shipDataList.length - 1 &&
+            newValue.length === this.shipDataList.length
+          ) {
             for (let i = 0; i < this.shipDataList.length; i++) {
-              if (!this.allShipTrack.some(val => val.id == this.shipDataList[i].id)) {
+              if (!this.allShipTrack.some((val) => val.id == this.shipDataList[i].id)) {
                 var item = [];
                 item.id = this.shipDataList[i].id;
                 this.allShipTrack.push(item);
@@ -221,10 +229,14 @@ export default {
           }
           // 限制轨迹点数量
           for (let i = 0; i < this.shipDataList.length; i++) {
-            let track = this.allShipTrack.find(val => val.id === this.shipDataList[i].id);
+            let track = this.allShipTrack.find((val) => val.id === this.shipDataList[i].id);
             let lastPoint = track.length > 0 ? track[track.length - 1] : null;
             let currentPoint = this.shipDataList[i].calibratedLocation;
-            if (lastPoint == null || lastPoint[0] != currentPoint[0] || lastPoint[1] != currentPoint[1]) {
+            if (
+              lastPoint == null ||
+              lastPoint[0] != currentPoint[0] ||
+              lastPoint[1] != currentPoint[1]
+            ) {
               track.push(currentPoint);
               // 每条轨迹线最多10000个点
               if (track.length > 10000) {
@@ -255,12 +267,10 @@ export default {
       deep: true
     }
   },
-  created() {
-
-  },
+  created() {},
   mounted() {
     // 接收船只数据
-    bus.$on('shipRunningList', shipDataList => {
+    bus.$on('shipRunningList', (shipDataList) => {
       this.shipDataList = shipDataList;
     });
   },
@@ -284,6 +294,7 @@ export default {
   width: 250px;
   background: #f0f0f0;
   z-index: 1;
+  font-weight: bold;
 }
 /* 底部轨迹按钮 */
 .track-btn-part {

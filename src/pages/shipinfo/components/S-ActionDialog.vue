@@ -1,5 +1,5 @@
 <template>
-  <el-dialog title="执行计划" :visible.sync="isShow" width="30%" center @close="actionClose">
+  <el-dialog title="执行计划" :visible.sync="isShow" width="30%" center :before-close="actionClose">
     <el-form ref="actiomFrom" label-width="110px" :rules="actiomRules" :model="actiomFrom">
       <el-form-item label="选择计划" prop="planId">
         <el-select placeholder="请选择" v-model="actiomFrom.planId" clearable>
@@ -47,7 +47,7 @@ export default {
       actiomFrom: {
         planId: null,
         usvId: null,
-        returnMode: 1
+        returnMode: 1 //1直线返航 , 2原路返航
       },
       // 执行计划校验规则
       actiomRules: Object.freeze({
@@ -58,23 +58,37 @@ export default {
   async created() {
     const { data } = await apiGetPlan();
     this.planList = data.result;
-    console.log(this.planList);
   },
   methods: {
-    actionClose() {},
-    // 执行计划
+    /**
+     * dialog关闭之前的回调
+     */
+    actionClose() {
+      this.cancalClick();
+      this.$nextTick(() => {
+        this.$refs.actiomFrom.resetFields();
+      });
+    },
+    /**
+     * 执行计划
+     */
     async actionPlan() {
       this.$refs.actiomFrom.validate(async (val) => {
         if (val) {
-          this.actionPlanLoading = true;
-          const { errorCode } = await apiPostExecutePlan(this.actiomFrom);
-          if (+errorCode === 0) {
-            this.$message.success('开始执行计划');
-            this.getShipData();
-            this.$router.push({
-              path: 'runstate',
-              query: { usvId: this.actiomFrom.usvId }
-            });
+          try {
+            this.actionPlanLoading = true;
+            const { errorCode } = await apiPostExecutePlan(this.actiomFrom);
+            this.actionPlanLoading = false;
+            if (+errorCode === 0) {
+              this.cancalClick();
+              this.$message.success('开始执行计划');
+              this.$router.push({
+                path: 'runstate',
+                query: { usvId: this.actiomFrom.usvId }
+              });
+            }
+          } catch (error) {
+            this.actionPlanLoading = false;
           }
         }
       });
