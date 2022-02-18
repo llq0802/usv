@@ -100,7 +100,7 @@ export default {
       if (list == undefined) list = [];
       if (list && !list.length) {
         // 默认显示五条在线船只
-        const res = await apiGetShipByQuery({ Page: 1, Size: 9999 });
+        const res = await apiGetShipByQuery({ Page: 1, Size: 9999, 'Condition.States':[], 'Condition.Keyword': '' });
         if (res.errorCode !== 0) return;
         for (let ship of res.data.result) {
           if (list.length === 5) return;
@@ -111,6 +111,7 @@ export default {
       }
       else {
         // 更新船只状态
+        if (!list.length) return
         for(let ship of list) {
           const res = await apiGetShipById(ship.id);
           if (res.errorCode) return ship = null;
