@@ -11,7 +11,7 @@
         <template v-if="shipDataList.length">
           <el-amap-marker
             ref="shipMarker"
-            v-for="(ship, index) in shipDataList"
+            v-for="ship in shipDataList"
             :key="ship.id"
             :position="ship.calibratedLocation"
             :extData="ship"
@@ -190,7 +190,7 @@ export default {
         // 在开启轨迹的时候,绘制所有船只轨迹
         if (this.isOpenTrack) {
           // 先判断是否为点击'开启轨迹'而促发的脚本,即第一次绘制轨迹时调用
-          if (this.allShipTrack.length == 0) {
+          if (this.allShipTrack.length === 0) {
             // 打开定时器的条件
             this.timer = 'startSimple';
             for (let i = 0; i < this.shipDataList.length; i++) {
