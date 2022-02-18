@@ -56,7 +56,10 @@ export default {
   },
   computed: {
     items() {
-      return this.routes[0].children
+      const value = this.routes.find((item) => {
+        if (item.children && item.children.length > 0) return item;
+      });
+      return value.children
         .filter((item) => {
           if (item.path !== '/404' && !item.meta.hidden) return item;
         })

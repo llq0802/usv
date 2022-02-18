@@ -2,18 +2,27 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import { getStorage } from '@/utils/localStorage';
 import { checkTokenTime } from '@/utils/token';
-// import { Message } from 'element-ui';
+import { Message } from 'element-ui';
 const ICON = 'iconfont';
 Vue.use(Router);
 export const routes = [
   {
     path: '/',
+    redirect: '/login'
+  },
+  {
+    path: '/login',
+    component: () => import(/* webpackChunkName: "login" */ '../pages/login/Login.vue'),
+    meta: { title: '登录' }
+  },
+  {
+    path: '/usv',
     component: () => import(/* webpackChunkName: "home" */ '../components/common/layout/Index.vue'),
     meta: { title: '首页' },
     children: [
       //meta中hidden表示是否在侧边菜单栏中显示,默认显示,为true则不显示
       {
-        path: '/',
+        path: '/usv',
         component: () => import(/* webpackChunkName: "homepage" */ '../pages/home/HomePage.vue'),
         meta: { title: '运行状态', icon: `${ICON} icon-weizhi` }
       },
@@ -73,11 +82,7 @@ export const routes = [
       }
     ]
   },
-  {
-    path: '/login',
-    component: () => import(/* webpackChunkName: "login" */ '../pages/login/Login.vue'),
-    meta: { title: '登录' }
-  },
+
   {
     path: '*',
     redirect: '/404'
@@ -111,12 +116,12 @@ router.beforeEach((to, from, next) => {
     return next();
   } else {
     if (!token || isPast) {
-      // if (document.getElementsByClassName('el-message').length) return next('./login');
-      // Message({
-      //   message: '用户身份信息失效，请重新登录',
-      //   type: 'error',
-      //   duration: 4000
-      // });
+      if (document.getElementsByClassName('el-message').length) return next('./login');
+      Message({
+        message: '用户身份信息失效，请重新登录',
+        type: 'error',
+        duration: 4000
+      });
       return next('./login');
     } else {
       return next();

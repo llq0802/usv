@@ -1,8 +1,8 @@
 <template>
   <div>
     <span class="add-description">添加船舶</span>
-    <ship-search 
-      :queryShip="true" 
+    <ship-search
+      :queryShip="true"
       :autoClear="true"
       :placeholder="'请选择添加的船舶'"
       @selectShip="addShip"
@@ -38,7 +38,8 @@ import { apiGetPortByQuery } from 'api/port';
 
 export default {
   components: {
-    ShipSearch, ShowShipTable
+    ShipSearch,
+    ShowShipTable
   },
   data() {
     return {
@@ -48,8 +49,7 @@ export default {
       // 表头配置
       tableColumn: Object.freeze([
         { prop: 'displayName', label: '无人船名称', width: 150 },
-        { prop: 'runtimeInfo', label: '无人船状态', width: 50,
-          render: val => val.state},
+        { prop: 'runtimeInfo', label: '无人船状态', width: 50, render: (val) => val.state }
       ]),
       // 图标配置
       tableOption: Object.freeze({
@@ -70,13 +70,13 @@ export default {
       // ws连接id
       wsConnectId: null,
       // 船只数据
-      shipDataMap: new Map(),
-    }
+      shipDataMap: new Map()
+    };
   },
   methods: {
     // 添加显示的船只
     async addShip(ship) {
-      if (this.showList.some(v => v.id === ship.id)) {
+      if (this.showList.some((v) => v.id === ship.id)) {
         this.$message.warning(`需要添加的船只已经在列表中!`);
         return;
       }
@@ -91,7 +91,7 @@ export default {
     },
     // 查看船只
     viewShip(ship) {
-      console.log(ship)
+      console.log(ship);
     },
 
     // 页面重载时恢复数据
@@ -101,18 +101,19 @@ export default {
         // 默认显示五条在线船只
         const res = await apiGetShipByQuery({ Page: 1, Size: 9999 });
         if (!res.errorCode) return;
+        console.log(res.data);
         for (let ship of res.data.result) {
           if (list.length === 5) return;
           if (!ship.runtimeInfo.state) {
             list.push(ship);
           }
         }
-      }
-      else {
+      } else {
         // 更新船只状态
-        for(let ship of list) {
+        for (let ship of list) {
           const res = await apiGetShipById(ship.id);
-          if (res.errorCode) return ship = null;
+          if (res.errorCode) return;
+          console.log(res.data);
           ship = res.data;
         }
       }
@@ -122,11 +123,11 @@ export default {
     // 让选中的船只运动起来
     showShip() {
       // 如果订阅了事件，先取消
-      if(this.isSubsribed) {
+      if (this.isSubsribed) {
         this.isSubsribed = false;
         signalr.unsubscribe(this.subscribeId);
         for (let item of this.shipDataMap.values()) {
-          if (!this.showList.some(val => val.id === item.id)) {
+          if (!this.showList.some((val) => val.id === item.id)) {
             this.shipDataMap.delete(item.id);
           }
         }
@@ -136,15 +137,15 @@ export default {
         this.shipDataMap.clear();
       }
       // 定义事件队列
-      let eventsList = this.showList.map(ship => ({
+      let eventsList = this.showList.map((ship) => ({
         eventName: 'usvRuntimeInfoChanged',
         shipId: ship.id,
         // 事件流回调函数
-        callback: async data => {
+        callback: async (data) => {
           console.log(data);
           // 添加无人船名称
           if (this.showList.length) {
-            for(let ship of this.showList) {
+            for (let ship of this.showList) {
               if (ship.id === data.id) {
                 data.shipName = ship.displayName;
               }
@@ -160,23 +161,22 @@ export default {
           this.shipDataMap.set(data.id, data);
         }
       }));
-    
+
       // 连接ws,订阅事件
-      this.wsConnectId = signalr.connected(()=>{
+      this.wsConnectId = signalr.connected(() => {
         // 传入事件名,和所需要的arr参数
-        signalr.subscribeAll(eventsList).then(data => {
+        signalr.subscribeAll(eventsList).then((data) => {
           this.isSubsribed = true;
-          console.log(data)
+          console.log(data);
           // 保存编码,是取消事件流的唯一标识
           if (data) {
             this.subscribeId = data;
           } else {
             this.$message.error(`指定的无人船不存在或者用户没有访问指定无人船的权限`);
           }
-        })
+        });
       });
-    },
-    
+    }
   },
   watch: {
     shipDataMap: {
@@ -185,7 +185,7 @@ export default {
         let shipDataList = Array.from(this.shipData.values());
         bus.$emit('shipRunningList', shipDataList);
       },
-      deep: true,
+      deep: true
     }
   },
   // 更新后
@@ -204,8 +204,8 @@ export default {
     // 关闭事件流
     signalr.unsubscribe(this.subscribeId);
     signalr.unconnected(this.wsConnectId);
-  },
-}
+  }
+};
 </script>
 
 <style lang="less" scoped>
@@ -218,7 +218,8 @@ export default {
 /deep/ .keyword-search-area {
   width: 160px;
   display: inline-block;
-  .el-form-item--mini.el-form-item, .el-form-item--small.el-form-item {
+  .el-form-item--mini.el-form-item,
+  .el-form-item--small.el-form-item {
     margin-bottom: 0;
   }
 }

@@ -83,7 +83,7 @@ export default {
                 setStorage('organizationId', arrayToken[5]);
                 this.loginLoading = false;
                 this.$message.success(MESSAGE.loginSuccess);
-                this.$router.push('/');
+                this.$router.push('/usv');
               }
             }
           } catch (error) {

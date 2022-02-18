@@ -10,6 +10,17 @@ import './plugins/signalR';
 
 Vue.config.productionTip = false;
 Vue.config.devtools = true;
+// Object.prototype[Symbol.iterator] = function () {
+//   let index = 0;
+//   return {
+//     next: (val) => {
+//       return {
+//         value: index++,
+//         done: index < val.length
+//       };
+//     };
+//   }
+// };
 
 new Vue({
   router,
