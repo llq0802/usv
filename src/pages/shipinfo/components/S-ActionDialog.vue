@@ -68,11 +68,11 @@ export default {
         if (val) {
           this.actionPlanLoading = true;
           const { errorCode } = await apiPostExecutePlan(this.actiomFrom);
-          if (errorCode === 0) {
+          if (+errorCode === 0) {
             this.$message.success('开始执行计划');
             this.getShipData();
             this.$router.push({
-              path: `actionplan`,
+              path: 'runstate',
               query: { usvId: this.actiomFrom.usvId }
             });
           }
