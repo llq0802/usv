@@ -31,7 +31,12 @@
       :organInfoList="organInfoList"
     />
     <!-- 无人船弹运行状态组件 -->
-    <state-info :isShow.sync="isShowState" :currentRow="currentRow" />
+    <state-info
+      :isShow.sync="isShowState"
+      :currentRow="currentRow"
+      :shipRealTimeStatus="shipRealTimeStatus"
+      @closeWS="closeWS"
+    />
     <!-- 无人船弹修改配置组件 -->
     <edit-config :isShow.sync="isShowConfig" :currentRow="currentRow" />
     <!-- 执行计划 -->
@@ -62,6 +67,7 @@ import * as liveApi from 'api/camera';
 import { PAGE_SIZE, BASE_CONSTANTS } from '@/config';
 import { checkTokenTime } from '@/utils/token';
 import { confirmMsg } from '@/utils';
+import * as signalr from '@/utils/signalR';
 import { turnLngLat, turnLngLatObj, str2Path } from '@/utils/handleLngLat';
 
 export default {
@@ -172,7 +178,12 @@ export default {
             methods: this.handleDelShip
           }
         ]
-      }
+      },
+      // 订阅id
+      subscribeId: null,
+      wsConnectedCbHandle: 0,
+      // 无人船实时状态
+      shipRealTimeStatus: {}
     };
   },
   created() {
@@ -269,7 +280,7 @@ export default {
     /**
      * 点击下拉菜单项
      */
-    dropdownChange(val) {
+    async dropdownChange(val) {
       if (val === 'editInfo') {
         this.title = 'edit';
         this.isShowEditAdd = true;
@@ -279,6 +290,9 @@ export default {
         this.handleSetReturnHome();
       } else if (val === 'viewStatusInfo') {
         this.isShowState = true;
+        // 开启websocket
+        await signalr.start(true);
+        this.wsConnectedCbHandle = signalr.connected(this.showShipStatusInfo);
       } else if (val === 'config') {
         this.getConfigShip();
       } else if (val === 'viewRunStatus') {
@@ -288,10 +302,8 @@ export default {
         // //30秒检查一次token是否快过期,还有3600秒,给新的token
         this.checkTokenInterval = setInterval(() => {
           if (checkTokenTime(this.videoData.cTime, 3600)) getOnlineVideoToken();
-          console.log('checkTokenInterval');
         }, 3e4);
       } else if (val === 'actionPlan') {
-        console.log('actionPlan');
         this.$refs.actionDialog.actiomFrom.usvId = this.currentRow.id;
         this.isShowAction = true;
       }
@@ -317,7 +329,6 @@ export default {
         this.videoData.exp = result.data.expiry;
         this.videoData.cTime = +(new Date(result.data.expiry).getTime() / 1000);
         this.videoData.token = result.data.token;
-        console.log(this.videoData);
       }
     },
 
@@ -362,6 +373,29 @@ export default {
           query: { usvId: this.currentRow.id }
         });
       }
+    },
+    // 查看状态信息的事件流函数
+    showShipStatusInfo() {
+      // 传入事件名,id,和回调函数
+      signalr
+        .subscribe('usvRuntimeInfoChanged', this.currentRow.id, (data) => {
+          // console.log(data);
+        })
+        .then((data) => {
+          // console.log(data);
+          this.shipRealTimeStatus = data;
+          // 保存编码,是取消事件流的唯一标识
+          if (data) {
+            this.subscribeId = data;
+          } else {
+            this.$message.error(`指定的无人船不存在或者用户没有访问指定无人船的权限`);
+          }
+        });
+    },
+    // 取消订阅事件
+    closeWS() {
+      signalr.unsubscribe([this.subscribeId]);
+      signalr.unconnected(this.wsConnectedCbHandle);
     }
   }
 };

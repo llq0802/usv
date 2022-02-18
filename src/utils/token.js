@@ -14,7 +14,6 @@ export const updateToken = async (timer = 1800, config) => {
   // token过期时间减去当前时间的值大于0 表示没过期,并且离过期时间还有1800秒时就更新token,
   if (res > 0 && res < timer) {
     const { data, errorCode } = await apiRefreshToken(config.headers.Authorization);
-    console.log('执行了更新token的请求', data);
     if (+errorCode !== 0) return;
     if (data && data.token) {
       //解析token

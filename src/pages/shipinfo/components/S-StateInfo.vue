@@ -4,7 +4,7 @@
     :visible.sync="isShow"
     width="40%"
     center
-    :before-close="cancalClick"
+    :before-close="handleClose"
     @open="openDialog"
   >
     <el-form ref="form" label-width="100px" :model="form">
@@ -97,6 +97,9 @@ export default {
     currentRow: {
       type: Object,
       default: () => {}
+    },
+    shipRealTimeStatus: {
+      type: Object,
     }
   },
   data() {
@@ -150,13 +153,32 @@ export default {
         this.form = runInfo;
       });
     },
-
+    handleClose(){
+      this.cancalClick()
+      this.$emit('closeWS');
+    },
     /**
      * 取消
      */
     cancalClick() {
       this.$emit('update:isShow');
     }
+  },
+  watch: {
+    shipRealTimeStatus: {
+      handler() {
+        if (this.shipRealTimeStatus) {
+          for (let key in this.form) {
+            if (!this.shipRealTimeStatus.hasOwnProperty(key)) return
+            this.form[key] = this.shipRealTimeStatus[key];
+          }
+        }
+      },
+      deep: true
+    }
+  },
+  created() {
+    
   }
 };
 </script>

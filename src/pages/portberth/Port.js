@@ -168,7 +168,7 @@ export default {
       this.isClickMap = true;
       this.isRequest = false;
       this.$message.info('开启了港口添加，请点击地图');
-      console.log('点击了新增港口按钮');
+      // console.log('点击了新增港口按钮');
     },
     /**
      * 点击了泊位,端点,过渡路径,程序的新增按钮

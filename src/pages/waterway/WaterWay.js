@@ -319,7 +319,7 @@ export default {
 
       //新增模式 手动规划  false,1
       else if (wayAddData.isClick && wayAddData.plan === 1) {
-        console.log('新增模式下,手动规划');
+        // console.log('新增模式下,手动规划');
         if (!navaList.length) {
           // 手动规划新增
           this.$set(navaList, navaList.length, {

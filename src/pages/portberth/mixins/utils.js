@@ -92,12 +92,12 @@ export default {
         if (this.navaList.some((item) => item.id === startMinPoint.id)) {
           addTransitionData.direction = 1; //1进港-航道
           addTransitionData.type = 2;
-          console.log('获得最近航标');
+          // console.log('获得最近航标');
         } else if (this.berthList.some((item) => item.id === startMinPoint.id)) {
           // 通过最短的点找到这个点是否在泊位中
           addTransitionData.direction = 2; //2离港-泊位
           addTransitionData.type = 1;
-          console.log('获得最近泊位');
+          // console.log('获得最近泊位');
         }
         //存储最近的开始点
         this.$set(addTransitionData, 'startMinPoint', startMinPoint);
@@ -111,7 +111,6 @@ export default {
       // let endBerthPoint = this.getMinPoint(addTransitionData.path, this.berthList);
       //点到泊位范围的距离
       let endBerthPoint = this.getDistanceToLine(addTransitionData.path, this.berthList);
-      console.log(endBerthPoint);
       let endPoint = this.getMinPoint(addTransitionData.path, this.pointList);
       // 比较在 泊位点 航标点 端点当中距离最短的结束点
       let endTempArr = this.navaList.length
@@ -145,7 +144,6 @@ export default {
         addTransitionData.type = 1;
         addTransitionData.direction = 1;
       }
-      console.log(addTransitionData);
     }
   }
 };

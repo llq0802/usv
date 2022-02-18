@@ -23,9 +23,7 @@ export default {
     }
   },
   methods: {},
-  mounted() {
-    console.log(this.dataList);
-  }
+  mounted() {}
 };
 </script>
 <style lang="less" scoped>

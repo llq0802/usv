@@ -7,7 +7,6 @@ import router from '@/router';
 import { Message } from 'element-ui';
 import NProgress from 'nprogress';
 import qs from 'qs';
-const msgCallBacks = [];
 const service = axios.create({
   baseURL: process.env.NODE_ENV === 'development' ? API : process.env.VUE_APP_API_BASE_PATH + API, //来判断是否开发环境
   timeout: 5000
@@ -50,16 +49,11 @@ service.interceptors.response.use(
       }
       // 响应请求为200,但是有错误提示时,统一提示给用户
       if (response.data.errorCode !== 0 && response.data.message) {
-        // if (msgCallBacks.length > 0) return response.data;
         if (document.getElementsByClassName('el-message').length) return response.data;
-        // msgCallBacks.push(Message);
         Message({
           message: response.data.message,
           type: 'error'
         });
-        // setTimeout(() => {
-        //   msgCallBacks.pop();
-        // });
         return response.data;
       }
     } else {

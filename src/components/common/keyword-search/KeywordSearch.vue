@@ -318,7 +318,6 @@ export default {
       if (+errorCode !== 0) return;
       this.total = data.total;
       this.navaAndWayList = data.result;
-      console.log(this.navaAndWayList);
     },
     // 关键字航道航标港口数据
     async filterNavaAndWayList(keyword) {
@@ -349,7 +348,6 @@ export default {
       if (res.errorCode !== 0) return;
       for (let item of res.data.result) {
         this.navaAndWayList.push(item);
-        console.log('获取下一页数据', this.navaAndWayList.length);
       }
     },
     selectNavaAndWay(id) {

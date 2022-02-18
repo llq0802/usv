@@ -77,7 +77,7 @@ export default {
      */
     async addPort() {
       const identReg = /^[A-Z]{4}$/;
-      console.log(this.addPortData);
+      // console.log(this.addPortData);
       let data = deepClone(this.addPortData);
       if (!identReg.test(data.ident)) {
         this.$message.warning('标识应由四个大写字母组成');
@@ -90,7 +90,7 @@ export default {
       }
       data.location = `${data.latitude},${data.longitude}`;
       const { errorCode } = await portApi.apiAddPort(data);
-      console.log(data);
+      // console.log(data);
       if (+errorCode === 0) {
         data = null; //清理内存
         await this.getPortList(this.publicQuery);
@@ -140,7 +140,7 @@ export default {
       data.Id = this.currentPort.id;
       data.Location = `${data.latitude},${data.longitude}`;
       const { errorCode } = await portApi.apiAddPoint(data);
-      console.log(data);
+      // console.log(data);
       if (+errorCode === 0) {
         data = null; //清理内存
         await this.getPointList(this.currentPort.id);

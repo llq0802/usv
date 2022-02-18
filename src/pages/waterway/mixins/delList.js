@@ -45,7 +45,6 @@ export default {
         currentWayComponent.currentWay.departure.navaid.ident = navaList[0].navaid.ident;
         currentWayComponent.currentWay.destination.navaid.ident =
           navaList[navaList.length - 1].navaid.ident;
-        console.log(navaList);
       }
       this.currentNava = navaList[navaList.length - 1].navaid;
       this.showLineAndDistance();

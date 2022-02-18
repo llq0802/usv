@@ -45,9 +45,9 @@ export default {
         this.player.stop();
         this.player = null;
         this.$refs.videoRef.innerHTML = '';
-        console.log('showPlayer-stop');
+        // console.log('showPlayer-stop');
       }
-      console.log('showPlayer-start');
+      // console.log('showPlayer-start');
       if (this.url && this.accessToken) {
         // 创建实例
         this.player = new EZUIKit.EZUIKitPlayer({
@@ -58,10 +58,10 @@ export default {
           audio: 1, // 是否默认开启声音 0 - 关闭 1 - 开启
           autoplay: this.autoplay,
           handleSuccess: () => {
-            console.log('EZUIKit', '成功');
+            // console.log('EZUIKit', '成功');
           },
           handleError: () => {
-            console.log('EZUIKit', '出错');
+            // console.log('EZUIKit', '出错');
           },
           width: this.width,
           height: this.height

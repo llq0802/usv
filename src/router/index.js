@@ -45,7 +45,7 @@ export const routes = [
       {
         path: '/chartshow',
         component: () =>
-          import(/* webpackChunkName: "portberth" */ '../pages/chartshow/ChartShow.vue'),
+          import(/* webpackChunkName: "chartshow" */ '../pages/chartshow/ChartShow.vue'),
         meta: { title: '航图展示管理', icon: `${ICON} icon-chart` }
       },
       {
@@ -78,11 +78,11 @@ export const routes = [
       },
       {
         path: '/404',
-        component: () => import(/* webpackChunkName: "404" */ '../pages/404/404.vue')
+        component: () => import(/* webpackChunkName: "404" */ '../pages/404/404.vue'),
+        meta: { title: '404', hidden: true }
       }
     ]
   },
-
   {
     path: '*',
     redirect: '/404'

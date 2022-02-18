@@ -1,6 +1,6 @@
 module.exports = {
   // 打包时需要配置该三个选项
-  publicPath: './',
+  publicPath: '/',
   outputDir: 'dist',
   assetsDir: 'static',
   lintOnSave: process.env.NODE_ENV !== 'production',

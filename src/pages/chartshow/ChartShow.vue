@@ -187,7 +187,7 @@ export default {
           // 获得父组件航道信息框是否打开
           this.currentWay = waterway;
           this.currentWay.lnglat = e.lnglat;
-          console.log('打开父组件航道信息框', waterway);
+          // console.log('打开父组件航道信息框', waterway);
           this.$nextTick(() => {
             this.$refs.waterwayLine.$$getInstance().setOptions({ showDir: true });
           });

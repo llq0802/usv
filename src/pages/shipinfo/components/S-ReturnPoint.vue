@@ -82,7 +82,7 @@ export default {
     handleClose() {
       this.cancalClick();
       this.$nextTick(() => {
-        console.log('dialog关闭之前的回调');
+        // console.log('dialog关闭之前的回调');
       });
     },
     async updateEdit() {
