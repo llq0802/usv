@@ -68,7 +68,6 @@ export default {
     };
   },
   created() {
-    console.log(organApi);
     this.getOrganList();
   },
   mounted() {},
