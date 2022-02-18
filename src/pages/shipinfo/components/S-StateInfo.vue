@@ -169,6 +169,7 @@ export default {
       handler() {
         if (this.shipRealTimeStatus) {
           for (let key in this.form) {
+            if (!this.shipRealTimeStatus.hasOwnProperty(key)) return
             this.form[key] = this.shipRealTimeStatus[key];
           }
         }
